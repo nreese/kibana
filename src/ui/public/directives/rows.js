@@ -32,7 +32,7 @@ module.directive('kbnRows', function ($compile, $rootScope, getAppState, Private
         };
 
         if (contents instanceof AggConfigResult) {
-          if (contents.type === 'bucket' && contents.aggConfig.field() && contents.aggConfig.field().filterable) {
+          if (contents.type === 'bucket' && contents.aggConfig.getField() && contents.aggConfig.getField().filterable) {
             $cell = createAggConfigResultCell(contents);
           }
           contents = contents.toString('html');
@@ -51,6 +51,10 @@ module.directive('kbnRows', function ($compile, $rootScope, getAppState, Private
             $cell = $compile($cell.html(contents.markup))(contents.scope);
           } else {
             $cell.html(contents.markup);
+          }
+
+          if (contents.attr) {
+            $cell.attr(contents.attr);
           }
         } else {
           if (contents === '') {

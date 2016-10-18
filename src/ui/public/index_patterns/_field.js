@@ -42,6 +42,9 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
     let scripted = !!spec.scripted;
     let sortable = spec.name === '_score' || ((indexed || scripted) && type.sortable);
     let filterable = spec.name === '_id' || scripted || (indexed && type.filterable);
+    let searchable = !!spec.searchable || scripted;
+    let aggregatable = !!spec.aggregatable || scripted;
+    let visualizable = aggregatable;
 
     obj.fact('name');
     obj.fact('type');
@@ -57,15 +60,23 @@ export default function FieldObjectProvider(Private, shortDotsFilter, $rootScope
     obj.fact('analyzed', !!spec.analyzed);
     obj.fact('doc_values', !!spec.doc_values);
 
+    // stats
+    obj.fact('searchable', searchable);
+    obj.fact('aggregatable', aggregatable);
+
     // usage flags, read-only and won't be saved
     obj.comp('format', format);
     obj.comp('sortable', sortable);
     obj.comp('filterable', filterable);
+    obj.comp('visualizable', visualizable);
 
     // computed values
     obj.comp('indexPattern', indexPattern);
     obj.comp('displayName', shortDotsFilter(spec.name));
     obj.comp('$$spec', spec);
+
+    // conflict info
+    obj.writ('conflictDescriptions');
 
     return obj.create();
   }

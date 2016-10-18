@@ -9,6 +9,8 @@ import VisRenderbotProvider from 'ui/vis/renderbot';
 import VislibVisTypeVislibRenderbotProvider from 'ui/vislib_vis_type/vislib_renderbot';
 import PersistedStatePersistedStateProvider from 'ui/persisted_state/persisted_state';
 import AggResponseIndexProvider from 'ui/agg_response/index';
+import noDigestPromises from 'test_utils/no_digest_promises';
+
 describe('renderbot', function exportWrapper() {
   let vislib;
   let Vis;
@@ -119,6 +121,8 @@ describe('renderbot', function exportWrapper() {
   });
 
   describe('render', function () {
+    noDigestPromises.activateForSuite();
+
     let vis = { type: mockVisType, isHierarchical: _.constant(false) };
     let $el = $('<div>testing</div>');
     let stubs = {};
@@ -134,10 +138,11 @@ describe('renderbot', function exportWrapper() {
       let buildStub = sinon.stub(renderbot, 'buildChartData', _.constant(football));
       let renderStub = sinon.stub(renderbot.vislibVis, 'render');
 
-      renderbot.render('flat data', persistedState);
-      expect(renderStub.callCount).to.be(1);
-      expect(buildStub.callCount).to.be(1);
-      expect(renderStub.firstCall.args[0]).to.be(football);
+      return renderbot.render('flat data', persistedState).then(() => {
+        expect(renderStub.callCount).to.be(1);
+        expect(buildStub.callCount).to.be(1);
+        expect(renderStub.firstCall.args[0]).to.be(football);
+      });
     });
   });
 

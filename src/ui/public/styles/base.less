@@ -130,7 +130,7 @@ a {
   cursor: default;
 }
 
-[ng-click], [clip-copy], [href], [confirm-click] {
+.link, [ng-click], [clip-copy], [href], [confirm-click] {
   cursor: pointer;
 }
 
@@ -215,16 +215,6 @@ a {
 
 .navbtn-inverse {
   .button-variant(@navbar-default-color; @navbar-default-bg; @navbar-default-border);
-}
-
-// right section of the main nav base
-.navbar-static-top .navbar-right {
-  font-size: @font-size-small;
-
-  .loading-spinner {
-    color: @navbar-inverse-brand-hover-color;
-    vertical-align: middle;
-  }
 }
 
 .navbar-timepicker {
@@ -315,6 +305,12 @@ table {
 
 //== breadCrumbsTemplate
 bread-crumbs {
+  display: block;
+
+  &.bread-crumbs--navbar {
+    background-color: @navbar-default-bg;
+  }
+
   ul {
     margin: 0;
     padding: 8px 10px;
@@ -625,6 +621,10 @@ fieldset {
     padding: 7px 10px;
   }
 
+  .panel-heading--clickable {
+    cursor: pointer;
+  }
+
   .panel-heading-elasticsearch,
   .panel-heading-kibana,
   .panel-heading-beats,
@@ -660,4 +660,14 @@ fieldset {
   }
 }
 
-@import (reference) "~dragula/dist/dragula.css";
+.page-row {
+  padding: 0 10px;
+  margin: 10px 0;
+}
+
+.page-row-text {
+  color: @kibanaGray2;
+  font-size: 14px;
+}
+
+@import "~dragula/dist/dragula.css";

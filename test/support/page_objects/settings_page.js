@@ -1,5 +1,5 @@
 
-import Bluebird from 'bluebird';
+import Bluebird, { map as mapAsync } from 'bluebird';
 
 import {
   defaultFindTimeout,
@@ -28,10 +28,6 @@ export default class SettingsPage {
 
   clickKibanaIndicies() {
     return this.clickLinkText('Index Patterns');
-  }
-
-  clickExistingData() {
-    return this.clickLinkText('Existing Data');
   }
 
   getAdvancedSettings(propertyName) {
@@ -231,9 +227,11 @@ export default class SettingsPage {
     });
   }
 
-  getPageFieldCount() {
-    return this.remote.setFindTimeout(defaultFindTimeout)
-    .findAllByCssSelector('div.agg-table-paginated table.table.table-condensed tbody tr td.ng-scope:nth-child(1) span.ng-binding');
+  async getFieldNames() {
+    const fieldNameCells = await PageObjects.common.findAllTestSubjects('editIndexPattern indexedFieldName');
+    return await mapAsync(fieldNameCells, async cell => {
+      return (await cell.getVisibleText()).trim();
+    });
   }
 
   goToPage(pageNum) {
@@ -307,7 +305,7 @@ export default class SettingsPage {
     return PageObjects.common.try(() => {
       return this.navigateTo()
         .then(() => {
-          return this.clickExistingData();
+          return this.clickKibanaIndicies();
         })
         .then(() => {
           return this.selectTimeFieldOption('@timestamp');

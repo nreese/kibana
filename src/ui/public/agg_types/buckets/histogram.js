@@ -16,7 +16,7 @@ export default function HistogramAggDefinition(Private) {
     title: 'Histogram',
     ordered: {},
     makeLabel: function (aggConfig) {
-      return aggConfig.params.field.displayName;
+      return aggConfig.getFieldDisplayName();
     },
     createFilter: createFilter,
     params: [
@@ -29,7 +29,7 @@ export default function HistogramAggDefinition(Private) {
         name: 'interval',
         editor: intervalTemplate,
         write: function (aggConfig, output) {
-          output.params.interval = parseInt(aggConfig.params.interval, 10);
+          output.params.interval = parseFloat(aggConfig.params.interval);
         }
       },
 
@@ -40,6 +40,8 @@ export default function HistogramAggDefinition(Private) {
         write: function (aggConfig, output) {
           if (aggConfig.params.min_doc_count) {
             output.params.min_doc_count = 0;
+          } else {
+            output.params.min_doc_count = 1;
           }
         }
       },

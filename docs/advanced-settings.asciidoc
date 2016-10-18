@@ -1,13 +1,13 @@
 [[kibana-settings-reference]]
 
-WARNING: Modifying the following settings can signficantly affect Kibana's performance and cause problems that are
+WARNING: Modifying the following settings can significantly affect Kibana's performance and cause problems that are
 difficult to diagnose. Setting a property's value to a blank field will revert to the default behavior, which may not be
 compatible with other configuration settings. Deleting a custom setting removes it from Kibana permanently.
 
 .Kibana Settings Reference
 [horizontal]
 `query:queryString:options`:: Options for the Lucene query string parser.
-`sort:options`:: Options for the Elasticsearch https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html[sort] parameter.
+`sort:options`:: Options for the Elasticsearch {ref}/search-request-sort.html[sort] parameter.
 `dateFormat`:: The format to use for displaying pretty-formatted dates.
 `dateFormat:tz`:: The timezone that Kibana uses. The default value of `Browser` uses the timezone detected by the browser.
 `dateFormat:scaled`:: These values define the format used to render ordered time-based data. Formatted timestamps must
@@ -18,7 +18,7 @@ adapt to the interval between measurements. Keys are http://en.wikipedia.org/wik
 `metaFields`:: An array of fields outside of `_source`. Kibana merges these fields into the document when displaying the
 document.
 `discover:sampleSize`:: The number of rows to show in the Discover table.
-`doc_table:highlight`:: Highlight results in Discover and Saved Searches Dashboard. Highlighing makes request slow when
+`doc_table:highlight`:: Highlight results in Discover and Saved Searches Dashboard. Highlighting makes request slow when
 working on big documents. Set this property to `false` to disable highlighting.
 `courier:maxSegmentCount`:: Kibana splits requests in the Discover app into segments to limit the size of requests sent to
 the Elasticsearch cluster. This setting constrains the length of the segment list. Long segment lists can significantly
@@ -28,7 +28,7 @@ increase request processing time.
 `histogram:maxBars`:: Date histograms are not generated with more bars than the value of this property, scaling values
 when necessary.
 `visualization:tileMap:maxPrecision`:: The maximum geoHash precision displayed on tile maps: 7 is high, 10 is very high,
-12 is the maximum. http://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html#_cell_dimensions_at_the_equator[Explanation of cell dimensions].
+12 is the maximum. {ref}/search-aggregations-bucket-geohashgrid-aggregation.html#_cell_dimensions_at_the_equator[Explanation of cell dimensions].
 `visualization:tileMap:WMSdefaults`:: Default properties for the WMS map server support in the tile map.
 `visualization:colorMapping`:: Maps values to specified colors within visualizations.
 `visualization:loadingDelay`:: Time to wait before dimming visualizations during query.

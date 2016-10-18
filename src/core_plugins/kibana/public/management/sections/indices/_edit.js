@@ -17,7 +17,7 @@ uiRoutes
     indexPattern: function ($route, courier) {
       return courier.indexPatterns
         .get($route.current.params.indexPatternId)
-        .catch(courier.redirectWhenMissing('/management/data/index'));
+        .catch(courier.redirectWhenMissing('/management/kibana/index'));
     }
   }
 });
@@ -27,7 +27,7 @@ uiRoutes
   resolve: {
     redirect: function ($location, config) {
       const defaultIndex = config.get('defaultIndex');
-      let path = '/management/data/index';
+      let path = '/management/kibana/index';
 
       if (defaultIndex) {
         path = `/management/kibana/indices/${defaultIndex}`;
@@ -81,11 +81,10 @@ uiModules.get('apps/management')
       }
     }
 
-    ingest.delete($scope.indexPattern.id)
-    .then($scope.indexPattern.destroy.bind($scope.indexPattern))
+    courier.indexPatterns.delete($scope.indexPattern)
     .then(refreshKibanaIndex)
     .then(function () {
-      $location.url('/management/data/index');
+      $location.url('/management/kibana/index');
     })
     .catch(notify.fatal);
   };
