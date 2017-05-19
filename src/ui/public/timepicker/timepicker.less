@@ -1,4 +1,22 @@
 @import '../styles/bootstrap/variables.less';
+.kbnTimepickerQuickPanel {
+  display: flex;
+}
+  .kbnTimepickerQuickPanel__list {
+    & + & {
+      margin-left: 10px;
+    }
+  }
+
+.kbnTimepickerRelativePanel {
+  display: flex;
+}
+  .kbnTimepickerRelativePanel__list {
+    & + & {
+      margin-left: 10px;
+    }
+  }
+
 .kbn-timepicker {
   [kbn-time-input] {
     text-align: center;
@@ -8,7 +26,7 @@
   }
   .kbn-timepicker-section {
     float: left;
-    padding: 0px 15px;
+    padding: 0px 10px;
   }
   .kbn-refresh-section {
     float: left;
