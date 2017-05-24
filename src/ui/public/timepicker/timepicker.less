@@ -3,6 +3,11 @@
   display: flex;
   justify-content: flex-end;
 
+  .kbn-timepicker-content {
+    width: 100%;
+    max-width: 600px;
+  }
+
   [kbn-time-input] {
     text-align: center;
   }
@@ -17,7 +22,11 @@
     display: flex;
     align-itmes: top;
     justify-content: stretch;
-    width: 600px;
+    width: 100%;
+
+    @media (max-width: 660px) {
+      flex-direction: column;
+    }
   }
   .kbn-timepicker-body-column {
     width: 100%;
