@@ -14,6 +14,18 @@ export function VislibVisualizationsColumnChartProvider(Private) {
   };
 
   /**
+   * Histogram intervals are not always equal widths, e.g, monthly time intervals.
+   * It is more visually appealing to vary bar width so that gutter width is constant.
+   */
+  function datumWidth(defaultWidth, datum, nextDatum, scale, gutterWidth, groupCount = 1) {
+    let datumWidth = defaultWidth;
+    if (nextDatum) {
+      datumWidth = ((scale(nextDatum.x) - scale(datum.x)) - gutterWidth) / groupCount;
+    }
+    return datumWidth;
+  }
+
+  /**
    * Vertical Bar Chart Visualization: renders vertical and/or stacked bars
    *
    * @class ColumnChart
@@ -108,19 +120,6 @@ export function VislibVisualizationsColumnChartProvider(Private) {
         barWidth = intervalWidth - gutterWidth;
       }
 
-      /**
-       * Histogram intervals are not always equal widths, e.g, monthly time intervals.
-       * It is more visually appealing to vary bar width so that gutter width is constant.
-       */
-      function datumWidth(d, i) {
-        let datumWidth = barWidth;
-        const nextDatum = bars.data()[i + 1];
-        if (nextDatum) {
-          datumWidth = (xScale(nextDatum.x) - xScale(d.x)) - gutterWidth;
-        }
-        return datumWidth;
-      }
-
       function x(d) {
         const groupPosition = isTimeScale ? barWidth * groupNum : xScale.rangeBand() / groupNum;
         return xScale(d.x) + groupPosition;
@@ -135,7 +134,7 @@ export function VislibVisualizationsColumnChartProvider(Private) {
 
       function widthFunc(d, i) {
         if (isTimeScale) {
-          return datumWidth(d, i);
+          return datumWidth(barWidth, d, bars.data()[i + 1], xScale, gutterWidth);
         }
         return xScale.rangeBand();
       }
@@ -189,22 +188,9 @@ export function VislibVisualizationsColumnChartProvider(Private) {
         barWidth = (intervalWidth - gutterWidth) / groupCount;
       }
 
-      /**
-       * Histogram intervals are not always equal widths, e.g, monthly time intervals.
-       * It is more visually appealing to vary bar width so that gutter width is constant.
-       */
-      function datumWidth(d, i) {
-        let datumWidth = barWidth;
-        const nextDatum = bars.data()[i + 1];
-        if (nextDatum) {
-          datumWidth = ((xScale(nextDatum.x) - xScale(d.x)) - gutterWidth) / groupCount;
-        }
-        return datumWidth;
-      }
-
       function x(d, i) {
         if (isTimeScale) {
-          return xScale(d.x) + datumWidth(d, i) * groupNum;
+          return xScale(d.x) + datumWidth(barWidth, d, bars.data()[i + 1], xScale, gutterWidth, groupCount) * groupNum;
         }
         return xScale(d.x) + xScale.rangeBand() / groupCount * groupNum;
       }
@@ -223,7 +209,7 @@ export function VislibVisualizationsColumnChartProvider(Private) {
         }
 
         if (isTimeScale) {
-          return datumWidth(d, i);
+          return datumWidth(barWidth, d, bars.data()[i + 1], xScale, gutterWidth, groupCount);
         }
         return xScale.rangeBand() / groupCount;
       }
