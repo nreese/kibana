@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { contentTypesSetup } from 'ui/index_patterns/_field_format/content_types';
+import { contentTypesSetup } from './content_types';
 
 export function FieldFormat(params) {
   // give the constructor a more appropriate name

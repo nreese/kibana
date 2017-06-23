@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import numeral from 'numeral';
-import { FieldFormat } from 'ui/index_patterns/_field_format/field_format';
+import { FieldFormat } from '../field_format';
 
 const numeralInst = numeral();
 

@@ -1,6 +1,6 @@
-import _ from 'lodash';
+import { _ } from '../../utils/lodash_mixins/extend_lodash';
 import { DEFAULT_COLOR } from './color_default';
-import { FieldFormat } from 'ui/index_patterns/_field_format/field_format';
+import { FieldFormat } from '../field_format';
 
 export function stringifyColor() {
 

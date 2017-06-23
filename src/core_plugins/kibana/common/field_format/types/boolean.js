@@ -1,4 +1,4 @@
-import { FieldFormat } from 'ui/index_patterns/_field_format/field_format';
+import { FieldFormat } from '../field_format';
 import _ from 'lodash';
 
 export function stringifyBoolean() {

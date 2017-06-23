@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { getHighlightHtml } from 'ui/highlight';
+import { getHighlightHtml } from '../highlight/highlight_html';
 
 const types = {
   html: function (format, convert) {

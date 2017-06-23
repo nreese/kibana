@@ -1,4 +1,4 @@
-import { Numeral } from 'ui/stringify/types/_numeral';
+import { Numeral } from './_numeral';
 
 export function stringifyNumber() {
   return Numeral.factory({

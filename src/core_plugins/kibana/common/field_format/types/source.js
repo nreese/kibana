@@ -1,10 +1,10 @@
 import _ from 'lodash';
-import { noWhiteSpace } from 'ui/utils/no_white_space';
-import { toJson } from 'ui/utils/aggressive_parse';
-import { FieldFormat } from 'ui/index_patterns/_field_format/field_format';
+import { noWhiteSpace } from '../../utils/no_white_space';
+import { toJson } from '../../utils/aggressive_parse';
+import { FieldFormat } from '../field_format';
 
 export function stringifySource() {
-  const template = _.template(noWhiteSpace(require('ui/stringify/types/_source.html')));
+  const template = _.template(noWhiteSpace(require('./_source.html')));
 
   _.class(Source).inherits(FieldFormat);
   function Source(params, getConfig) {

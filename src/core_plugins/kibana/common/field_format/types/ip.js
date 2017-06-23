@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { FieldFormat } from 'ui/index_patterns/_field_format/field_format';
+import { FieldFormat } from '../field_format';
 
 export function stringifyIp() {
   _.class(Ip).inherits(FieldFormat);

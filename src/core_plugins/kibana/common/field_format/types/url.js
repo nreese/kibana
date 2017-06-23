@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { FieldFormat } from 'ui/index_patterns/_field_format/field_format';
-import { getHighlightHtml } from 'ui/highlight';
+import { FieldFormat } from '../field_format';
+import { getHighlightHtml } from '../../highlight/highlight_html';
 
 export function stringifyUrl() {
   _.class(Url).inherits(FieldFormat);

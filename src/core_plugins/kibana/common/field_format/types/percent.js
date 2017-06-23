@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Numeral } from 'ui/stringify/types/_numeral';
+import { Numeral } from './_numeral';
 
 export function stringifyPercent() {
   return Numeral.factory({

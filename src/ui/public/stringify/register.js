@@ -1,16 +1,16 @@
 import { RegistryFieldFormatsProvider } from 'ui/registry/field_formats';
-import { stringifyUrl } from 'ui/stringify/types/url';
-import { stringifyBytes } from 'ui/stringify/types/bytes';
-import { stringifyDate } from 'ui/stringify/types/date';
-import { stringifyDuration } from 'ui/stringify/types/duration';
-import { stringifyIp } from 'ui/stringify/types/ip';
-import { stringifyNumber } from 'ui/stringify/types/number';
-import { stringifyPercent } from 'ui/stringify/types/percent';
-import { stringifyString } from 'ui/stringify/types/string';
-import { stringifySource } from 'ui/stringify/types/source';
-import { stringifyColor } from 'ui/stringify/types/color';
-import { stringifyTruncate } from 'ui/stringify/types/truncate';
-import { stringifyBoolean } from 'ui/stringify/types/boolean';
+import { stringifyUrl } from '../../../core_plugins/kibana/common/field_format/types/url';
+import { stringifyBytes } from '../../../core_plugins/kibana/common/field_format/types/bytes';
+import { stringifyDate } from '../../../core_plugins/kibana/common/field_format/types/date';
+import { stringifyDuration } from '../../../core_plugins/kibana/common/field_format/types/duration';
+import { stringifyIp } from '../../../core_plugins/kibana/common/field_format/types/ip';
+import { stringifyNumber } from '../../../core_plugins/kibana/common/field_format/types/number';
+import { stringifyPercent } from '../../../core_plugins/kibana/common/field_format/types/percent';
+import { stringifyString } from '../../../core_plugins/kibana/common/field_format/types/string';
+import { stringifySource } from '../../../core_plugins/kibana/common/field_format/types/source';
+import { stringifyColor } from '../../../core_plugins/kibana/common/field_format/types/color';
+import { stringifyTruncate } from '../../../core_plugins/kibana/common/field_format/types/truncate';
+import { stringifyBoolean } from '../../../core_plugins/kibana/common/field_format/types/boolean';
 
 RegistryFieldFormatsProvider.register(stringifyUrl);
 RegistryFieldFormatsProvider.register(stringifyBytes);

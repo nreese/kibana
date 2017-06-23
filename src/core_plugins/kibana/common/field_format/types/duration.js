@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { FieldFormat } from 'ui/index_patterns/_field_format/field_format';
+import { FieldFormat } from '../field_format';
 
 export function stringifyDuration() {
   const ratioToSeconds = {
