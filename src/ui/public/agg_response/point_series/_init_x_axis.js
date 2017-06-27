@@ -3,7 +3,7 @@ export function PointSeriesInitXAxisProvider() {
   return function initXAxis(chart) {
     const x = chart.aspects.x;
     chart.xAxisFormatter = x.agg ? x.agg.fieldFormatter() : String;
-    chart.xAxisLabel = x.col.title;
+    chart.xAxisLabel = x.agg ? x.agg.makeLabel.bind(x.agg) : () => '';
 
     if (!x.agg || !x.agg.type.ordered) return;
 

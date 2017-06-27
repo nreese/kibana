@@ -7,7 +7,6 @@ export function VislibTypesPointSeries() {
       return seri.aggId === seriConfig.data.id;
     }) : null;
 
-
     let interpolate = matchingSeriParams ? matchingSeriParams.interpolate : cfg.interpolate;
     // for backward compatibility when loading URLs or configs we need to check smoothLines
     if (cfg.smoothLines) interpolate = 'cardinal';
@@ -111,6 +110,10 @@ export function VislibTypesPointSeries() {
           if (axis.labels) {
             axis.labels.axisFormatter = data.data.yAxisFormatter || data.get('yAxisFormatter');
           }
+          if (!axis.title) {
+            axis.title = {};
+          }
+          axis.title.text = data.data.yAxisLabel || data.get('yAxisLabel');
         });
       }
 
@@ -130,6 +133,13 @@ export function VislibTypesPointSeries() {
             }
           }
         ];
+      } else {
+        config.categoryAxes.forEach(axis => {
+          if (!axis.title) {
+            axis.title = {};
+          }
+          axis.title.text = data.get('xAxisLabel');
+        });
       }
 
       if (!config.charts) {
@@ -206,7 +216,7 @@ export function VislibTypesPointSeries() {
           rangeOuterPadding: 0
         },
         title: {
-          text: data.get('zAxisLabel') || ''
+          text: data.get('zAxisLabel')
         }
       });
       return defaults;

@@ -44,7 +44,7 @@ export function VislibLibAxisTitleProvider() {
             return `translate(${titlePadding},${height / 2}) rotate(270)`;
           })
           .attr('text-anchor', 'middle')
-          .text(config.get('title.text'))
+          .text(config.get('title.text')())
           .node()
           .getBBox();
 

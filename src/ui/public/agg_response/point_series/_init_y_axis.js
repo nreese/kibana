@@ -9,20 +9,20 @@ export function PointSeriesInitYAxisProvider() {
     if (_.isArray(y)) {
       // TODO: vis option should allow choosing this format
       chart.yAxisFormatter = y[0].agg.fieldFormatter();
-      chart.yAxisLabel = ''; // use the legend
+      chart.yAxisLabel = () => ''; // use the legend
     } else {
       chart.yAxisFormatter = y.agg.fieldFormatter();
-      chart.yAxisLabel = y.col.title;
+      chart.yAxisLabel = y.agg ? y.agg.makeLabel.bind(y.agg) : () => '';
     }
 
     const z = chart.aspects.series;
     if (z) {
       if (_.isArray(z)) {
         chart.zAxisFormatter = z[0].agg.fieldFormatter();
-        chart.zAxisLabel = ''; // use the legend
+        chart.zAxisLabel = () => ''; // use the legend
       } else {
         chart.zAxisFormatter = z.agg.fieldFormatter();
-        chart.zAxisLabel = z.col.title;
+        chart.zAxisLabel = z.agg ? z.agg.makeLabel.bind(z.agg) : () => '';
       }
     }
 

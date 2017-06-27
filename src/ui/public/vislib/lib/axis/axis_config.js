@@ -41,7 +41,7 @@ export function VislibLibAxisConfigProvider() {
       truncate: 100
     },
     title: {
-      text: '',
+      text: () => '',
       elSelector: '.axis-wrapper-{pos} .axis-div',
     }
   };
