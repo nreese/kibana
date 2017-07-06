@@ -97,22 +97,26 @@ export function AggTypesBucketsGeoHashProvider(Private, config) {
       const aggs = [];
 
       if (agg.params.useFilter) {
-        const boundingBox = {};
-        boundingBox[agg.getField().name] = {
-          'top_left' : '90, -180',
-          'bottom_right' : '-90, 180'
-        };
-        aggs.push(new AggConfig(agg.vis, {
-          type: 'filter',
-          id: 'filter_agg',
-          enabled:true,
-          params: {
-            geo_bounding_box: boundingBox
-          },
-          schema: {
-            group: 'buckets'
-          }
-        }));
+        const vis = agg.vis;
+        let mapCollar;
+        if (vis.hasUiState()) {
+          mapCollar = vis.uiStateVal('mapCollar');
+        }
+        if (mapCollar) {
+          const boundingBox = {};
+          boundingBox[agg.getField().name] = mapCollar;
+          aggs.push(new AggConfig(agg.vis, {
+            type: 'filter',
+            id: 'filter_agg',
+            enabled:true,
+            params: {
+              geo_bounding_box: boundingBox
+            },
+            schema: {
+              group: 'buckets'
+            }
+          }));
+        }
       }
 
       aggs.push(agg);

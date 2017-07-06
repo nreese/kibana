@@ -543,6 +543,7 @@ export class KibanaMap extends EventEmitter {
       if (!centerFromUIState || centerFromMap.lon !== centerFromUIState[1] || centerFromMap.lat !== centerFromUIState[0]) {
         uiState.set('mapCenter', [centerFromMap.lat, centerFromMap.lon]);
       }
+      uiState.set('mapCollar', this.getBounds());
     }
 
     this.on('dragend', persistMapStateInUiState);

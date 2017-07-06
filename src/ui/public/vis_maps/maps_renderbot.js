@@ -61,6 +61,7 @@ export default function MapsRenderbotFactory(Private, $injector, serviceSettings
       options.center = centerFromUIState ? centerFromUIState : this.vis.type.params.defaults.mapCenter;
 
       this._kibanaMap = new KibanaMap(containerElement, options);
+      uiState.set('mapCollar', this._kibanaMap.getBounds());
       this._kibanaMap.addDrawControl();
       this._kibanaMap.addFitControl();
       this._kibanaMap.addLegendControl();
@@ -140,6 +141,7 @@ export default function MapsRenderbotFactory(Private, $injector, serviceSettings
         this._kibanaMap.useUiStateFromVisualization(this.vis);
         this._kibanaMap.resize();
         this._dataDirty = false;
+
         this._doRenderComplete();
       });
     }
