@@ -5,6 +5,7 @@ import { VislibVisTypeBuildChartDataProvider } from 'ui/vislib_vis_type/build_ch
 import { FilterBarPushFilterProvider } from 'ui/filter_bar/push_filter';
 import { KibanaMap } from './kibana_map';
 import { GeohashLayer } from './geohash_layer';
+import { geoContains } from './lib/geo_utils';
 import './lib/service_settings';
 import './styles/_tilemap.less';
 import { ResizeCheckerProvider } from 'ui/resize_checker';
@@ -61,7 +62,8 @@ export default function MapsRenderbotFactory(Private, $injector, serviceSettings
       options.center = centerFromUIState ? centerFromUIState : this.vis.type.params.defaults.mapCenter;
 
       this._kibanaMap = new KibanaMap(containerElement, options);
-      uiState.set('mapCollar', this._kibanaMap.getBounds());
+      this._previouslyFetchedMapCollar = this._kibanaMap.getBounds();
+      uiState.set('mapCollar', this._previouslyFetchMapCollar);
       this._kibanaMap.addDrawControl();
       this._kibanaMap.addFitControl();
       this._kibanaMap.addLegendControl();
@@ -73,6 +75,11 @@ export default function MapsRenderbotFactory(Private, $injector, serviceSettings
         precisionChange = (previousPrecision !== this._kibanaMap.getAutoPrecision());
         previousPrecision = this._kibanaMap.getAutoPrecision();
       });
+      this._kibanaMap.on('dragend', () => {
+        if (!geoContains(this._previouslyFetchedMapCollar, this._kibanaMap.getBounds())) {
+          courier.fetch();
+        }
+      });
       this._kibanaMap.on('zoomend', () => {
 
         const isAutoPrecision = _.get(this._chartData, 'geohashGridAgg.params.autoPrecision', true);
@@ -81,7 +88,7 @@ export default function MapsRenderbotFactory(Private, $injector, serviceSettings
         }
 
         this._dataDirty = true;
-        if (precisionChange) {
+        if (precisionChange || !geoContains(this._previouslyFetchedMapCollar, this._kibanaMap.getBounds())) {
           courier.fetch();
         } else {
           this._recreateGeohashLayer();
@@ -140,6 +147,7 @@ export default function MapsRenderbotFactory(Private, $injector, serviceSettings
         this._recreateGeohashLayer();
         this._kibanaMap.useUiStateFromVisualization(this.vis);
         this._kibanaMap.resize();
+        this._previouslyFetchedMapCollar = this._kibanaMap.getBounds();
         this._dataDirty = false;
 
         this._doRenderComplete();
