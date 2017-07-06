@@ -31,15 +31,6 @@ export function AggResponseTabifyProvider(Private, Notifier) {
   function collectBucket(write, bucket, key) {
     const agg = write.aggStack.shift();
 
-    const aggType = agg.type;
-    if (aggType.dslName === 'filter') {
-      write.cell(agg, 'filter', function () {
-        collectBucket(write, bucket[agg.id]);
-      });
-      write.aggStack.unshift(agg);
-      return;
-    }
-
     switch (agg.schema.group) {
       case 'buckets':
         const buckets = new Buckets(bucket[agg.id]);
