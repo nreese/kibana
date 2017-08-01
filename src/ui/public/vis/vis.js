@@ -16,6 +16,8 @@ import { PersistedState } from 'ui/persisted_state';
 import { UtilsBrushEventProvider } from 'ui/utils/brush_event';
 import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
 import { FilterBarClickHandlerProvider } from 'ui/filter_bar/filter_bar_click_handler';
+import { SearchSourceProvider } from 'ui/courier/data_source/search_source';
+import { FetchProvider } from 'ui/courier/fetch/fetch';
 
 export function VisProvider(Private, indexPatterns, timefilter, getAppState) {
   const visTypes = Private(VisTypesRegistryProvider);
@@ -23,6 +25,8 @@ export function VisProvider(Private, indexPatterns, timefilter, getAppState) {
   const brushEvent = Private(UtilsBrushEventProvider);
   const queryFilter = Private(FilterBarQueryFilterProvider);
   const filterBarClickHandler = Private(FilterBarClickHandlerProvider);
+  const fetch = Private(FetchProvider);
+  const SearchSource = Private(SearchSourceProvider);
 
   class Vis extends EventEmitter {
     constructor(indexPattern, visState, uiState) {
@@ -45,6 +49,8 @@ export function VisProvider(Private, indexPatterns, timefilter, getAppState) {
       this.setUiState(uiState);
 
       this.API = {
+        fetch: fetch,
+        SearchSource: SearchSource,
         indexPatterns: indexPatterns,
         timeFilter: timefilter,
         queryFilter: queryFilter,
