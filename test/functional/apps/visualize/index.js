@@ -28,5 +28,6 @@ export default function ({ getService, loadTestFile }) {
     loadTestFile(require.resolve('./_heatmap_chart'));
     loadTestFile(require.resolve('./_point_series_options'));
     loadTestFile(require.resolve('./_shared_item'));
+    loadTestFile(require.resolve('./_terms_control'));
   });
 }
