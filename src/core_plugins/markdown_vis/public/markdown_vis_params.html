@@ -11,5 +11,10 @@
       <input type="range" ng-model="vis.params.fontSize" class="form-control" min="8" max="36" />
     </div>
   </div>
-  <textarea ng-model="vis.params.markdown" class="form-control" rows="20"></textarea>
+  <textarea
+    ng-model="vis.params.markdown"
+    class="form-control"
+    rows="20"
+    data-test-subj="markdownTextarea"
+  ></textarea>
 </div>
