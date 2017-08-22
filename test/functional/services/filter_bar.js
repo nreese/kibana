@@ -19,3 +19,5 @@ export function FilterBarProvider({ getService }) {
 
   return new FilterBar();
 }
+
+Hi Nathan!
