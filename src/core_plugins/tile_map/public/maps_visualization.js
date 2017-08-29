@@ -20,15 +20,18 @@ export function MapsVisualizationProvider(serviceSettings, Notifier, getAppState
   class MapsVisualization {
 
     constructor(element, vis) {
-
       this.vis = vis;
       this.$el = $(element);
       this._$container = this.$el;
       this._geohashLayer = null;
       this._kibanaMap = null;
-      this._kibanaMapReady = this._makeKibanaMap();
       this._baseLayerDirty = true;
       this._currentParams = null;
+    }
+
+    init() {
+      this._kibanaMapReady = this._makeKibanaMap();
+      return this._kibanaMapReady;
     }
 
     destroy() {
@@ -62,7 +65,6 @@ export function MapsVisualizationProvider(serviceSettings, Notifier, getAppState
 
       });
     }
-
 
     //**********************************************************************************************************
     async _makeKibanaMap() {
