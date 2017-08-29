@@ -17,7 +17,7 @@ import {
 
 uiModules
 .get('kibana/directive', ['ngSanitize'])
-  .directive('visualize', function (Notifier, Private, timefilter, getAppState) {
+  .directive('visualize', function (Notifier, Private, timefilter, getAppState, $timeout) {
     const notify = new Notifier({ location: 'Visualize' });
     const requestHandlers = Private(VisRequestHandlersRegistryProvider);
     const responseHandlers = Private(VisResponseHandlersRegistryProvider);
@@ -53,7 +53,12 @@ uiModules
         const responseHandler = getHandler(responseHandlers, $scope.vis.type.responseHandler);
 
         $scope.fetch = _.debounce(function () {
-
+          if (!$scope.vis.initialized) {
+            $scope.timeout = $timeout(() => {
+              $scope.fetch();
+            }, 100);
+            return;
+          }
         // searchSource is only there for courier request handler
           requestHandler($scope.vis, $scope.appState, $scope.uiState, queryFilter, $scope.savedObj.searchSource)
           .then(requestHandlerResponse => {
@@ -149,6 +154,7 @@ uiModules
 
         $scope.$on('$destroy', () => {
           resizeChecker.destroy();
+          if ($scope.timeout) $timeout.cancel($scope.timeout);
         });
 
         $scope.fetch();
