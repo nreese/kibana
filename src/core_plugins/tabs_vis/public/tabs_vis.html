@@ -1,0 +1,46 @@
+<div ng-controller="KbnTabsVisController" class="tabs-vis">
+    <div class="kuiTabs">
+      <button
+        class="kuiTab kbn-management-tab"
+        ng-class="{ 'kuiTab-isSelected': openTab === tab.id }"
+        ng-repeat="tab in tabs track by tab.id"
+        ng-click="changeTab(tab)"
+        aria-label="{ tab.title }"
+      >
+        {{ tab.title }}
+      </button>
+    </div>
+
+    <!--<div
+      class="list-group-item list-group-item--noBorder"
+      ng-repeat="tab in tabs track by tab.id"
+      ng-show="tab.id === openTab"
+      style="height:100%;"
+    >
+      <dashboard-panel
+        panel="tab"
+        is-full-screen-mode="false"
+        is-expanded="false"
+        dashboard-view-mode="viewOnlyMode"
+        container-api="containerApi"
+      >
+
+      </dashboard-panel>
+    </div>-->
+
+    <div
+      class="stackable"
+      style="z-index:{{tab.zIndex}};"
+      ng-repeat="tab in tabs track by tab.id">
+      <dashboard-panel
+        panel="tab"
+        is-full-screen-mode="false"
+        is-expanded="false"
+        dashboard-view-mode="viewOnlyMode"
+        container-api="containerApi"
+      >
+      </dashboard-panel>
+    </div>
+
+
+</div>
