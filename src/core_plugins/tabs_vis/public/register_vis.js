@@ -4,7 +4,7 @@ import { CATEGORY } from 'ui/vis/vis_category';
 import { VisFactoryProvider } from 'ui/vis/vis_factory';
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import tabsVisTemplate from './tabs_vis.html';
-import tabsOptionsTemplate from './tabs_vis_options.html';
+import { TabsVisEditor } from './components/vis_editor';
 
 function TabsVisProvider(Private) {
   const VisFactory = Private(VisFactoryProvider);
@@ -19,27 +19,12 @@ function TabsVisProvider(Private) {
     visConfig: {
       template: tabsVisTemplate,
       defaults: {
-        tabs: [
-          {
-            title: '1',
-            type: 'visualization',
-            id: '8d265790-8f2d-11e7-8c54-f9aca5a9885c',
-          },
-          {
-            title: '2',
-            type: 'visualization',
-            id: '0c606250-8e5f-11e7-b53f-350aa627b95a',
-          },
-          {
-            title: '3',
-            type: 'visualization',
-            id: '73fbab40-8e5f-11e7-b53f-350aa627b95a',
-          }
-        ]
+        tabs: []
       }
     },
+    editor: 'default',
     editorConfig: {
-      optionsTemplate: tabsOptionsTemplate
+      optionsTemplate: TabsVisEditor
     },
     requestHandler: 'none',
     responseHandler: 'none',

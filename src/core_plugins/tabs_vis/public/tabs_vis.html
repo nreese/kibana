@@ -2,8 +2,8 @@
     <div class="kuiTabs">
       <button
         class="kuiTab kbn-management-tab"
-        ng-class="{ 'kuiTab-isSelected': openTab === tab.id }"
-        ng-repeat="tab in tabs track by tab.id"
+        ng-class="{ 'kuiTab-isSelected': openTab === tab.tabId }"
+        ng-repeat="tab in tabs track by tab.tabId"
         ng-click="changeTab(tab)"
         aria-label="{ tab.title }"
       >
@@ -31,7 +31,7 @@
     <div
       class="stackable"
       style="z-index:{{tab.zIndex}};"
-      ng-repeat="tab in tabs track by tab.id">
+      ng-repeat="tab in tabs track by tab.tabId">
       <dashboard-panel
         panel="tab"
         is-full-screen-mode="false"
