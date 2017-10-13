@@ -21,6 +21,7 @@ import { queryManagerFactory } from '../query_manager';
 import * as kueryAPI from 'ui/kuery';
 import { SearchSourceProvider } from 'ui/courier/data_source/search_source';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
+import { EmbeddableHandlersRegistryProvider } from 'ui/embeddable/embeddable_handlers_registry';
 
 export function VisProvider(Private, indexPatterns, timefilter, getAppState) {
   const visTypes = Private(VisTypesRegistryProvider);
@@ -55,7 +56,10 @@ export function VisProvider(Private, indexPatterns, timefilter, getAppState) {
       // For instance, map bounds, which depends on the view port, browser window size, etc.
       this.sessionState = {};
 
+      const embeddableHandlers = Private(EmbeddableHandlersRegistryProvider);
       this.API = {
+        getAppState: getAppState,
+        embeddableHandlers: embeddableHandlers,
         savedObjectsClient: savedObjectsClient,
         SearchSource: SearchSource,
         indexPatterns: indexPatterns,

@@ -16,6 +16,7 @@ export class TabsContainerAPI extends ContainerAPI {
   }
 
   createChildUistate(path, initialState) {
+    console.log(this.uiState);
     return this.uiState.createChild(path, initialState, true);
   }
 
