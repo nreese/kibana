@@ -48,13 +48,6 @@ export class VisController {
 
   changeTab = (newPanel) => {
     this.openPanel = newPanel;
-    this.panels.forEach((panel) => {
-      if (panel.tabId === this.openPanel.tabId) {
-        panel.zIndex = 1;
-      } else {
-        panel.zIndex = -1;
-      }
-    });
     this.drawVis();
   }
 

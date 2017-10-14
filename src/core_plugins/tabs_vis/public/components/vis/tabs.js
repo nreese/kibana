@@ -8,7 +8,9 @@ import {
   KuiTab,
 } from 'ui_framework/components';
 
-export function Tabs({ changeTab, getContainerApi, getEmbeddableHandler, panels, openPanel }) {
+export function Tabs({ changeTab, children, getContainerApi, getEmbeddableHandler, panels, openPanel }) {
+
+  console.log(openPanel);
 
   const tabs = panels.map((panel, index) => {
     return {
@@ -30,24 +32,32 @@ export function Tabs({ changeTab, getContainerApi, getEmbeddableHandler, panels,
     ));
   };
 
-  const renderPanel = () => {
-    if (!openPanel) {
-      return;
-    }
-    return (
-      <DashboardPanel
-        dashboardViewMode={DashboardViewMode.VIEW}
-        isFullScreenMode={false}
-        panel={openPanel}
-        getEmbeddableHandler={getEmbeddableHandler}
-        isExpanded={false}
-        getContainerApi={getContainerApi}
-        onToggleExpanded={() => {}}
-        onDeletePanel={() => {}}
-        onPanelFocused={() => {}}
-        onPanelBlurred={() => {}}
-      />
-    );
+  const renderPanels = () => {
+    return panels.map((panel) => {
+      const style = {
+        zIndex: panel.tabId === openPanel.tabId ? 1 : -1
+      };
+      return (
+        <div
+          className="stackable"
+          style={style}
+          key={panel.tabId}
+        >
+          <DashboardPanel
+            dashboardViewMode={DashboardViewMode.VIEW}
+            isFullScreenMode={false}
+            panel={panel}
+            getEmbeddableHandler={getEmbeddableHandler}
+            isExpanded={false}
+            getContainerApi={getContainerApi}
+            onToggleExpanded={() => {}}
+            onDeletePanel={() => {}}
+            onPanelFocused={() => {}}
+            onPanelBlurred={() => {}}
+          />
+        </div>
+      );
+    });
   };
 
   return (
@@ -56,7 +66,7 @@ export function Tabs({ changeTab, getContainerApi, getEmbeddableHandler, panels,
         {renderTabs()}
       </KuiTabs>
 
-      {renderPanel()}
+      {renderPanels()}
 
     </div>
   );
@@ -64,6 +74,7 @@ export function Tabs({ changeTab, getContainerApi, getEmbeddableHandler, panels,
 
 Tabs.propTypes = {
   changeTab: PropTypes.func.isRequired,
+  children: PropTypes.node,
   getContainerApi: PropTypes.func.isRequired,
   getEmbeddableHandler: PropTypes.func.isRequired,
   panels: PropTypes.array.isRequired,
