@@ -11,6 +11,7 @@ import { UiI18n } from './ui_i18n';
 
 import { uiSettingsMixin } from './ui_settings';
 import { fieldFormatsMixin } from './field_formats/field_formats_mixin';
+import { tutorialsMixin } from './tutorials_mixin';
 
 export default async (kbnServer, server, config) => {
   const uiExports = kbnServer.uiExports = new UiExports({
@@ -21,6 +22,8 @@ export default async (kbnServer, server, config) => {
   await kbnServer.mixin(uiSettingsMixin);
 
   await kbnServer.mixin(fieldFormatsMixin);
+
+  await kbnServer.mixin(tutorialsMixin);
 
   const uiI18n = kbnServer.uiI18n = new UiI18n(config.get('i18n.defaultLocale'));
   uiI18n.addUiExportConsumer(uiExports);
