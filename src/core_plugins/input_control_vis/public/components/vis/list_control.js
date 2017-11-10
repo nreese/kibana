@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import Select from 'react-select';
 import { FormRow } from './form_row';
+import { Portal } from './portal';
 
 export class ListControl extends Component {
   constructor(props) {
@@ -32,18 +33,20 @@ export class ListControl extends Component {
         id={this.props.control.id}
         label={this.props.control.label}
       >
-        <Select
-          className="list-control-react-select"
-          placeholder="Select..."
-          multi={this.props.control.options.multiselect}
-          simpleValue={true}
-          delimiter={this.props.control.getMultiSelectDelimiter()}
-          value={this.props.control.value}
-          options={this.props.control.selectOptions}
-          onChange={this.handleOnChange}
-          valueRenderer={this.truncate}
-          inputProps={{ id: this.props.control.id }}
-        />
+        <Portal>
+          <Select
+            className="list-control-react-select"
+            placeholder="Select..."
+            multi={this.props.control.options.multiselect}
+            simpleValue={true}
+            delimiter={this.props.control.getMultiSelectDelimiter()}
+            value={this.props.control.value}
+            options={this.props.control.selectOptions}
+            onChange={this.handleOnChange}
+            valueRenderer={this.truncate}
+            inputProps={{ id: this.props.control.id }}
+          />
+        </Portal>
       </FormRow>
     );
   }
