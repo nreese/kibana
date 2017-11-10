@@ -40,9 +40,8 @@ export function netflowSpecProvider() {
                   'cd logstash-{config.kibana.version}',
                   './bin/logstash --modules netflow -M netflow.var.input.udp.port={params.netflow_var_input_udp_port} --setup',
                 ],
-                textPost: 'The `--setup` option creates a `netflow-*` index pattern in Elasticsearch and imports' +
-                  ' Kibana dashboards and visualizations. **Running `--setup` is a one-time setup step.** Omit this option' +
-                  ' for subsequent runs of the module to avoid overwriting existing Kibana dashboards.'
+                textPost: 'The `--setup` flag loads the' +
+                  ' Kibana dashboards and visualizations. If the dashboards are already setup, you don\'t need to use this flag.'
               }
             ]
           }
