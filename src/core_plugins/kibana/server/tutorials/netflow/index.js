@@ -38,7 +38,7 @@ export function netflowSpecProvider() {
                 textPre: 'In the Logstash install directory, run the following command to set up and run the Netflow module.',
                 commands: [
                   'cd logstash-{config.kibana.version}',
-                  './bin/logstash --modules netflow --setup -M netflow.var.input.udp.port={params.netflow_var_input_udp_port}',
+                  './bin/logstash --modules netflow -M netflow.var.input.udp.port={params.netflow_var_input_udp_port} --setup',
                 ],
                 textPost: 'The `--setup` option creates a `netflow-*` index pattern in Elasticsearch and imports' +
                   ' Kibana dashboards and visualizations. **Running `--setup` is a one-time setup step.** Omit this option' +
