@@ -31,7 +31,7 @@ export function netflowSpecProvider() {
           {
             id: INSTRUCTION_VARIANT.OSX,
             instructions: [
-              LOGSTASH_INSTRUCTIONS.INSTALL.OSX,
+              ...LOGSTASH_INSTRUCTIONS.INSTALL.OSX,
               {
                 title: 'Set up and run the Netflow module',
                 textPre: 'In the Logstash install directory, run the following command to set up and run the Netflow module.',
