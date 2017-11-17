@@ -8,8 +8,7 @@ export const LOGSTASH_INSTRUCTIONS = {
       {
         title: 'Download and install the Java runtime environment',
         textPre: `Follow the installation instructions [here](https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jre.html). ` +
-          `${SKIP_INSTALL_SENTENCE} ${FIRST_TIME_SENTENCE}`,
-        commands: []
+          `${SKIP_INSTALL_SENTENCE} ${FIRST_TIME_SENTENCE}`
       },
       {
         title: 'Download and install Logstash',

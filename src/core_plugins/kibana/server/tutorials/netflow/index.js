@@ -43,7 +43,24 @@ export function netflowSpecProvider() {
                   ' Kibana dashboards and visualizations. If the dashboards are already setup, you don\'t need to use this flag.'
               }
             ]
+          },
+          {
+            id: INSTRUCTION_VARIANT.DEB,
+            instructions: [
+              ...LOGSTASH_INSTRUCTIONS.INSTALL.DEB,
+              {
+                title: 'TODO: Set up and run the Netflow module',
+                textPre: 'In the Logstash install directory, run the following command to set up and run the Netflow module.',
+                commands: [
+                  'cd logstash-{config.kibana.version}',
+                  './bin/logstash --modules netflow -M netflow.var.input.udp.port={params.netflow_var_input_udp_port} --setup',
+                ],
+                textPost: 'The `--setup` flag loads the' +
+                  ' Kibana dashboards and visualizations. If the dashboards are already setup, you don\'t need to use this flag.'
+              }
+            ]
           }
+
         ]
       }
     ]
