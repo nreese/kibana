@@ -49,6 +49,15 @@ export function netflowSpecProvider() {
             instructions: [
               ...LOGSTASH_INSTRUCTIONS.INSTALL.DEB,
               {
+                title: 'Configure the Netflow module',
+                textPre: 'Edit the `config/logstash.yml` file under the Logstash install directory and add the following to it:',
+                commands: [
+                  'modules:',
+                  '- name: netflow',
+                  '  var.input.udp.port: {params.netflow_var_input_udp_port}'
+                ]
+              },
+              {
                 title: 'TODO: Set up and run the Netflow module',
                 textPre: 'In the Logstash install directory, run the following command to set up and run the Netflow module.',
                 commands: [
