@@ -23,10 +23,10 @@ export const ON_PREM_INSTRUCTIONS = {
               title: 'Set up the Netflow module',
               textPre: 'In the Logstash install directory, run the following command to set up the Netflow module.',
               commands: [
-                './bin/logstash --modules netflow --setup',
+                './bin/logstash --modules netflow --setup-and-exit',
               ],
-              textPost: 'The `--setup` option creates a `netflow-*` index pattern in Elasticsearch and imports' +
-                ' Kibana dashboards and visualizations. Running `--setup` is a one-time setup step. Omit this step' +
+              textPost: 'The `--setup-and-exit` option creates a `netflow-*` index pattern in Elasticsearch and imports' +
+                ' Kibana dashboards and visualizations. Running `--setup-and-exit` is a one-time setup step. Omit this step' +
                 ' for subsequent runs of the module to avoid overwriting existing Kibana dashboards.'
             },
             {
