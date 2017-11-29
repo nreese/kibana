@@ -57,13 +57,44 @@ export const ON_PREM_INSTRUCTIONS = {
               commands: [
                 'modules:',
                 '- name: netflow',
-                '  var.input.udp.port: {parans.netflow_var_input_udp_port}'
+                '  var.input.udp.port: {params.netflow_var_input_udp_port}'
               ]
             },
             {
               title: 'Restart the Logstash service',
               commands: [
-                'sudo systemctl start logstash.service'
+                'sudo systemctl restart logstash.service'
+              ]
+            }
+          ]
+        },
+        {
+          id: INSTRUCTION_VARIANT.RPM,
+          instructions: [
+            ...LOGSTASH_INSTRUCTIONS.INSTALL.RPM,
+            {
+              title: 'Set up the Netflow module',
+              textPre: 'Run the following command to set up the Netflow module.',
+              commands: [
+                '/usr/share/logstash/bin/logstash --modules netflow --setup-and-exit',
+              ],
+              textPost: 'The `--setup-and-exit` option creates a `netflow-*` index pattern in Elasticsearch and imports' +
+                ' Kibana dashboards and visualizations. Running `--setup-and-exit` is a one-time setup step. Omit this step' +
+                ' for subsequent runs of the module to avoid overwriting existing Kibana dashboards.'
+            },
+            {
+              title: 'Configure the Netflow module',
+              textPre: 'Edit `/etc/logstash/logstash.yml` and add the following lines to it:',
+              commands: [
+                'modules:',
+                '- name: netflow',
+                '  var.input.udp.port: {params.netflow_var_input_udp_port}'
+              ]
+            },
+            {
+              title: 'Restart the Logstash service',
+              commands: [
+                'sudo systemctl restart logstash.service'
               ]
             }
           ]

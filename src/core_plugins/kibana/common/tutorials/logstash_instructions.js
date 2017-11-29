@@ -35,6 +35,23 @@ export const LOGSTASH_INSTRUCTIONS = {
           'sudo apt install ./logstash-{config.kibana.version}.deb'
         ]
       }
+    ],
+    RPM: [
+      {
+        title: 'Download and install the Java runtime environment',
+        textPre: `${SKIP_INSTALL_SENTENCE} ${FIRST_TIME_SENTENCE}`,
+        commands: [
+          'sudo yum install -y java-1.8.0-openjdk'
+        ]
+      },
+      {
+        title: 'Download and install Logstash',
+        textPre: SKIP_INSTALL_SENTENCE,
+        commands: [
+          'curl -L -O https://artifacts.elastic.co/downloads/logstash/logstash-{config.kibana.version}.rpm',
+          'sudo rpm -ivh ./logstash-{config.kibana.version}.rpm'
+        ]
+      }
     ]
   }
 };
