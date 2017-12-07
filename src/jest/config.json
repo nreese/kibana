@@ -23,7 +23,8 @@
   },
   "setupFiles": [
     "<rootDir>/src/jest/setup/babel_polyfill.js",
-    "<rootDir>/src/jest/setup/request_animation_frame_polyfill.js"
+    "<rootDir>/src/jest/setup/request_animation_frame_polyfill.js",
+    "<rootDir>/src/jest/setup/enzyme.js"
   ],
   "coverageDirectory": "<rootDir>/target/jest-coverage",
   "coverageReporters": [
