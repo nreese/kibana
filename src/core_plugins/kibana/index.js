@@ -11,6 +11,7 @@ import { exportApi } from './server/routes/api/export';
 import scripts from './server/routes/api/scripts';
 import { registerSuggestionsApi } from './server/routes/api/suggestions';
 import { registerFieldFormats } from './server/field_formats/register';
+import { registerCloudApi } from './server/routes/api/cloud';
 import * as systemApi from './server/lib/system_api';
 import handleEsError from './server/lib/handle_es_error';
 import mappings from './mappings.json';
@@ -149,6 +150,7 @@ export default function (kibana) {
       exportApi(server);
       registerSuggestionsApi(server);
       registerFieldFormats(server);
+      registerCloudApi(server);
 
       server.expose('systemApi', systemApi);
       server.expose('handleEsError', handleEsError);

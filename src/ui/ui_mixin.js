@@ -6,6 +6,7 @@ import { uiBundlesMixin } from './ui_bundles';
 import { uiNavLinksMixin } from './ui_nav_links';
 import { uiRenderMixin } from './ui_render';
 import { uiSettingsMixin } from './ui_settings';
+import { cloudMixin } from './cloud_mixin';
 
 export async function uiMixin(kbnServer) {
   await kbnServer.mixin(uiExportsMixin);
@@ -16,4 +17,5 @@ export async function uiMixin(kbnServer) {
   await kbnServer.mixin(uiNavLinksMixin);
   await kbnServer.mixin(uiI18nMixin);
   await kbnServer.mixin(uiRenderMixin);
+  await kbnServer.mixin(cloudMixin);
 }
