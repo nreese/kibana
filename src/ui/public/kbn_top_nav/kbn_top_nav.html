@@ -21,7 +21,7 @@
           aria-haspopup="{{!menuItem.hasFunction}}"
           aria-expanded="{{kbnTopNav.isCurrent(menuItem.key)}}"
           ng-class="{'kuiLocalMenuItem-isSelected': kbnTopNav.isCurrent(menuItem.key), 'kuiLocalMenuItem-isDisabled': menuItem.disableButton()}"
-          ng-click="kbnTopNav.handleClick(menuItem)"
+          ng-click="kbnTopNav.handleClick(menuItem, $event)"
           ng-bind="menuItem.label"
           tooltip="{{menuItem.tooltip()}}"
           tooltip-placement="bottom"
