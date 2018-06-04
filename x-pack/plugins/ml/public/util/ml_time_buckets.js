@@ -19,7 +19,7 @@ import { inherits } from 'plugins/ml/util/inherits';
 import { calcEsInterval } from 'ui/time_buckets/calc_es_interval';
 
 import { TimeBuckets } from 'ui/time_buckets';
-export function IntervalHelperProvider(Private, timefilter, config) {
+export function IntervalHelperProvider(Private, config) {
 
   const calcAuto = Private(TimeBucketsCalcAutoIntervalProvider);
   inherits(MlTimeBuckets, TimeBuckets);

@@ -28,6 +28,7 @@ import './visualization';
 import './visualization_editor';
 import { FilterBarQueryFilterProvider } from '../filter_bar/query_filter';
 import { ResizeChecker } from '../resize_checker';
+import { timefilter } from 'ui/timefilter';
 
 import {
   isTermSizeZeroError,
@@ -35,7 +36,7 @@ import {
 
 uiModules
   .get('kibana/directive', ['ngSanitize'])
-  .directive('visualize', function ($timeout, Notifier, Private, timefilter, getAppState, Promise) {
+  .directive('visualize', function ($timeout, Notifier, Private, getAppState, Promise) {
     const notify = new Notifier({ location: 'Visualize' });
     const requestHandlers = Private(VisRequestHandlersRegistryProvider);
     const responseHandlers = Private(VisResponseHandlersRegistryProvider);
@@ -97,7 +98,7 @@ uiModules
           // to make this working and correctly rerender, so for now we will either
           // use the one passed in to us or look into the timefilter ourselfs (which
           // will be removed in the future).
-          const timeRange = $scope.timeRange || timefilter.time;
+          const timeRange = $scope.timeRange || timefilter.getTime();
 
           $scope.vis.filters = { timeRange };
 
@@ -202,13 +203,14 @@ uiModules
         resizeChecker.on('resize', $scope.fetch);
 
         // visualize needs to know about timeFilter
-        $scope.$listen(timefilter, 'fetch', $scope.fetch);
+        timefilter.on('fetch', $scope.fetch);
 
         $scope.$on('$destroy', () => {
           destroyed = true;
           $scope.vis.removeListener('reload', reload);
           $scope.vis.removeListener('update', handleVisUpdate);
           queryFilter.off('update', handleQueryUpdate);
+          timefilter.off('fetch', $scope.fetch);
           $scope.uiState.off('change', $scope.fetch);
           resizeChecker.destroy();
         });
