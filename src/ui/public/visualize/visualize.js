@@ -202,7 +202,7 @@ uiModules
         $scope.uiState.on('change', $scope.fetch);
         resizeChecker.on('resize', $scope.fetch);
 
-        // visualize needs to know about timeFilter
+        // visualize needs to know about timefilter
         timefilter.on('fetch', $scope.fetch);
 
         $scope.$on('$destroy', () => {
