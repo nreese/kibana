@@ -29,6 +29,7 @@ import {
   EuiText,
   EuiSpacer,
   EuiTitle,
+  EuiCallOut,
 } from '@elastic/eui';
 
 export class TestScript extends Component {
@@ -91,7 +92,7 @@ export class TestScript extends Component {
     if (scriptResponse.status !== 200) {
       this.setState({
         isLoading: false,
-        previewData: scriptResponse.error
+        previewData: scriptResponse
       });
       return;
     }
@@ -113,8 +114,24 @@ export class TestScript extends Component {
   }
 
   renderPreview() {
-    if (!this.state.previewData) {
+    const { previewData } = this.state;
+
+    if (!previewData) {
       return null;
+    }
+
+    if (previewData.error) {
+      return (
+        <EuiCallOut
+          title="There's an error in your script"
+          color="danger"
+          iconType="cross"
+        >
+          <EuiCodeBlock language="json" className="scriptPreviewCodeBlock">
+            {JSON.stringify(previewData.error, null, ' ')}
+          </EuiCodeBlock>
+        </EuiCallOut>
+      );
     }
 
     return (
@@ -122,7 +139,7 @@ export class TestScript extends Component {
         <EuiTitle size="xs"><p>First 10 results</p></EuiTitle>
         <EuiSpacer size="s" />
         <EuiCodeBlock language="json" className="scriptPreviewCodeBlock">
-          {JSON.stringify(this.state.previewData, null, ' ')}
+          {JSON.stringify(previewData, null, ' ')}
         </EuiCodeBlock>
       </Fragment>
     );
