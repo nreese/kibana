@@ -5,7 +5,8 @@
  */
 
 import 'angular-paging';
-import 'plugins/reporting/services/job_queue';
+import chrome from 'ui/chrome';
+import { reportingJobQueue } from 'plugins/reporting/lib/job_queue';
 import 'plugins/reporting/less/main.less';
 import { toastNotifications } from 'ui/notify';
 import { XPackInfoProvider } from 'plugins/xpack_main/services/xpack_info';
@@ -37,8 +38,8 @@ function mapJobs(jobs) {
 routes.when('/management/kibana/reporting', {
   template,
   controllerAs: 'jobsCtrl',
-  controller($scope, $route, $window, $interval, reportingJobQueue, kbnUrl, Private, reportingPollConfig) {
-    const { jobsRefresh } = reportingPollConfig;
+  controller($scope, $route, $window, $interval, kbnUrl, Private) {
+    const { jobsRefresh } = chrome.getInjected('reportingPollConfig');
     const xpackInfo = Private(XPackInfoProvider);
 
     this.loading = false;

@@ -4,14 +4,14 @@
  * you may not use this file except in compliance with the Elastic License.
  */
 
-import 'plugins/reporting/services/job_completion_notifications';
 import chrome from 'ui/chrome';
 import rison from 'rison-node';
 import { uiModules } from 'ui/modules';
 import { QueryString } from 'ui/utils/query_string';
+import { reportingJobCompletionNotifications } from '../lib/job_completion_notifications';
 
 uiModules.get('xpack/reporting')
-  .service('reportingDocumentControl', function (Private, $http, reportingJobCompletionNotifications, $injector) {
+  .service('reportingDocumentControl', function (Private, $http, $injector) {
     const $Promise = $injector.get('Promise');
     const mainEntry = '/api/reporting/generate';
     const reportPrefix = chrome.addBasePath(mainEntry);

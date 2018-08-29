@@ -4,10 +4,9 @@
  * you may not use this file except in compliance with the Elastic License.
  */
 
-import { uiModules } from 'ui/modules';
 import { JOB_COMPLETION_NOTIFICATIONS_SESSION_KEY } from '../../common/constants';
 
-export const jobCompletionNotifications = {
+export const reportingJobCompletionNotifications = {
   add(jobId) {
     const jobs = this.getAll();
     jobs.push(jobId);
@@ -39,7 +38,3 @@ export const jobCompletionNotifications = {
     );
   },
 };
-
-uiModules
-  .get('xpack/reporting')
-  .factory('reportingJobCompletionNotifications', () => jobCompletionNotifications);

@@ -13,8 +13,8 @@ import { get } from 'lodash';
 import {
   API_BASE_URL
 } from '../../common/constants';
-import 'plugins/reporting/services/job_queue';
-import 'plugins/reporting/services/job_completion_notifications';
+import { reportingJobCompletionNotifications } from '../lib/job_completion_notifications';
+import { reportingJobQueue } from '../lib/job_queue';
 import { PathProvider } from 'plugins/xpack_main/services/path';
 import { XPackInfoProvider } from 'plugins/xpack_main/services/xpack_info';
 import { Poller } from '../../../../common/poller';
@@ -26,7 +26,7 @@ import {
  * Poll for changes to reports. Inform the user of changes when the license is active.
  */
 uiModules.get('kibana')
-  .run(($http, reportingJobQueue, Private, reportingPollConfig, reportingJobCompletionNotifications) => {
+  .run(($http, Private) => {
     // Don't show users any reporting toasts until they're logged in.
     if (Private(PathProvider).isLoginOrLogout()) {
       return;
@@ -104,7 +104,7 @@ uiModules.get('kibana')
       });
     }
 
-    const { jobCompletionNotifier } = reportingPollConfig;
+    const { jobCompletionNotifier } = chrome.getInjected('reportingPollConfig');
 
     const poller = new Poller({
       functionToPoll: async () => {
