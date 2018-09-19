@@ -15,7 +15,7 @@ import { ASource } from './source';
 import { GeohashGridLayer } from '../geohashgrid_layer';
 import { GIS_API_PATH } from '../../../../common/constants';
 
-export class ESGeohashGridSource extends ASource {
+export class ESSearchSource extends ASource {
 
   static type = 'ES_GEOHASH_GRID';
 
