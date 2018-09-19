@@ -3,7 +3,6 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
   height: 100%;
   position: relative;
 
@@ -41,7 +40,7 @@
   }
 }
 
-.dshPanel__panel--editing {
+.dshPanel--editing {
   transition: all $euiAnimSpeedFast $euiAnimSlightResistance;
 
   &:hover,
@@ -56,7 +55,7 @@
 // Adjust borders/etc... for non-spaced out panels
 .dshLayout-withoutMargins {
   // Remove border color unless in editing mode
-  .dshPanel:not(.dshPanel__panel--editing) {
+  .dshPanel:not(.dshPanel--editing) {
     border-color: transparent;
   }
 
@@ -89,7 +88,7 @@
   display: inline-block;
 }
 
-.dshPanel__panel--editing:hover {
+.dshPanel--editing:hover {
   .dshPanel__header {
     background-color: rgba($euiColorFullShade,.05) !important;
     cursor: move;

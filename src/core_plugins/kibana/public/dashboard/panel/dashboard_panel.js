@@ -130,7 +130,7 @@ export class DashboardPanel extends React.Component {
   render() {
     const { viewOnlyMode, panel } = this.props;
     const classes = classNames('dshPanel', this.props.className, {
-      'dshPanel__panel--editing': !viewOnlyMode
+      'dshPanel--editing': !viewOnlyMode
     });
     return (
       <EuiPanel
