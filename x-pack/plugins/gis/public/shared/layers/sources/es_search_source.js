@@ -14,6 +14,7 @@ import {
 import { ASource } from './source';
 import { GeohashGridLayer } from '../geohashgrid_layer';
 import { GIS_API_PATH } from '../../../../common/constants';
+import { IndexPatternSelect } from './index_pattern_select';
 
 export class ESSearchSource extends ASource {
 
@@ -28,17 +29,7 @@ export class ESSearchSource extends ASource {
   }
 
   static renderEditor({ onPreviewSource, dataSourcesMeta }) {
-    const indexPatterns = dataSourcesMeta.elasticsearch.indexPatterns.filter(indexPattern => indexPattern.isGeohashable);
-    const onSelect = (selection) => {
-      const sourceDescriptor = ESGeohashGridSource.createDescriptor({
-        esIndexPattern: selection.esIndexPattern,
-        pointField: selection.pointField
-      });
-      const source = new ESGeohashGridSource(sourceDescriptor);
-      onPreviewSource(source);
-    };
-
-    return (<GeohashableIndexPatternEditor indexPatterns={indexPatterns} onSelect={onSelect}/>);
+    return (<Editor/>);
   }
 
   renderDetails() {
@@ -96,103 +87,29 @@ export class ESSearchSource extends ASource {
 
 }
 
-class GeohashableIndexPatternEditor extends React.Component {
+class Editor extends React.Component {
 
   constructor() {
     super();
     this.state = {
-      selectedIndexPattern: null,
-      selectedPointField: null
+      indexPatternId: '',
+      geoField: '',
+      selectedFields: [],
     };
-    this._pointFieldSelect = null;
   }
 
-  _getSelectedIndexPattern() {
-    return this.props.indexPatterns.find(indexPattern => indexPattern.id === this.state.selectedIndexPattern);
-  }
-
-  _getPointFields() {
-    const indexPattern = this._getSelectedIndexPattern();
-    return indexPattern.fields.filter(field => field.type === 'geo_point');
-  }
+  onIndexPatternSelect = (indexPatternId) => {
+    this.setState({ indexPatternId: indexPatternId });
+  };
 
   render() {
-
-    const indexPatterns = this.props.indexPatterns.map((indexPattern) => {
-      return {
-        value: indexPattern.id,
-        text: indexPattern.title
-      };
-    });
-    let pointOptions;
-    if (this.state.selectedIndexPattern) {
-      const pointFields = this._getPointFields();
-      pointOptions = pointFields.map(field => {
-        return {
-          text: field.name,
-          value: field.name
-        };
-      });
-    } else {
-      pointOptions = [];
-    }
-
-    const onIndexPatternChange = (e) => {
-      this.setState({
-        selectedIndexPattern: e.target.value,
-        selectedPointField: null
-      });
-    };
-    const onPointFieldChange = (e) => {
-      this.setState({
-        selectedPointField: e.target.value
-      });
-    };
-
-
-    let geoFieldSelect;
-    if (this.state.selectedIndexPattern) {
-      geoFieldSelect = (
-        <EuiSelect
-          options={pointOptions}
-          aria-label="Select geo_point field used to group points into buckets that represent cells in a grid."
-          onChange={onPointFieldChange}
-        />
-      );
-    }
-
     return (
       <Fragment>
-        <EuiSelect
-          hasNoInitialSelection
-          options={indexPatterns}
-          onChange={onIndexPatternChange}
-          aria-label="Select index-pattern"
+        <IndexPatternSelect
+          indexPatternId={this.state.indexPatternId}
+          onChange={this.onIndexPatternSelect}
+          placeholder="Select index pattern"
         />
-        {geoFieldSelect}
-        <EuiButton
-          size="s"
-          onClick={() => {
-            if (!this.state.selectedIndexPattern) {
-              return;
-            }
-            const indexPattern = this._getSelectedIndexPattern();
-            let pointField;
-            if (this.state.selectedPointField) {
-              pointField = this.state.selectedPointField;
-            } else {
-              const pointFields = this._getPointFields();
-              pointField = pointFields[0].name;
-            }
-            this.props.onSelect({
-              esIndexPattern: indexPattern.title,
-              pointField: pointField
-            });
-          }}
-          isDisabled={!this.state.selectedIndexPattern}
-        >
-          Preview geohash layer
-        </EuiButton>
       </Fragment>
     );
   }
