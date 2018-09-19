@@ -4,6 +4,7 @@
  * you may not use this file except in compliance with the Elastic License.
  */
 
+import _ from 'lodash';
 import React, { Fragment } from 'react';
 
 import {
@@ -15,6 +16,8 @@ import { ASource } from './source';
 import { GeohashGridLayer } from '../geohashgrid_layer';
 import { GIS_API_PATH } from '../../../../common/constants';
 import { IndexPatternSelect } from './index_pattern_select';
+import { SingleFieldSelect } from './single_field_select';
+import { indexPatternService } from '../../../kibana_services';
 
 export class ESSearchSource extends ASource {
 
@@ -92,15 +95,75 @@ class Editor extends React.Component {
   constructor() {
     super();
     this.state = {
+      isLoadingIndexPattern: false,
       indexPatternId: '',
       geoField: '',
       selectedFields: [],
     };
   }
 
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+    this.loadIndexPattern(this.state.indexPatternId);
+  }
+
   onIndexPatternSelect = (indexPatternId) => {
-    this.setState({ indexPatternId: indexPatternId });
+    this.setState({
+      indexPatternId,
+    }, this.loadIndexPattern(indexPatternId));
   };
+
+  loadIndexPattern = (indexPatternId) => {
+    this.setState({
+      isLoadingIndexPattern: true,
+      indexPattern: undefined,
+      geoField: undefined,
+    }, this.debouncedLoad.bind(null, indexPatternId));
+  }
+
+  debouncedLoad = _.debounce(async (indexPatternId) => {
+    if (!indexPatternId || indexPatternId.length === 0) {
+      return;
+    }
+
+    let indexPattern;
+    try {
+      indexPattern = await indexPatternService.get(indexPatternId);
+    } catch (err) {
+      // index pattern no longer exists
+      return;
+    }
+
+    console.log(indexPattern);
+
+    if (!this._isMounted) {
+      return;
+    }
+
+    // props.indexPatternId may be updated before getIndexPattern returns
+    // ignore response when fetched index pattern does not match active index pattern
+    if (indexPattern.id !== indexPatternId) {
+      return;
+    }
+    console.log(indexPattern);
+
+    this.setState({
+      isLoadingIndexPattern: false,
+      indexPattern: indexPattern
+    });
+  }, 300);
+
+  onGeoFieldSelect = (geoField) => {
+    this.setState({ geoField });
+  };
+
+  filterGeoField = (field) => {
+    return ['geo_point', 'geo_shape'].includes(field.type);
+  }
 
   render() {
     return (
@@ -109,6 +172,13 @@ class Editor extends React.Component {
           indexPatternId={this.state.indexPatternId}
           onChange={this.onIndexPatternSelect}
           placeholder="Select index pattern"
+        />
+        <SingleFieldSelect
+          placeholder="Select geo field"
+          value={this.state.geoField}
+          onChange={this.onGeoFieldSelect}
+          filterField={this.filterGeoField}
+          fields={this.state.indexPattern ? this.state.indexPattern.fields : undefined}
         />
       </Fragment>
     );

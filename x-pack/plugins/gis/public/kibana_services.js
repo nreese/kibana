@@ -1,11 +1,13 @@
+/*
+ * Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+ * or more contributor license agreements. Licensed under the Elastic License;
+ * you may not use this file except in compliance with the Elastic License.
+ */
 
 import { uiModules } from 'ui/modules';
-import React from 'react';
 
-export const kibanaContext = React.createContext({});
-export let indexPatterns;
+export let indexPatternService;
 
 uiModules.get('gis').run(($injector) => {
-  indexPatterns = $injector.get('indexPatterns');
-  console.log('yesss!!!');
+  indexPatternService = $injector.get('indexPatterns');
 });
