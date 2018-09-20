@@ -8,17 +8,12 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Fragment } from 'react';
 
-import {
-  EuiButton,
-  EuiSelect
-} from '@elastic/eui';
-
 import { ASource } from './source';
-import { GeohashGridLayer } from '../geohashgrid_layer';
 import { IndexPatternSelect } from './index_pattern_select';
 import { SingleFieldSelect } from './single_field_select';
 import { indexPatternService, SearchSource } from '../../../kibana_services';
 import { VectorLayer } from '../vector_layer';
+import { hitsToGeoJson } from '../../../elasticsearch_geo_utils';
 
 export class ESSearchSource extends ASource {
 
@@ -49,11 +44,14 @@ export class ESSearchSource extends ASource {
         <div>
           <span className="bold">Geo field: </span><span>{this._descriptor.geoField}</span>
         </div>
+        <div>
+          <span className="bold">Limit: </span><span>{this._descriptor.limit}</span>
+        </div>
       </Fragment>
     );
   }
 
-  async getGeoJson(precision, extent) {
+  async getGeoJson(/* precision, extent */) {
     let indexPattern;
     try {
       indexPattern = await indexPatternService.get(this._descriptor.indexPatternId);
@@ -62,21 +60,27 @@ export class ESSearchSource extends ASource {
       return { type: 'FeatureCollection', features: [] };
     }
 
-    const searchSource = new SearchSource();
-    searchSource.setField('index', indexPattern);
-    searchSource.setField('size', 10);
-
     let resp;
     try {
+      const searchSource = new SearchSource();
+      searchSource.setField('index', indexPattern);
+      searchSource.setField('size', this._descriptor.limit);
       resp = await searchSource.fetch();
     } catch(error) {
       // TODO dispatch action to set error state in store
       return { type: 'FeatureCollection', features: [] };
     }
 
-    console.log('resp', resp);
+    let geoJson;
+    try {
+      const field = indexPattern.fields.byName[this._descriptor.geoField];
+      geoJson = hitsToGeoJson(resp.hits.hits, field.name, field.type);
+    } catch(error) {
+      // TODO dispatch action to set error state in store
+      return { type: 'FeatureCollection', features: [] };
+    }
 
-    return { type: 'FeatureCollection', features: [] };
+    return geoJson;
   }
 
   createDefaultLayer(options) {
@@ -90,7 +94,7 @@ export class ESSearchSource extends ASource {
   }
 
   getDisplayName() {
-    return 'search source';
+    return this._descriptor.name;
   }
 }
 
@@ -145,8 +149,6 @@ class Editor extends React.Component {
       return;
     }
 
-    console.log(indexPattern);
-
     if (!this._isMounted) {
       return;
     }
@@ -178,6 +180,8 @@ class Editor extends React.Component {
       this.props.onSelect({
         indexPatternId,
         geoField,
+        limit: 10,
+        name: 'My elasticsearch document layer'
       });
     }
   }
