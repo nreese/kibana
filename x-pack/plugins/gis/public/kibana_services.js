@@ -5,9 +5,13 @@
  */
 
 import { uiModules } from 'ui/modules';
+import { SearchSourceProvider } from 'ui/courier';
 
 export let indexPatternService;
+export let SearchSource;
 
 uiModules.get('gis').run(($injector) => {
   indexPatternService = $injector.get('indexPatterns');
+  const Private = $injector.get('Private');
+  SearchSource = Private(SearchSourceProvider);
 });

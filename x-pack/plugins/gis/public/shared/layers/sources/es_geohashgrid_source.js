@@ -155,7 +155,7 @@ class GeohashableIndexPatternEditor extends React.Component {
       geoFieldSelect = (
         <EuiSelect
           options={pointOptions}
-          aria-label="Select geo_point field used to group points into buckets that represent cells in a grid."
+          aria-label="Select geo_point field"
           onChange={onPointFieldChange}
         />
       );

@@ -5,6 +5,7 @@
  */
 
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import React, { Fragment } from 'react';
 
 import {
@@ -14,83 +15,89 @@ import {
 
 import { ASource } from './source';
 import { GeohashGridLayer } from '../geohashgrid_layer';
-import { GIS_API_PATH } from '../../../../common/constants';
 import { IndexPatternSelect } from './index_pattern_select';
 import { SingleFieldSelect } from './single_field_select';
-import { indexPatternService } from '../../../kibana_services';
+import { indexPatternService, SearchSource } from '../../../kibana_services';
+import { VectorLayer } from '../vector_layer';
 
 export class ESSearchSource extends ASource {
 
-  static type = 'ES_GEOHASH_GRID';
+  static type = 'ES_SEARCH';
 
-  static createDescriptor({ esIndexPattern, pointField }) {
-    return {
-      type: ESGeohashGridSource.type,
-      esIndexPattern: esIndexPattern,
-      pointField: pointField
+  static renderEditor({ onPreviewSource }) {
+    const onSelect = (layerConfig) => {
+      const layerSource = new ESSearchSource(layerConfig);
+      onPreviewSource(layerSource);
     };
+
+    return (<Editor onSelect={onSelect}/>);
   }
 
-  static renderEditor({ onPreviewSource, dataSourcesMeta }) {
-    return (<Editor/>);
+  constructor(descriptor) {
+    super({ type: ESSearchSource.type, ...descriptor });
   }
 
   renderDetails() {
     return (
       <Fragment>
         <div>
-          <span className="bold">Type: </span><span>Geohash grid (todo, use icon)</span>
+          <span className="bold">Type: </span><span>Elasticsearch document</span>
         </div>
         <div>
-          <span className="bold">Index pattern: </span><span>{this._descriptor.esIndexPattern}</span>
+          <span className="bold">Index pattern: </span><span>{this._descriptor.indexPatternId}</span>
         </div>
         <div>
-          <span className="bold">Point field: </span><span>{this._descriptor.pointField}</span>
+          <span className="bold">Geo field: </span><span>{this._descriptor.geoField}</span>
         </div>
       </Fragment>
     );
   }
 
-  async getGeoJsonPointsWithTotalCount(precision, extent) {
+  async getGeoJson(precision, extent) {
+    let indexPattern;
     try {
-      let url = `../${GIS_API_PATH}/data/geohash_grid`;
-      url += `?index_pattern=${encodeURIComponent(this._descriptor.esIndexPattern)}`;
-      url += `&geo_point_field=${encodeURIComponent(this._descriptor.pointField)}`;
-      url += `&precision=${precision}`;
-      url += `&minlon=${extent[0]}`;
-      url += `&maxlon=${extent[2]}`;
-      url += `&minlat=${extent[1]}`;
-      url += `&maxlat=${extent[3]}`;
-      const data = await fetch(url);
-      return data.json();
-    } catch (e) {
-      console.error('Cant load data', e);
+      indexPattern = await indexPatternService.get(this._descriptor.indexPatternId);
+    } catch (err) {
+      // TODO dispatch action to set error state in store
       return { type: 'FeatureCollection', features: [] };
     }
-  }
 
-  _createDefaultLayerDescriptor(options) {
-    return GeohashGridLayer.createDescriptor({
-      sourceDescriptor: this._descriptor,
-      ...options
-    });
+    const searchSource = new SearchSource();
+    searchSource.setField('index', indexPattern);
+    searchSource.setField('size', 10);
+
+    let resp;
+    try {
+      resp = await searchSource.fetch();
+    } catch(error) {
+      // TODO dispatch action to set error state in store
+      return { type: 'FeatureCollection', features: [] };
+    }
+
+    console.log('resp', resp);
+
+    return { type: 'FeatureCollection', features: [] };
   }
 
   createDefaultLayer(options) {
-    return new GeohashGridLayer({
-      layerDescriptor: this._createDefaultLayerDescriptor(options),
+    return new VectorLayer({
+      layerDescriptor: VectorLayer.createDescriptor({
+        sourceDescriptor: this._descriptor,
+        ...options
+      }),
       source: this
     });
   }
 
   getDisplayName() {
-    return this._descriptor.esIndexPattern + ' grid';
+    return 'search source';
   }
-
-
 }
 
 class Editor extends React.Component {
+  static propTypes = {
+    onSelect: PropTypes.func.isRequired,
+  }
 
   constructor() {
     super();
@@ -149,7 +156,6 @@ class Editor extends React.Component {
     if (indexPattern.id !== indexPatternId) {
       return;
     }
-    console.log(indexPattern);
 
     this.setState({
       isLoadingIndexPattern: false,
@@ -158,8 +164,23 @@ class Editor extends React.Component {
   }, 300);
 
   onGeoFieldSelect = (geoField) => {
-    this.setState({ geoField });
+    this.setState({
+      geoField
+    }, this.previewLayer);
   };
+
+  previewLayer = () => {
+    const {
+      indexPatternId,
+      geoField,
+    } = this.state;
+    if (indexPatternId && geoField) {
+      this.props.onSelect({
+        indexPatternId,
+        geoField,
+      });
+    }
+  }
 
   filterGeoField = (field) => {
     return ['geo_point', 'geo_shape'].includes(field.type);
@@ -183,6 +204,4 @@ class Editor extends React.Component {
       </Fragment>
     );
   }
-
-
 }
