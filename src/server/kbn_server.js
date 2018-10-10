@@ -44,6 +44,7 @@ import { serverExtensionsMixin } from './server_extensions';
 import { uiMixin } from '../ui';
 import { sassMixin } from './sass';
 import { i18nMixin } from './i18n';
+import { omniBarMixin } from './omni_bar/omni_bar_mixin';
 
 const rootDir = fromRoot('.');
 
@@ -93,6 +94,8 @@ export default class KbnServer {
 
       // setup routes for installing/uninstalling sample data sets
       sampleDataMixin,
+
+      omniBarMixin,
 
       // setup routes for short urls
       urlShorteningMixin,
