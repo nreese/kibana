@@ -7,9 +7,7 @@
 import React from 'react';
 import { ALL_SOURCES } from '../../shared/layers/sources/all_sources';
 import {
-  EuiSpacer,
   EuiButton,
-  EuiHorizontalRule,
   EuiButtonEmpty,
   EuiFlexGroup,
   EuiFlexItem,
@@ -18,6 +16,9 @@ import {
   EuiFormRow,
   EuiSuperSelect,
   EuiPanel,
+  EuiFlyoutHeader,
+  EuiFlyoutBody,
+  EuiFlyoutFooter,
 } from '@elastic/eui';
 
 export class AddLayerPanel extends React.Component {
@@ -147,23 +148,19 @@ export class AddLayerPanel extends React.Component {
         direction="column"
         gutterSize="none"
       >
-        <EuiFlexItem grow={false} className="gisLayerPanel__header">
+        <EuiFlyoutHeader hasBorder className="gisLayerPanel__footer">
           <EuiTitle size="s">
-            <h1>Add layer</h1>
+            <h2>Add layer</h2>
           </EuiTitle>
-          <EuiSpacer size="m"/>
-          <EuiHorizontalRule margin="none"/>
-        </EuiFlexItem>
+        </EuiFlyoutHeader>
 
-        <EuiFlexItem className="gisLayerPanel__body">
-          <EuiPanel>
+        <EuiFlyoutBody className="gisLayerPanel__body">
+          <EuiPanel grow={false}>
             {this._renderAddLayerForm()}
           </EuiPanel>
-        </EuiFlexItem>
+        </EuiFlyoutBody>
 
-        <EuiFlexItem grow={false} className="gisLayerPanel__footer">
-          <EuiHorizontalRule margin="none"/>
-          <EuiSpacer size="m"/>
+        <EuiFlyoutFooter className="gisLayerPanel__footer">
           <EuiFlexGroup justifyContent="spaceBetween" responsive={false}>
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
@@ -177,7 +174,7 @@ export class AddLayerPanel extends React.Component {
               {this._renderNextBtn()}
             </EuiFlexItem>
           </EuiFlexGroup>
-        </EuiFlexItem>
+        </EuiFlyoutFooter>
       </EuiFlexGroup>
     );
   }
