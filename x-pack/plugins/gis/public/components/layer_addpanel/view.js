@@ -102,7 +102,6 @@ export class AddLayerPanel extends React.Component {
     return (
       <EuiFormRow label="Data source">
         <EuiSuperSelect
-          itemClassName="sourceSelectItem"
           options={sourceOptions}
           valueOfSelected={this.state.sourceType}
           onChange={this._onSourceTypeChange}
@@ -148,7 +147,7 @@ export class AddLayerPanel extends React.Component {
         direction="column"
         gutterSize="none"
       >
-        <EuiFlexItem grow={false} className="gisViewPanel__header">
+        <EuiFlexItem grow={false} className="gisLayerPanel__header">
           <EuiTitle size="s">
             <h1>Add layer</h1>
           </EuiTitle>
@@ -156,13 +155,13 @@ export class AddLayerPanel extends React.Component {
           <EuiHorizontalRule margin="none"/>
         </EuiFlexItem>
 
-        <EuiFlexItem className="gisViewPanel__body">
+        <EuiFlexItem className="gisLayerPanel__body">
           <EuiPanel>
             {this._renderAddLayerForm()}
           </EuiPanel>
         </EuiFlexItem>
 
-        <EuiFlexItem grow={false} className="gisViewPanel__footer">
+        <EuiFlexItem grow={false} className="gisLayerPanel__footer">
           <EuiHorizontalRule margin="none"/>
           <EuiSpacer size="m"/>
           <EuiFlexGroup justifyContent="spaceBetween" responsive={false}>
