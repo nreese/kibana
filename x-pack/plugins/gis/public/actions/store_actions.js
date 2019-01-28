@@ -251,7 +251,6 @@ export function clearMouseCoordinates() {
   return { type: CLEAR_MOUSE_COORDINATES };
 }
 
-
 export function fitToLayerExtent(layerId) {
   return async function (dispatch, getState) {
     const targetLayer = getLayerList(getState()).find(layer => {
@@ -274,7 +273,6 @@ export function setGotoWithBounds(bounds) {
     bounds: bounds
   };
 }
-
 
 export function setGotoWithCenter({ lat, lon, zoom }) {
   return {
