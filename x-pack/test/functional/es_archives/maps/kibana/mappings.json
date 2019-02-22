@@ -219,13 +219,13 @@
           "type": "nested",
           "properties": {
             "name": {
-              "type": "keyword",
+              "type": "keyword"
             },
             "type": {
-              "type": "keyword",
+              "type": "keyword"
             },
             "id": {
-              "type": "keyword",
+              "type": "keyword"
             },
           },
         },
