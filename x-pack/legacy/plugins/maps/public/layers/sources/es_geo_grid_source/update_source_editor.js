@@ -16,19 +16,19 @@ import { EuiFormRow } from '@elastic/eui';
 export class UpdateSourceEditor extends Component {
 
   state = {
-    fields: null,
+    indexPattern: null,
   };
 
   componentDidMount() {
     this._isMounted = true;
-    this._loadFields();
+    this._loadIndexPattern();
   }
 
   componentWillUnmount() {
     this._isMounted = false;
   }
 
-  async _loadFields() {
+  async _loadIndexPattern() {
     let indexPattern;
     try {
       indexPattern = await indexPatternService.get(this.props.indexPatternId);
@@ -50,7 +50,7 @@ export class UpdateSourceEditor extends Component {
       return;
     }
 
-    this.setState({ fields: indexPattern.fields });
+    this.setState({ indexPattern });
   }
 
   _onMetricsChange = (metrics) => {
@@ -62,6 +62,10 @@ export class UpdateSourceEditor extends Component {
   };
 
   _renderMetricsEditor() {
+    if (!this.state.indexPattern) {
+      return null;
+    }
+
     const metricsFilter = (this.props.renderAs === RENDER_AS.HEATMAP) ?  ((metric) => {
       //these are countable metrics, where blending heatmap color blobs make sense
       return ['count', 'sum'].includes(metric.value);
@@ -75,9 +79,9 @@ export class UpdateSourceEditor extends Component {
       >
         <div>
           <MetricsEditor
+            indexPattern={this.state.indexPattern}
             allowMultipleMetrics={allowMultipleMetrics}
             metricsFilter={metricsFilter}
-            fields={this.state.fields}
             metrics={this.props.metrics}
             onChange={this._onMetricsChange}
           />

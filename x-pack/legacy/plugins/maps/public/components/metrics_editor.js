@@ -14,93 +14,63 @@ import {
   EuiPanel,
 } from '@elastic/eui';
 import { MetricEditor } from './metric_editor';
+import { DefaultEditorAggGroup } from '../../../../../../src/legacy/ui/public/vis/editors/default/components/agg_group';
+import { Schemas } from 'ui/vis/editors/default/schemas';
+import { AggConfigs } from 'ui/vis/agg_configs';
 
-export function MetricsEditor({ fields, metrics, onChange, allowMultipleMetrics, metricsFilter }) {
+const geoTileGridSchema = new Schemas([
+  {
+    group: 'metrics',
+    name: 'metric',
+    title: i18n.translate('maps.geoTileGrid.schemas.metricTitle', {
+      defaultMessage: 'Grid cell metric',
+    }),
+    min: 1,
+    max: Infinity,
+    aggFilter: ['count', 'avg', 'sum', 'min', 'max', 'cardinality', 'top_hits'],
+    defaults: [
+      { schema: 'metric', type: 'count' },
+    ],
+  }
+]);
 
-  function renderMetrics() {
-    return metrics.map((metric, index) => {
-      const onMetricChange = (metric) => {
-        onChange([
-          ...metrics.slice(0, index),
-          metric,
-          ...metrics.slice(index + 1)
-        ]);
-      };
+export function MetricsEditor({ indexPattern, metrics, onChange, allowMultipleMetrics, metricsFilter }) {
 
-      const onRemove = () => {
-        onChange([
-          ...metrics.slice(0, index),
-          ...metrics.slice(index + 1)
-        ]);
-      };
-
-      let removeButton;
-      if (index > 0) {
-        removeButton = (
-          <EuiButtonIcon
-            iconType="trash"
-            color="danger"
-            aria-label={i18n.translate('xpack.maps.metricsEditor.deleteMetricAriaLabel', {
-              defaultMessage: 'Delete metric'
-            })}
-            title={i18n.translate('xpack.maps.metricsEditor.deleteMetricButtonLabel', {
-              defaultMessage: 'Delete metric'
-            })}
-            onClick={onRemove}
-          />
-        );
-      }
-      return (
-        <EuiPanel
-          key={index}
-          className="mapMetricEditorPanel"
-          paddingSize="s"
-        >
-          <MetricEditor
-            onChange={onMetricChange}
-            metric={metric}
-            fields={fields}
-            metricsFilter={metricsFilter}
-            removeButton={removeButton}
-          />
-        </EuiPanel>
-      );
-    });
+  function onAggParamsChange(args) {
+    console.log('onAggParamsChange args', args);
   }
 
-  function addMetric() {
-    onChange([
-      ...metrics,
-      {},
-    ]);
+  function onAggTypeChange(args) {
+    console.log('onAggTypeChange args', args);
   }
 
-  function renderAddMetricButton() {
-
-    if (!allowMultipleMetrics) {
-      return null;
-    }
-
-    return (
-      <EuiButton
-        onClick={addMetric}
-        style={{ topMargin: '4px' }}
-      >
-        <FormattedMessage
-          id="xpack.maps.metricsEditor.addMetricButtonLabel"
-          defaultMessage="Add metric"
-        />
-      </EuiButton>
-    );
+  function onToggleEnableAgg(args) {
+    console.log('onToggleEnableAgg args', args);
   }
 
+  function setTouched(args) {
+    console.log('setTouched', args)
+  }
+
+  function setValidity(args) {
+    console.log('setValidity', args)
+  }
+
+  const state = {
+    aggs: new AggConfigs(indexPattern, [], geoTileGridSchema.metrics)
+  };
 
   return (
-    <Fragment>
-      {renderMetrics()}
-
-      {renderAddMetricButton()}
-    </Fragment>
+    <DefaultEditorAggGroup
+      groupName="metrics"
+      schemas={geoTileGridSchema.metrics}
+      onAggParamsChange={onAggParamsChange}
+      onAggTypeChange={onAggTypeChange}
+      onToggleEnableAgg={onToggleEnableAgg}
+      setTouched={setTouched}
+      setValidity={setValidity}
+      state={state}
+    />
   );
 }
 

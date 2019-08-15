@@ -62,6 +62,8 @@ function DefaultEditorAggGroup({
   // e.g. buckets can have no aggs
   const group: AggConfig[] = state.aggs.bySchemaGroup[groupName] || [];
 
+
+  console.log(state);
   const stats = {
     max: 0,
     count: group.length,
