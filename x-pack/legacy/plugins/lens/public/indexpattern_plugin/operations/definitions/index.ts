@@ -14,6 +14,7 @@ import { termsOperation } from './terms';
 import { cardinalityOperation } from './cardinality';
 import { minOperation, averageOperation, sumOperation, maxOperation } from './metrics';
 import { dateHistogramOperation } from './date_histogram';
+import { geoTileGridOperation } from './geotile_grid';
 import { countOperation } from './count';
 import { DimensionPriority, StateSetter, OperationMetadata } from '../../../types';
 import { BaseIndexPatternColumn, FieldBasedIndexPatternColumn } from './column_types';
@@ -25,6 +26,7 @@ import { IndexPatternPrivateState, IndexPattern, IndexPatternField } from '../..
 const internalOperationDefinitions = [
   termsOperation,
   dateHistogramOperation,
+  geoTileGridOperation,
   minOperation,
   maxOperation,
   averageOperation,

@@ -23,6 +23,10 @@ import {
   datatableVisualizationSetup,
   datatableVisualizationStop,
 } from '../datatable_visualization_plugin';
+import {
+  mapSetup,
+  mapStop,
+} from '../map_plugin';
 import { App } from './app';
 import { EditorFrameInstance } from '../types';
 import {
@@ -49,12 +53,14 @@ export class AppPlugin {
     const datatableVisualization = datatableVisualizationSetup();
     const xyVisualization = xyVisualizationSetup();
     const metricVisualization = metricVisualizationSetup();
+    const mapVisualization = mapSetup();
     const editorFrameSetupInterface = editorFrameSetup();
     this.store = new SavedObjectIndexStore(chrome!.getSavedObjectsClient());
 
     editorFrameSetupInterface.registerVisualization(xyVisualization);
     editorFrameSetupInterface.registerVisualization(datatableVisualization);
     editorFrameSetupInterface.registerVisualization(metricVisualization);
+    editorFrameSetupInterface.registerVisualization(mapVisualization);
     editorFrameSetupInterface.registerDatasource('indexpattern', indexPattern);
   }
 
@@ -129,6 +135,7 @@ export class AppPlugin {
     xyVisualizationStop();
     metricVisualizationStop();
     datatableVisualizationStop();
+    mapStop();
     editorFrameStop();
   }
 }

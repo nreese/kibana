@@ -110,7 +110,7 @@ export function getDatasourceSuggestionsForField(
 }
 
 function getBucketOperation(field: IndexPatternField) {
-  return getOperationTypesForField(field).find(op => op === 'date_histogram' || op === 'terms');
+  return getOperationTypesForField(field).find(op => op === 'date_histogram' || op === 'terms' || op === 'geotile_grid');
 }
 
 function getExistingLayerSuggestionsForField(
