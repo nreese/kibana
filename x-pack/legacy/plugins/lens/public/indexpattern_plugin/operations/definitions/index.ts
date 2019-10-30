@@ -4,12 +4,12 @@
  * you may not use this file except in compliance with the Elastic License.
  */
 
-import { Storage } from 'ui/storage';
 import {
   UiSettingsClientContract,
   SavedObjectsClientContract,
   HttpServiceBase,
 } from 'src/core/public';
+import { IStorageWrapper } from 'src/plugins/kibana_utils/public';
 import { termsOperation } from './terms';
 import { cardinalityOperation } from './cardinality';
 import { minOperation, averageOperation, sumOperation, maxOperation } from './metrics';
@@ -17,8 +17,9 @@ import { dateHistogramOperation } from './date_histogram';
 import { geoTileGridOperation } from './geotile_grid';
 import { countOperation } from './count';
 import { DimensionPriority, StateSetter, OperationMetadata } from '../../../types';
-import { BaseIndexPatternColumn, FieldBasedIndexPatternColumn } from './column_types';
+import { BaseIndexPatternColumn } from './column_types';
 import { IndexPatternPrivateState, IndexPattern, IndexPatternField } from '../../types';
+import { DateRange } from '../../../../common';
 
 // List of all operation definitions registered to this data source.
 // If you want to implement a new operation, add it to this array and
@@ -50,9 +51,10 @@ export interface ParamEditorProps<C extends BaseIndexPatternColumn> {
   columnId: string;
   layerId: string;
   uiSettings: UiSettingsClientContract;
-  storage: Storage;
+  storage: IStorageWrapper;
   savedObjectsClient: SavedObjectsClientContract;
   http: HttpServiceBase;
+  dateRange: DateRange;
 }
 
 interface BaseOperationDefinitionProps<C extends BaseIndexPatternColumn> {
@@ -142,26 +144,14 @@ interface FieldBasedOperationDefinition<C extends BaseIndexPatternColumn>
   onFieldChange: (oldColumn: C, indexPattern: IndexPattern, field: IndexPatternField) => C;
 }
 
-interface DocumentBasedOperationDefinition<C extends BaseIndexPatternColumn>
-  extends BaseOperationDefinitionProps<C> {
-  /**
-   * Returns the meta data of the operation if applied to documents of the given index pattern.
-   * Undefined if the operation is not applicable to the index pattern.
-   */
-  getPossibleOperationForDocument: (indexPattern: IndexPattern) => OperationMetadata | undefined;
-  buildColumn: (arg: BaseBuildColumnArgs) => C;
-}
-
 /**
  * Shape of an operation definition. If the type parameter of the definition
  * indicates a field based column, `getPossibleOperationForField` has to be
  * specified, otherwise `getPossibleOperationForDocument` has to be defined.
  */
-export type OperationDefinition<
-  C extends BaseIndexPatternColumn
-> = C extends FieldBasedIndexPatternColumn
-  ? FieldBasedOperationDefinition<C>
-  : DocumentBasedOperationDefinition<C>;
+export type OperationDefinition<C extends BaseIndexPatternColumn> = FieldBasedOperationDefinition<
+  C
+>;
 
 // Helper to to infer the column type out of the operation definition.
 // This is done to avoid it to have to list out the column types along with
@@ -187,9 +177,7 @@ export type OperationType = (typeof internalOperationDefinitions)[number]['type'
  * This is an operation definition of an unspecified column out of all possible
  * column types. It
  */
-export type GenericOperationDefinition =
-  | FieldBasedOperationDefinition<IndexPatternColumn>
-  | DocumentBasedOperationDefinition<IndexPatternColumn>;
+export type GenericOperationDefinition = FieldBasedOperationDefinition<IndexPatternColumn>;
 
 /**
  * List of all available operation definitions
