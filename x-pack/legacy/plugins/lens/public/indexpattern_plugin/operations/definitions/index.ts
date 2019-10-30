@@ -14,6 +14,7 @@ import { termsOperation } from './terms';
 import { cardinalityOperation } from './cardinality';
 import { minOperation, averageOperation, sumOperation, maxOperation } from './metrics';
 import { dateHistogramOperation } from './date_histogram';
+import { geoCentroidOperation } from './geo_centroid';
 import { geoTileGridOperation } from './geotile_grid';
 import { countOperation } from './count';
 import { DimensionPriority, StateSetter, OperationMetadata } from '../../../types';
@@ -27,6 +28,7 @@ import { DateRange } from '../../../../common';
 const internalOperationDefinitions = [
   termsOperation,
   dateHistogramOperation,
+  geoCentroidOperation,
   geoTileGridOperation,
   minOperation,
   maxOperation,

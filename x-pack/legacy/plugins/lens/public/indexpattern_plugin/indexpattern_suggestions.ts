@@ -228,7 +228,7 @@ function addFieldAsBucketOperation(
     [newColumnId]: newColumn,
   };
   let updatedColumnOrder: string[] = [];
-  if (applicableBucketOperation === 'terms') {
+  if (applicableBucketOperation === 'terms' || applicableBucketOperation === 'geotile_grid') {
     updatedColumnOrder = [newColumnId, ...buckets, ...metrics];
   } else {
     const oldDateHistogramColumn = layer.columnOrder.find(
@@ -285,26 +285,38 @@ function createNewLayerWithBucketAggregation(
   indexPattern: IndexPattern,
   field: IndexPatternField
 ): IndexPatternLayer {
-  const countColumn = buildColumn({
-    op: 'count',
-    columns: {},
-    indexPattern,
-    layerId,
-    suggestedPriority: undefined,
-    field: documentField,
-  });
-
   const col1 = generateId();
-  const col2 = generateId();
 
-  // let column know about count column
+  const countId = generateId();
+  const metricColumns = {
+    [countId]: buildColumn({
+      op: 'count',
+      columns: {},
+      indexPattern,
+      layerId,
+      suggestedPriority: undefined,
+      field: documentField,
+    }),
+  };
+
+  if (field.type === 'geo_point') {
+    const geoCentroidId = generateId();
+    metricColumns[geoCentroidId] = buildColumn({
+      op: 'geo_centroid',
+      columns: {},
+      indexPattern,
+      layerId,
+      suggestedPriority: undefined,
+      field,
+    });
+  }
+
+  // let column know about metric columns
   const column = buildColumn({
     layerId,
     op: getBucketOperation(field),
     indexPattern,
-    columns: {
-      [col2]: countColumn,
-    },
+    columns: metricColumns,
     field,
     suggestedPriority: undefined,
   });
@@ -313,9 +325,9 @@ function createNewLayerWithBucketAggregation(
     indexPatternId: indexPattern.id,
     columns: {
       [col1]: column,
-      [col2]: countColumn,
+      ...metricColumns,
     },
-    columnOrder: [col1, col2],
+    columnOrder: [col1, ...Object.keys(metricColumns)],
   };
 }
 
