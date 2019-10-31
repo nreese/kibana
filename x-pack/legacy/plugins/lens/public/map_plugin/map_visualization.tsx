@@ -19,7 +19,6 @@ import {
 } from '../types';
 import { generateId } from '../id_generator';
 import { NativeRenderer } from '../native_renderer';
-import chartTableSVG from '../assets/chart_datatable.svg';
 
 export interface LayerState {
   layerId: string;
@@ -103,7 +102,7 @@ export const mapVisualization: Visualization<
     {
       id: 'lnsMap',
       icon: 'visTable',
-      largeIcon: chartTableSVG,
+      largeIcon: 'gisApp',
       label: i18n.translate('xpack.lens.map.label', {
         defaultMessage: 'Map',
       }),
@@ -112,7 +111,7 @@ export const mapVisualization: Visualization<
 
   getDescription(state) {
     return {
-      icon: chartTableSVG,
+      icon: 'gisApp',
       label: i18n.translate('xpack.lens.map.label', {
         defaultMessage: 'Map',
       }),
@@ -177,7 +176,7 @@ export const mapVisualization: Visualization<
             },
           ],
         },
-        previewIcon: chartTableSVG,
+        previewIcon: 'gisApp',
         // dont show suggestions for reduced versions or single-line tables
         hide: table.changeType === 'reduced' || !table.isMultiRow,
       },

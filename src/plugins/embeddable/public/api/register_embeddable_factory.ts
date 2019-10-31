@@ -23,9 +23,11 @@ export const registerEmbeddableFactory: EmbeddableApiPure['registerEmbeddableFac
   embeddableFactories,
 }) => (embeddableFactoryId, factory) => {
   if (embeddableFactories.has(embeddableFactoryId)) {
-    throw new Error(
-      `Embeddable factory [embeddableFactoryId = ${embeddableFactoryId}] already registered in Embeddables API.`
-    );
+    // for some reason lens embeddable is getting registered twice
+    return;
+    //throw new Error(
+    //  `Embeddable factory [embeddableFactoryId = ${embeddableFactoryId}] already registered in Embeddables API.`
+    //);
   }
 
   embeddableFactories.set(embeddableFactoryId, factory);

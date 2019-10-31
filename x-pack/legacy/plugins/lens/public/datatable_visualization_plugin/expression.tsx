@@ -140,6 +140,8 @@ function DatatableComponent(props: DatatableProps & { formatFactory: FormatFacto
     formatters[column.id] = props.formatFactory(column.formatHint);
   });
 
+  console.log('data table props', props);
+
   return (
     <VisualizationContainer>
       <EuiBasicTable

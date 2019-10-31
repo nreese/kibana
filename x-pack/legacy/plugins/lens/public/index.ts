@@ -14,6 +14,8 @@ import 'uiExports/visRequestHandlers';
 import 'uiExports/visResponseHandlers';
 // Used for kibana_context function
 import 'uiExports/savedObjectTypes';
+import 'uiExports/embeddableFactories';
+import 'uiExports/embeddableActions';
 
 import { render, unmountComponentAtNode } from 'react-dom';
 import { IScope } from 'angular';

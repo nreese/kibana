@@ -15,6 +15,7 @@ import {
 } from '../../../../../../src/legacy/core_plugins/expressions/public';
 import { FormatFactory } from '../../../../../../src/legacy/ui/public/visualize/loader/pipeline_helpers/utilities';
 import { VisualizationContainer } from '../visualization_container';
+import { EmbeddedMap } from './embedded_map';
 
 export interface MapColumns {
   columnIds: string[];
@@ -142,9 +143,7 @@ function MapComponent(props: MapProps & { formatFactory: FormatFactory }) {
 
   return (
     <VisualizationContainer>
-      <div>
-        Map goes here
-      </div>
+      <EmbeddedMap />
     </VisualizationContainer>
   );
 }
