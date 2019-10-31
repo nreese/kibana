@@ -6,84 +6,227 @@
 
 import React from 'react';
 import { render } from 'react-dom';
-import { I18nProvider } from '@kbn/i18n/react';
+import { EuiForm, EuiFormRow, EuiPanel, EuiSpacer } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
-import { Ast } from '@kbn/interpreter/target/common';
-import { State, PersistableState } from './types';
-import { getSuggestions } from './map_suggestions';
-import { Visualization, FramePublicAPI } from '../types';
+import { I18nProvider } from '@kbn/i18n/react';
+import { MultiColumnEditor } from '../multi_column_editor';
+import {
+  SuggestionRequest,
+  Visualization,
+  VisualizationProps,
+  VisualizationSuggestion,
+  Operation,
+} from '../types';
 import { generateId } from '../id_generator';
-import chartMetricSVG from '../assets/chart_metric.svg';
+import { NativeRenderer } from '../native_renderer';
+import chartTableSVG from '../assets/chart_datatable.svg';
 
-const toExpression = (
-  state: State,
-  frame: FramePublicAPI,
-  mode: 'reduced' | 'full' = 'full'
-): Ast => {
-  const [datasource] = Object.values(frame.datasourceLayers);
-  const operation = datasource && datasource.getOperationForColumnId(state.accessor);
+export interface LayerState {
+  layerId: string;
+  columns: string[];
+}
 
+export interface MapVisualizationState {
+  layers: LayerState[];
+}
+
+function newLayerState(layerId: string): LayerState {
   return {
-    type: 'expression',
-    chain: [
-      {
-        type: 'function',
-        function: 'lens_map_chart',
-        arguments: {
-          title: [(operation && operation.label) || ''],
-          accessor: [state.accessor],
-          mode: [mode],
-        },
-      },
-    ],
+    layerId,
+    columns: [generateId()],
   };
-};
+}
 
-export const mapVisualization: Visualization<State, PersistableState> = {
+function updateColumns(
+  state: MapVisualizationState,
+  layer: LayerState,
+  fn: (columns: string[]) => string[]
+) {
+  const columns = fn(layer.columns);
+  const updatedLayer = { ...layer, columns };
+  const layers = state.layers.map(l => (l.layerId === layer.layerId ? updatedLayer : l));
+  return { ...state, layers };
+}
+
+const allOperations = () => true;
+
+export function MapLayer({
+  layer,
+  frame,
+  state,
+  setState,
+  dragDropContext,
+}: { layer: LayerState } & VisualizationProps<MapVisualizationState>) {
+  const datasource = frame.datasourceLayers[layer.layerId];
+
+  const originalOrder = datasource.getTableSpec().map(({ columnId }) => columnId);
+  // When we add a column it could be empty, and therefore have no order
+  const sortedColumns = Array.from(new Set(originalOrder.concat(layer.columns)));
+
+  return (
+    <EuiPanel className="lnsConfigPanel__panel" paddingSize="s">
+      <NativeRenderer
+        render={datasource.renderLayerPanel}
+        nativeProps={{ layerId: layer.layerId }}
+      />
+
+      <EuiSpacer size="s" />
+      <EuiFormRow
+        className="lnsConfigPanel__axis"
+        label={i18n.translate('xpack.lens.map.columns', { defaultMessage: 'Columns' })}
+      >
+        <MultiColumnEditor
+          accessors={sortedColumns}
+          datasource={datasource}
+          dragDropContext={dragDropContext}
+          filterOperations={allOperations}
+          layerId={layer.layerId}
+          onAdd={() => setState(updateColumns(state, layer, columns => [...columns, generateId()]))}
+          onRemove={column =>
+            setState(updateColumns(state, layer, columns => columns.filter(c => c !== column)))
+          }
+          testSubj="datatable_columns"
+          data-test-subj="datatable_multicolumnEditor"
+        />
+      </EuiFormRow>
+    </EuiPanel>
+  );
+}
+
+export const mapVisualization: Visualization<
+  MapVisualizationState,
+  MapVisualizationState
+> = {
   id: 'lnsMap',
 
   visualizationTypes: [
     {
       id: 'lnsMap',
-      icon: 'gisApp',
-      largeIcon: chartMetricSVG,
+      icon: 'visTable',
+      largeIcon: chartTableSVG,
       label: i18n.translate('xpack.lens.map.label', {
         defaultMessage: 'Map',
       }),
     },
   ],
 
-  getDescription() {
+  getDescription(state) {
     return {
-      icon: chartMetricSVG,
+      icon: chartTableSVG,
       label: i18n.translate('xpack.lens.map.label', {
         defaultMessage: 'Map',
       }),
     };
   },
 
-  getSuggestions,
+  switchVisualizationType: (_, state) => state,
 
   initialize(frame, state) {
     return (
       state || {
-        layerId: frame.addNewLayer(),
-        accessor: generateId(),
+        layers: [newLayerState(frame.addNewLayer())],
       }
     );
   },
 
   getPersistableState: state => state,
 
+  getSuggestions({
+    table,
+    state,
+    keptLayerIds,
+  }: SuggestionRequest<MapVisualizationState>): Array<
+    VisualizationSuggestion<MapVisualizationState>
+  > {
+    if (
+      table.columns[0].operation.dataType !== 'geo_point'
+    ) {
+      return [];
+    }
+    const title =
+      table.changeType === 'unchanged'
+        ? i18n.translate('xpack.lens.map.suggestionLabel', {
+            defaultMessage: 'As map',
+          })
+        : i18n.translate('xpack.lens.map.visualizationOf', {
+            defaultMessage: 'Map {operations}',
+            values: {
+              operations:
+                table.label ||
+                table.columns
+                  .map(col => col.operation.label)
+                  .join(
+                    i18n.translate('xpack.lens.map.conjunctionSign', {
+                      defaultMessage: ' & ',
+                      description:
+                        'A character that can be used for conjunction of multiple enumarated items. Make sure to include spaces around it if needed.',
+                    })
+                  ),
+            },
+          });
+
+    return [
+      {
+        title,
+        score: 1,
+        state: {
+          layers: [
+            {
+              layerId: table.layerId,
+              columns: table.columns.map(col => col.columnId),
+            },
+          ],
+        },
+        previewIcon: chartTableSVG,
+        // dont show suggestions for reduced versions or single-line tables
+        hide: table.changeType === 'reduced' || !table.isMultiRow,
+      },
+    ];
+  },
+
   renderConfigPanel: (domElement, props) =>
     render(
       <I18nProvider>
-        <div>Map config panel</div>
+        <EuiForm className="lnsConfigPanel">
+          {props.state.layers.map(layer => (
+            <MapLayer key={layer.layerId} layer={layer} {...props} />
+          ))}
+        </EuiForm>
       </I18nProvider>,
       domElement
     ),
 
-  toExpression,
-  toPreviewExpression: (state: State, frame: FramePublicAPI) =>
-    toExpression(state, frame, 'reduced'),
+  toExpression(state, frame) {
+    const layer = state.layers[0];
+    const datasource = frame.datasourceLayers[layer.layerId];
+    const operations = layer.columns
+      .map(columnId => ({ columnId, operation: datasource.getOperationForColumnId(columnId) }))
+      .filter((o): o is { columnId: string; operation: Operation } => !!o.operation);
+
+    return {
+      type: 'expression',
+      chain: [
+        {
+          type: 'function',
+          function: 'lens_map',
+          arguments: {
+            columns: [
+              {
+                type: 'expression',
+                chain: [
+                  {
+                    type: 'function',
+                    function: 'lens_map_columns',
+                    arguments: {
+                      columnIds: operations.map(o => o.columnId),
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
+    };
+  },
 };

@@ -7,8 +7,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { i18n } from '@kbn/i18n';
-import { IInterpreterRenderFunction } from '../../../../../../src/legacy/core_plugins/expressions/public';
-import { ExpressionFunction } from '../../../../../../src/plugins/expressions/common';
+import { ExpressionFunction } from '../../../../../../src/plugins/expressions/public';
+import { LensMultiTable } from '../types';
+import {
+  IInterpreterRenderFunction,
+  IInterpreterRenderHandlers,
+} from '../../../../../../src/legacy/core_plugins/expressions/public';
 import { FormatFactory } from '../../../../../../src/legacy/ui/public/visualize/loader/pipeline_helpers/utilities';
 import { VisualizationContainer } from '../visualization_container';
 
@@ -20,32 +24,37 @@ interface Args {
   columns: MapColumns;
 }
 
+export interface MapProps {
+  data: LensMultiTable;
+  args: Args;
+}
+
 export interface MapRender {
-    type: 'render';
-    as: 'lens_map_renderer';
-    value: MapProps;
-  }
+  type: 'render';
+  as: 'lens_map_renderer';
+  value: MapProps;
+}
 
 export const map: ExpressionFunction<
   'lens_map',
   any,
   Args,
-  any
+  MapRender
 > = ({
-  name: 'lens_datatable',
+  name: 'lens_map',
   type: 'render',
-  help: i18n.translate('xpack.lens.datatable.expressionHelpLabel', {
-    defaultMessage: 'Datatable renderer',
+  help: i18n.translate('xpack.lens.map.expressionHelpLabel', {
+    defaultMessage: 'Map renderer',
   }),
   args: {
     title: {
       types: ['string'],
-      help: i18n.translate('xpack.lens.datatable.titleLabel', {
+      help: i18n.translate('xpack.lens.map.titleLabel', {
         defaultMessage: 'Title',
       }),
     },
     columns: {
-      types: ['lens_datatable_columns'],
+      types: ['lens_map_columns'],
       help: '',
     },
   },
@@ -55,7 +64,7 @@ export const map: ExpressionFunction<
   fn(data: any, args: Args) {
     return {
       type: 'render',
-      as: 'lens_datatable_renderer',
+      as: 'lens_map_renderer',
       value: {
         data,
         args,
@@ -63,7 +72,7 @@ export const map: ExpressionFunction<
     };
   },
   // TODO the typings currently don't support custom type args. As soon as they do, this can be removed
-} as unknown) as ExpressionFunction<'lens_datatable', KibanaDatatable, Args, DatatableRender>;
+} as unknown) as ExpressionFunction<'lens_map', any, Args, MapRender>;
 
 type MapColumnsResult = MapColumns & { type: 'lens_map_columns' };
 
@@ -82,7 +91,7 @@ export const mapColumns: ExpressionFunction<
   },
   args: {
     columnIds: {
-      types: ['geo_point'],
+      types: ['string'],
       multi: true,
       help: '',
     },
@@ -95,31 +104,46 @@ export const mapColumns: ExpressionFunction<
   },
 };
 
-export interface MapProps {
-    data: any;
-    args: any;
-  }
-
 export const getMapRenderer = (
   formatFactory: FormatFactory
 ): IInterpreterRenderFunction<MapProps> => ({
   name: 'lens_map_renderer',
   displayName: i18n.translate('xpack.lens.map.visualizationName', {
-    defaultMessage: 'Map',
+    defaultMessage: 'Datatable',
   }),
   help: '',
   validate: () => {},
   reuseDomNode: true,
-  render: async (domNode: Element, config: MapProps, _handlers: unknown) => {
-    ReactDOM.render(<MapComponent {...config} formatFactory={formatFactory} />, domNode);
+  render: async (
+    domNode: Element,
+    config: MapProps,
+    handlers: IInterpreterRenderHandlers
+  ) => {
+    ReactDOM.render(
+      <MapComponent {...config} formatFactory={formatFactory} />,
+      domNode,
+      () => {
+        handlers.done();
+      }
+    );
+    handlers.onDestroy(() => ReactDOM.unmountComponentAtNode(domNode));
   },
 });
 
 function MapComponent(props: MapProps & { formatFactory: FormatFactory }) {
+  const [firstTable] = Object.values(props.data.tables);
+  const formatters: Record<string, ReturnType<FormatFactory>> = {};
+
+  firstTable.columns.forEach(column => {
+    formatters[column.id] = props.formatFactory(column.formatHint);
+  });
+
+  console.log('Map props', props);
+
   return (
     <VisualizationContainer>
       <div>
-        Map
+        Map goes here
       </div>
     </VisualizationContainer>
   );
