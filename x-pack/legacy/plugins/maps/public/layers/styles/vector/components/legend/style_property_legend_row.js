@@ -18,20 +18,20 @@ export class StylePropertyLegendRow extends Component {
 
   state = {
     label: '',
-    hasLoadedFieldFormatter: false,
+    fieldFormatter: undefined,
   }
 
   componentDidMount() {
     this._isMounted = true;
     this._prevLabel = undefined;
-    this._fieldValueFormatter = undefined;
+    this._prevFieldName = undefined;
     this._loadLabel();
     this._loadFieldFormatter();
   }
 
   componentDidUpdate() {
-    // label could change so it needs to be loaded on update
     this._loadLabel();
+    this._loadFieldFormatter();
   }
 
   componentWillUnmount() {
@@ -39,15 +39,21 @@ export class StylePropertyLegendRow extends Component {
   }
 
   async _loadFieldFormatter() {
-    if (this.props.style.isDynamic() && this.props.style.isComplete() && this.props.style.getField().getSource()) {
-      const field = this.props.style.getField();
-      const source = field.getSource();
-      this._fieldValueFormatter = await source.getFieldFormatter(field.getName());
-    } else {
-      this._fieldValueFormatter = null;
+    if (this._excludeFromHeader()) {
+      return;
     }
+
+    const field = this.props.style.getField();
+    if (this._prevFieldName === field.getName()) {
+      return;
+    }
+
+    this._prevFieldName = field.getName();
+    const source = field.getSource();
+    const fieldFormatter = await source.getFieldFormatter(field.getName());
+
     if (this._isMounted) {
-      this.setState({ hasLoadedFieldFormatter: true });
+      this.setState({ fieldFormatter });
     }
   }
 
@@ -73,11 +79,11 @@ export class StylePropertyLegendRow extends Component {
   }
 
   _formatValue = value => {
-    if (!this.state.hasLoadedFieldFormatter || !this._fieldValueFormatter || value === EMPTY_VALUE) {
+    if (!this.state.fieldFormatter || value === EMPTY_VALUE) {
       return value;
     }
 
-    return this._fieldValueFormatter(value);
+    return this.state.fieldFormatter(value);
   }
 
   render() {
