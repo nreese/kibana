@@ -32,12 +32,6 @@ const requestTypeOptions = [
     value: RENDER_AS.GRID,
   },
   {
-    label: i18n.translate('xpack.maps.source.esGeoGrid.heatmapDropdownOption', {
-      defaultMessage: 'heat map',
-    }),
-    value: RENDER_AS.HEATMAP,
-  },
-  {
     label: i18n.translate('xpack.maps.source.esGeoGrid.pointsDropdownOption', {
       defaultMessage: 'clusters',
     }),

@@ -52,6 +52,7 @@ export const SORT_ORDER = {
 export const EMS_TMS = 'EMS_TMS';
 export const EMS_FILE = 'EMS_FILE';
 export const ES_GEO_GRID = 'ES_GEO_GRID';
+export const ES_HEAT_MAP = 'ES_HEATMAP';
 export const ES_SEARCH = 'ES_SEARCH';
 export const ES_PEW_PEW = 'ES_PEW_PEW';
 

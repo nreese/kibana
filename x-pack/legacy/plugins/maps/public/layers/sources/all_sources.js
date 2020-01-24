@@ -11,7 +11,7 @@ import { XYZTMSSource } from './xyz_tms_source';
 import { EMSTMSSource } from './ems_tms_source';
 import { WMSSource } from './wms_source';
 import { KibanaTilemapSource } from './kibana_tilemap_source';
-import { ESGeoGridSource } from './es_geo_grid_source';
+import { ESGeoGridSource, ESHeatMapSource } from './es_geo_grid_source';
 import { ESSearchSource } from './es_search_source';
 import { ESPewPewSource } from './es_pew_pew_source/es_pew_pew_source';
 
@@ -19,6 +19,7 @@ export const ALL_SOURCES = [
   GeojsonFileSource,
   ESSearchSource,
   ESGeoGridSource,
+  ESHeatMapSource,
   ESPewPewSource,
   EMSFileSource,
   EMSTMSSource,

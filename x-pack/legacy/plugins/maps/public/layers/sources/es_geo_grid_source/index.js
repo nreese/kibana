@@ -5,3 +5,4 @@
  */
 
 export { ESGeoGridSource } from './es_geo_grid_source';
+export { ESHeatMapSource } from './es_heat_map_source';

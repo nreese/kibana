@@ -8,7 +8,6 @@ import React from 'react';
 import uuid from 'uuid/v4';
 
 import { VECTOR_SHAPE_TYPES } from '../vector_feature_types';
-import { HeatmapLayer } from '../../heatmap_layer';
 import { VectorLayer } from '../../vector_layer';
 import { Schemas } from 'ui/vis/editors/default/schemas';
 import { AggConfigs } from 'ui/agg_types';
@@ -53,7 +52,7 @@ const aggSchemas = new Schemas([
 export class ESGeoGridSource extends AbstractESAggSource {
   static type = ES_GEO_GRID;
   static title = i18n.translate('xpack.maps.source.esGridTitle', {
-    defaultMessage: 'Grid aggregation',
+    defaultMessage: 'Clusters',
   });
   static description = i18n.translate('xpack.maps.source.esGridDescription', {
     defaultMessage: 'Geospatial data grouped in grids with metrics for each gridded cell',
@@ -63,9 +62,9 @@ export class ESGeoGridSource extends AbstractESAggSource {
     return {
       type: ESGeoGridSource.type,
       id: uuid(),
-      indexPatternId: indexPatternId,
-      geoField: geoField,
-      requestType: requestType,
+      indexPatternId,
+      geoField,
+      requestType,
       resolution: resolution ? resolution : GRID_RESOLUTION.COARSE,
     };
   }
@@ -231,13 +230,6 @@ export class ESGeoGridSource extends AbstractESAggSource {
     ];
   }
 
-  _createHeatmapLayerDescriptor(options) {
-    return HeatmapLayer.createDescriptor({
-      sourceDescriptor: this._descriptor,
-      ...options,
-    });
-  }
-
   _createVectorLayerDescriptor(options) {
     const descriptor = VectorLayer.createDescriptor({
       sourceDescriptor: this._descriptor,
@@ -296,13 +288,6 @@ export class ESGeoGridSource extends AbstractESAggSource {
   }
 
   createDefaultLayer(options) {
-    if (this._descriptor.requestType === RENDER_AS.HEATMAP) {
-      return new HeatmapLayer({
-        layerDescriptor: this._createHeatmapLayerDescriptor(options),
-        source: this,
-      });
-    }
-
     const layerDescriptor = this._createVectorLayerDescriptor(options);
     const style = new VectorStyle(layerDescriptor.style, this);
     return new VectorLayer({
