@@ -17,13 +17,9 @@ export interface IStyle {
     mapColors: string[]
   ): { hasChanges: boolean; nextStyleDescriptor?: StyleDescriptor };
   pluckStyleMetaFromSourceDataRequest(sourceDataRequest: DataRequest): StyleMetaDescriptor;
-  renderEditor({
-    layer,
-    onStyleDescriptorChange,
-  }: {
-    layer: ILayer;
-    onStyleDescriptorChange: (styleDescriptor: StyleDescriptor) => void;
-  }): ReactElement<any> | null;
+  renderEditor(
+    onStyleDescriptorChange: (styleDescriptor: StyleDescriptor) => void
+  ): ReactElement<any> | null;
   getSourceFieldNames(): string[];
 }
 
@@ -51,7 +47,7 @@ export class AbstractStyle implements IStyle {
     return this._descriptor;
   }
 
-  renderEditor(/* { layer, onStyleDescriptorChange } */) {
+  renderEditor(/* onStyleDescriptorChange */) {
     return null;
   }
 

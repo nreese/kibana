@@ -190,12 +190,47 @@ export type VectorStylePropertiesDescriptor = {
 };
 
 export type StyleDescriptor = {
-  type: string;
+  type: LAYER_STYLE_TYPE;
+};
+
+export type RangeFieldMeta = {
+  min: number;
+  max: number;
+  delta: number;
+  isMinOutsideStdRange?: boolean;
+  isMaxOutsideStdRange?: boolean;
+};
+
+export type Category = {
+  key: string;
+  count: number;
+};
+
+export type CategoryFieldMeta = {
+  categories: Category[];
+};
+
+export type GeometryTypes = {
+  isPointsOnly: boolean;
+  isLinesOnly: boolean;
+  isPolygonsOnly: boolean;
+};
+
+export type StyleMetaDescriptor = {
+  geometryTypes?: GeometryTypes;
+  fieldMeta: {
+    [key: string]: {
+      range: RangeFieldMeta;
+      categories: CategoryFieldMeta;
+    };
+  };
 };
 
 export type VectorStyleDescriptor = StyleDescriptor & {
+  __styleMeta?: StyleMetaDescriptor;
   type: LAYER_STYLE_TYPE.VECTOR;
   properties: VectorStylePropertiesDescriptor;
+  isTimeAware: boolean;
 };
 
 export type StylePropertyOptions =

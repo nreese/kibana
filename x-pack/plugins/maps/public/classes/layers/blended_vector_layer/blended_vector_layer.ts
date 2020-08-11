@@ -102,6 +102,7 @@ function getClusterStyleDescriptor(
         },
       },
     },
+    isTimeAware: documentStyle.getDescriptor().isTimeAware,
   };
   documentStyle
     .getAllStyleProperties()

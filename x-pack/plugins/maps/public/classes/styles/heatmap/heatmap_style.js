@@ -40,7 +40,7 @@ export class HeatmapStyle extends AbstractStyle {
     });
   }
 
-  renderEditor({ onStyleDescriptorChange }) {
+  renderEditor(onStyleDescriptorChange) {
     const onHeatmapColorChange = ({ colorRampName }) => {
       const styleDescriptor = HeatmapStyle.createDescriptor(colorRampName);
       onStyleDescriptorChange(styleDescriptor);

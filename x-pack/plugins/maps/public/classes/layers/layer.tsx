@@ -509,7 +509,7 @@ export class AbstractLayer implements ILayer {
     if (!style) {
       return null;
     }
-    return style.renderEditor({ layer: this, onStyleDescriptorChange });
+    return style.renderEditor(onStyleDescriptorChange);
   }
 
   getIndexPatternIds(): string[] {
