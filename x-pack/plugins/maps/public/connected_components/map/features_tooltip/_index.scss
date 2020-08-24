@@ -18,5 +18,6 @@
 
 .mapFeatureTooltip__propertyLabel {
   max-width: $euiSizeXL * 4;
-  font-weight: $euiFontWeightSemiBold;
+  font-weight: $euiFontWeightMedium;
+  color: shade($euiColorGhost, 20%);
 }

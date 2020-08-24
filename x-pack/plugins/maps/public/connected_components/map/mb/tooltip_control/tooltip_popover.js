@@ -154,6 +154,7 @@ export class TooltipPopover extends Component {
     return (
       <EuiPopover
         id="mapTooltip"
+        panelClassName="mapTooltipPopover"
         button={tooltipAnchor}
         anchorPosition="upCenter"
         isOpen

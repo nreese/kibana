@@ -1,0 +1,5 @@
+.mapTooltipPopover {
+  @include euiToolTipStyle('s');
+  border: none;
+  max-width: 425px;
+}
