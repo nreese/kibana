@@ -13,7 +13,7 @@ import { LayerWizard, RenderWizardArguments } from '../../layers/layer_wizard_re
 import { ESSearchSource, sourceTitle } from './es_search_source';
 import { BlendedVectorLayer } from '../../layers/blended_vector_layer/blended_vector_layer';
 import { VectorLayer } from '../../layers/vector_layer/vector_layer';
-import { LAYER_WIZARD_CATEGORY, SCALING_TYPES } from '../../../../common/constants';
+import { DOMAIN_TYPE, LAYER_WIZARD_CATEGORY, SCALING_TYPES } from '../../../../common/constants';
 import { TiledVectorLayer } from '../../layers/tiled_vector_layer/tiled_vector_layer';
 
 export function createDefaultLayerDescriptor(sourceConfig: unknown, mapColors: string[]) {
@@ -33,6 +33,7 @@ export const esDocumentsLayerWizardConfig: LayerWizard = {
   description: i18n.translate('xpack.maps.source.esSearchDescription', {
     defaultMessage: 'Points, lines, and polygons from Elasticsearch',
   }),
+  domainType: DOMAIN_TYPE.GEO,
   icon: 'logoElasticsearch',
   renderWizard: ({ previewLayers, mapColors }: RenderWizardArguments) => {
     const onSourceConfigChange = (sourceConfig: unknown) => {

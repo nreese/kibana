@@ -49,11 +49,12 @@ import {
   ROLLBACK_MAP_SETTINGS,
   TRACK_MAP_SETTINGS,
   UPDATE_MAP_SETTING,
+  SET_DOMAIN_TYPE,
 } from '../actions';
 
 import { getDefaultMapSettings } from './default_map_settings';
 import { copyPersistentState, TRACKED_LAYER_DESCRIPTOR } from './util';
-import { SOURCE_DATA_REQUEST_ID } from '../../common/constants';
+import { DOMAIN_TYPE, SOURCE_DATA_REQUEST_ID } from '../../common/constants';
 
 const getLayerIndex = (list, layerId) => list.findIndex(({ id }) => layerId === id);
 
@@ -102,6 +103,7 @@ const updateLayerSourceDescriptorProp = (state, layerId, propName, value) => {
 };
 
 export const DEFAULT_MAP_STATE = {
+  domainType: DOMAIN_TYPE.GEO,
   ready: false,
   mapInitError: null,
   goto: null,
@@ -354,6 +356,11 @@ export function map(state = DEFAULT_MAP_STATE, action) {
       return {
         ...state,
         mapInitError: action.errorMessage,
+      };
+    case SET_DOMAIN_TYPE:
+      return {
+        ...state,
+        domainType: action.domainType,
       };
     case SET_INTERACTIVE:
       return {

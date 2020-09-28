@@ -50,10 +50,12 @@ import {
   MapCenterAndZoom,
   MapQuery,
 } from '../../../../common/descriptor_types';
+import { DOMAIN_TYPE } from '../../../../common/constants';
 import { MapSettings } from '../../../reducers/map';
 import { ISavedGisMap } from '../../bootstrap/services/saved_gis_map';
 
 interface Props {
+  domainType: DOMAIN_TYPE;
   savedMap: ISavedGisMap;
   onAppLeave: AppMountParameters['onAppLeave'];
   stateTransfer: EmbeddableStateTransfer;
@@ -180,6 +182,7 @@ export class MapsAppView extends React.Component<Props, State> {
 
   _setBreadcrumbs = () => {
     const breadcrumbs = getBreadcrumbs({
+      domainType: this.props.domainType,
       title: this.props.savedMap.title,
       getHasUnsavedChanges: this._hasUnsavedChanges,
       originatingApp: this.state.originatingApp,
@@ -296,7 +299,8 @@ export class MapsAppView extends React.Component<Props, State> {
 
     const layerList = getInitialLayers(
       this.props.savedMap.layerListJSON,
-      getInitialLayersFromUrlParam()
+      getInitialLayersFromUrlParam(),
+      this.props.domainType
     );
     this.props.replaceLayerList(layerList);
     this.setState({

@@ -10,13 +10,14 @@ import { XYZTMSEditor, XYZTMSSourceConfig } from './xyz_tms_editor';
 import { XYZTMSSource, sourceTitle } from './xyz_tms_source';
 import { LayerWizard, RenderWizardArguments } from '../../layers/layer_wizard_registry';
 import { TileLayer } from '../../layers/tile_layer/tile_layer';
-import { LAYER_WIZARD_CATEGORY } from '../../../../common/constants';
+import { DOMAIN_TYPE, LAYER_WIZARD_CATEGORY } from '../../../../common/constants';
 
 export const tmsLayerWizardConfig: LayerWizard = {
   categories: [LAYER_WIZARD_CATEGORY.REFERENCE],
   description: i18n.translate('xpack.maps.source.ems_xyzDescription', {
     defaultMessage: 'Tile map service configured in interface',
   }),
+  domainType: DOMAIN_TYPE.GEO,
   icon: 'grid',
   renderWizard: ({ previewLayers }: RenderWizardArguments) => {
     const onSourceConfigChange = (sourceConfig: XYZTMSSourceConfig | null) => {

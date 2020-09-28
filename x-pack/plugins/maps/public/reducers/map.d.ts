@@ -15,7 +15,7 @@ import {
   MapRefreshConfig,
   TooltipState,
 } from '../../common/descriptor_types';
-import { INITIAL_LOCATION } from '../../common/constants';
+import { DOMAIN_TYPE, INITIAL_LOCATION } from '../../common/constants';
 import { Filter, TimeRange } from '../../../../../src/plugins/data/public';
 
 export type MapContext = {
@@ -61,6 +61,7 @@ export type MapSettings = {
 };
 
 export type MapState = {
+  domainType: DOMAIN_TYPE;
   ready: boolean;
   mapInitError?: string | null;
   goto?: Goto | null;

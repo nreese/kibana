@@ -10,7 +10,7 @@ import { MVTSingleLayerVectorSourceEditor } from './mvt_single_layer_vector_sour
 import { MVTSingleLayerVectorSource, sourceTitle } from './mvt_single_layer_vector_source';
 import { LayerWizard, RenderWizardArguments } from '../../layers/layer_wizard_registry';
 import { TiledVectorLayer } from '../../layers/tiled_vector_layer/tiled_vector_layer';
-import { LAYER_WIZARD_CATEGORY } from '../../../../common/constants';
+import { DOMAIN_TYPE, LAYER_WIZARD_CATEGORY } from '../../../../common/constants';
 import { TiledSingleLayerVectorSourceSettings } from '../../../../common/descriptor_types';
 
 export const mvtVectorSourceWizardConfig: LayerWizard = {
@@ -18,6 +18,7 @@ export const mvtVectorSourceWizardConfig: LayerWizard = {
   description: i18n.translate('xpack.maps.source.mvtVectorSourceWizard', {
     defaultMessage: 'Data service implementing the Mapbox vector tile specification',
   }),
+  domainType: DOMAIN_TYPE.GEO,
   icon: 'grid',
   renderWizard: ({ previewLayers, mapColors }: RenderWizardArguments) => {
     const onSourceConfigChange = (sourceConfig: TiledSingleLayerVectorSourceSettings) => {

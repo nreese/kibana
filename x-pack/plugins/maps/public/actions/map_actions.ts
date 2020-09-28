@@ -30,6 +30,7 @@ import {
   MAP_EXTENT_CHANGED,
   MAP_READY,
   ROLLBACK_MAP_SETTINGS,
+  SET_DOMAIN_TYPE,
   SET_GOTO,
   SET_INTERACTIVE,
   SET_MAP_INIT_ERROR,
@@ -60,6 +61,13 @@ export function setMapInitError(errorMessage: string) {
   return {
     type: SET_MAP_INIT_ERROR,
     errorMessage,
+  };
+}
+
+export function setDomainType(domainType: DOMAIN_TYPE) {
+  return {
+    type: SET_DOMAIN_TYPE,
+    domainType,
   };
 }
 

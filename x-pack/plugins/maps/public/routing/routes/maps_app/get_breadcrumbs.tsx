@@ -7,6 +7,7 @@
 import { i18n } from '@kbn/i18n';
 import { getNavigateToApp } from '../../../kibana_services';
 import { goToSpecifiedPath } from '../../maps_router';
+import { DOMAIN_TYPE } from '../../../../common/constants';
 
 export const unsavedChangesWarning = i18n.translate(
   'xpack.maps.breadCrumbs.unsavedChangesWarning',
@@ -16,11 +17,13 @@ export const unsavedChangesWarning = i18n.translate(
 );
 
 export function getBreadcrumbs({
+  domainType,
   title,
   getHasUnsavedChanges,
   originatingApp,
   getAppNameFromId,
 }: {
+  domainType: DOMAIN_TYPE;
   title: string;
   getHasUnsavedChanges: () => boolean;
   originatingApp?: string;
@@ -36,21 +39,29 @@ export function getBreadcrumbs({
     });
   }
 
-  breadcrumbs.push({
-    text: i18n.translate('xpack.maps.mapController.mapsBreadcrumbLabel', {
-      defaultMessage: 'Maps',
-    }),
-    onClick: () => {
-      if (getHasUnsavedChanges()) {
-        const navigateAway = window.confirm(unsavedChangesWarning);
-        if (navigateAway) {
+  if (domainType === DOMAIN_TYPE.GEO) {
+    breadcrumbs.push({
+      text: i18n.translate('xpack.maps.mapController.mapsBreadcrumbLabel', {
+        defaultMessage: 'Maps',
+      }),
+      onClick: () => {
+        if (getHasUnsavedChanges()) {
+          const navigateAway = window.confirm(unsavedChangesWarning);
+          if (navigateAway) {
+            goToSpecifiedPath('/');
+          }
+        } else {
           goToSpecifiedPath('/');
         }
-      } else {
-        goToSpecifiedPath('/');
-      }
-    },
-  });
+      },
+    });
+  } else if (domainType === DOMAIN_TYPE.XY) {
+    breadcrumbs.push({
+      text: i18n.translate('xpack.maps.mapController.scatterplotBreadcrumbLabel', {
+        defaultMessage: 'Scatterplot',
+      }),
+    });
+  }
 
   breadcrumbs.push({ text: title });
 

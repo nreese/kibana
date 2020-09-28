@@ -8,12 +8,14 @@ import { i18n } from '@kbn/i18n';
 import React from 'react';
 import { LayerWizard, RenderWizardArguments } from '../../layers/layer_wizard_registry';
 import { ClientFileCreateSourceEditor, INDEX_SETUP_STEP_ID, INDEXING_STEP_ID } from './wizard';
+import { DOMAIN_TYPE } from '../../../../common/constants';
 
 export const uploadLayerWizardConfig: LayerWizard = {
   categories: [],
   description: i18n.translate('xpack.maps.fileUploadWizard.description', {
     defaultMessage: 'Index GeoJSON data in Elasticsearch',
   }),
+  domainType: DOMAIN_TYPE.GEO,
   icon: 'importAction',
   prerequisiteSteps: [
     {

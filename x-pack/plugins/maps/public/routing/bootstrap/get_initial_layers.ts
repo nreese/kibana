@@ -24,13 +24,23 @@ import { EMSTMSSource } from '../../classes/sources/ems_tms_source';
 // @ts-expect-error
 import { VectorTileLayer } from '../../classes/layers/vector_tile_layer/vector_tile_layer';
 import { getIsEmsEnabled, getToasts } from '../../kibana_services';
-import { INITIAL_LAYERS_KEY } from '../../../common/constants';
+import { DOMAIN_TYPE, INITIAL_LAYERS_KEY } from '../../../common/constants';
 import { getKibanaTileMap } from '../../meta';
 
-export function getInitialLayers(layerListJSON?: string, initialLayers: LayerDescriptor[] = []) {
+export function getInitialLayers(
+  layerListJSON?: string,
+  initialLayers: LayerDescriptor[] = [],
+  domainType: DOMAIN_TYPE
+) {
   if (layerListJSON) {
     return JSON.parse(layerListJSON);
   }
+
+  if (domainType === DOMAIN_TYPE.XY) {
+    // TODO return grid layer
+    return [];
+  }
+
   const tilemapSourceFromKibana = getKibanaTileMap();
   if (_.get(tilemapSourceFromKibana, 'url')) {
     const layerDescriptor = TileLayer.createDescriptor({

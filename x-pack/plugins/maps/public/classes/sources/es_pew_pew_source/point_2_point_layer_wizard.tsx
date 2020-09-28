@@ -12,6 +12,7 @@ import { VectorLayer } from '../../layers/vector_layer/vector_layer';
 import { ESPewPewSource, sourceTitle } from './es_pew_pew_source';
 import { VectorStyle } from '../../styles/vector/vector_style';
 import {
+  DOMAIN_TYPE,
   FIELD_ORIGIN,
   COUNT_PROP_NAME,
   LAYER_WIZARD_CATEGORY,
@@ -29,6 +30,7 @@ export const point2PointLayerWizardConfig: LayerWizard = {
   description: i18n.translate('xpack.maps.source.pewPewDescription', {
     defaultMessage: 'Aggregated data paths between the source and destination',
   }),
+  domainType: DOMAIN_TYPE.GEO,
   icon: 'logoElasticsearch',
   renderWizard: ({ previewLayers }: RenderWizardArguments) => {
     const onSourceConfigChange = (sourceConfig: unknown) => {

@@ -114,6 +114,15 @@ export class MapsPlugin
     plugins.visualizations.registerAlias(
       getMapsVisTypeAlias(plugins.visualizations, config.showMapVisualizationTypes)
     );
+    plugins.visualizations.registerAlias({
+      aliasApp: APP_ID,
+      aliasPath: '/scatterplot',
+      name: 'Scatterplot',
+      title: 'Scatterplot',
+      description: 'Use cartesian coordinates to display two variables for a set of data',
+      icon: 'visLine',
+      stage: 'production',
+    });
     plugins.embeddable.registerEmbeddableFactory(MAP_SAVED_OBJECT_TYPE, new MapEmbeddableFactory());
 
     core.application.register({

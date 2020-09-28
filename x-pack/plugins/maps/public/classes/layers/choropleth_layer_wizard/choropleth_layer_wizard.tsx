@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { i18n } from '@kbn/i18n';
-import { LAYER_WIZARD_CATEGORY } from '../../../../common/constants';
+import { DOMAIN_TYPE, LAYER_WIZARD_CATEGORY } from '../../../../common/constants';
 import { LayerWizard, RenderWizardArguments } from '../layer_wizard_registry';
 import { LayerTemplate } from './layer_template';
 
@@ -15,6 +15,7 @@ export const choroplethLayerWizardConfig: LayerWizard = {
   description: i18n.translate('xpack.maps.choropleth.desc', {
     defaultMessage: 'Shaded areas to compare statistics across boundaries',
   }),
+  domainType: DOMAIN_TYPE.GEO,
   icon: 'logoElasticsearch',
   renderWizard: (renderWizardArguments: RenderWizardArguments) => {
     return <LayerTemplate {...renderWizardArguments} />;

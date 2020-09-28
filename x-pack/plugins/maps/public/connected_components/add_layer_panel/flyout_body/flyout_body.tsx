@@ -9,8 +9,10 @@ import { EuiButtonEmpty, EuiSpacer } from '@elastic/eui';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { LayerWizardSelect } from './layer_wizard_select';
 import { LayerWizard, RenderWizardArguments } from '../../../classes/layers/layer_wizard_registry';
+import { DOMAIN_TYPE } from '../../../../common/constants';
 
 type Props = RenderWizardArguments & {
+  domainType: DOMAIN_TYPE;
   layerWizard: LayerWizard | null;
   onClear: () => void;
   onWizardSelect: (layerWizard: LayerWizard) => void;
@@ -20,7 +22,7 @@ type Props = RenderWizardArguments & {
 export const FlyoutBody = (props: Props) => {
   function renderContent() {
     if (!props.layerWizard || !props.currentStepId) {
-      return <LayerWizardSelect onSelect={props.onWizardSelect} />;
+      return <LayerWizardSelect onSelect={props.onWizardSelect} domainType={props.domainType} />;
     }
 
     const renderWizardArgs = {

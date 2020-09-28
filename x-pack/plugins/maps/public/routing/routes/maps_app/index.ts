@@ -18,6 +18,7 @@ import {
   getTimeFilters,
   hasDirtyState,
   getLayerListConfigOnly,
+  getDomainType,
 } from '../../../selectors/map_selectors';
 import {
   replaceLayerList,
@@ -46,6 +47,7 @@ import { MapSettings } from '../../../reducers/map';
 
 function mapStateToProps(state: MapStoreState) {
   return {
+    domainType: getDomainType(state),
     isFullScreen: getIsFullScreen(state),
     isOpenSettingsDisabled: getFlyoutDisplay(state) !== FLYOUT_STATE.NONE,
     isSaveDisabled: hasDirtyState(state),

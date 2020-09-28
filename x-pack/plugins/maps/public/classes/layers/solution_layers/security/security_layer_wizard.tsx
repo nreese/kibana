@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { i18n } from '@kbn/i18n';
-import { LAYER_WIZARD_CATEGORY } from '../../../../../common/constants';
+import { DOMAIN_TYPE, LAYER_WIZARD_CATEGORY } from '../../../../../common/constants';
 import { LayerWizard, RenderWizardArguments } from '../../layer_wizard_registry';
 import { getSecurityIndexPatterns } from './security_index_pattern_utils';
 import { SecurityLayerTemplate } from './security_layer_template';
@@ -20,6 +20,7 @@ export const SecurityLayerWizardConfig: LayerWizard = {
   description: i18n.translate('xpack.maps.security.desc', {
     defaultMessage: 'Security layers',
   }),
+  domainType: DOMAIN_TYPE.GEO,
   icon: 'logoSecurity',
   renderWizard: (renderWizardArguments: RenderWizardArguments) => {
     return <SecurityLayerTemplate {...renderWizardArguments} />;

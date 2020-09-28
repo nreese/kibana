@@ -7,10 +7,11 @@
 import { connect } from 'react-redux';
 import { FlyoutBody } from './flyout_body';
 import { MapStoreState } from '../../../reducers/store';
-import { getMapColors } from '../../../selectors/map_selectors';
+import { getDomainType, getMapColors } from '../../../selectors/map_selectors';
 
 function mapStateToProps(state: MapStoreState) {
   return {
+    domainType: getDomainType(state),
     mapColors: getMapColors(state),
   };
 }

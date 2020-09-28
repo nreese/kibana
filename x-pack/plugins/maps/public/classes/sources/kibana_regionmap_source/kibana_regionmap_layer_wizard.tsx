@@ -13,7 +13,7 @@ import { VectorLayer } from '../../layers/vector_layer/vector_layer';
 // @ts-ignore
 import { CreateSourceEditor } from './create_source_editor';
 import { getKibanaRegionList } from '../../../meta';
-import { LAYER_WIZARD_CATEGORY } from '../../../../common/constants';
+import { DOMAIN_TYPE, LAYER_WIZARD_CATEGORY } from '../../../../common/constants';
 
 export const kibanaRegionMapLayerWizardConfig: LayerWizard = {
   categories: [LAYER_WIZARD_CATEGORY.REFERENCE],
@@ -24,6 +24,7 @@ export const kibanaRegionMapLayerWizardConfig: LayerWizard = {
   description: i18n.translate('xpack.maps.source.kbnRegionMapDescription', {
     defaultMessage: 'Vector data from hosted GeoJSON configured in kibana.yml',
   }),
+  domainType: DOMAIN_TYPE.GEO,
   icon: 'logoKibana',
   renderWizard: ({ previewLayers, mapColors }: RenderWizardArguments) => {
     const onSourceConfigChange = (sourceConfig: unknown) => {

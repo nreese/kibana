@@ -50,6 +50,11 @@ export function getExistingMapPath(id: string) {
   return `${MAP_BASE_URL}/${id}`;
 }
 
+export enum DOMAIN_TYPE {
+  GEO = 'GEO',
+  XY = 'XY',
+}
+
 export enum LAYER_TYPE {
   TILE = 'TILE',
   VECTOR = 'VECTOR',

@@ -19,9 +19,10 @@ import {
 import { FormattedMessage } from '@kbn/i18n/react';
 import { i18n } from '@kbn/i18n';
 import { getLayerWizards, LayerWizard } from '../../../classes/layers/layer_wizard_registry';
-import { LAYER_WIZARD_CATEGORY } from '../../../../common/constants';
+import { DOMAIN_TYPE, LAYER_WIZARD_CATEGORY } from '../../../../common/constants';
 
 interface Props {
+  domainType: DOMAIN_TYPE;
   onSelect: (layerWizard: LayerWizard) => void;
 }
 
@@ -74,7 +75,7 @@ export class LayerWizardSelect extends Component<Props, State> {
   }
 
   async _loadLayerWizards() {
-    const layerWizards = await getLayerWizards();
+    const layerWizards = await getLayerWizards(this.props.domainType);
     const activeCategories: LAYER_WIZARD_CATEGORY[] = [];
     layerWizards.forEach((layerWizard: LayerWizard) => {
       layerWizard.categories.forEach((category: LAYER_WIZARD_CATEGORY) => {

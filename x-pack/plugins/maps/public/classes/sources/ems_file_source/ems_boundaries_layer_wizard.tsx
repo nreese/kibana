@@ -13,7 +13,7 @@ import { EMSFileSource, sourceTitle } from './ems_file_source';
 // @ts-ignore
 import { getIsEmsEnabled } from '../../../kibana_services';
 import { EMSFileSourceDescriptor } from '../../../../common/descriptor_types';
-import { LAYER_WIZARD_CATEGORY } from '../../../../common/constants';
+import { DOMAIN_TYPE, LAYER_WIZARD_CATEGORY } from '../../../../common/constants';
 
 export const emsBoundariesLayerWizardConfig: LayerWizard = {
   categories: [LAYER_WIZARD_CATEGORY.REFERENCE],
@@ -23,6 +23,7 @@ export const emsBoundariesLayerWizardConfig: LayerWizard = {
   description: i18n.translate('xpack.maps.source.emsFileDescription', {
     defaultMessage: 'Administrative boundaries from Elastic Maps Service',
   }),
+  domainType: DOMAIN_TYPE.GEO,
   icon: 'emsApp',
   renderWizard: ({ previewLayers, mapColors }: RenderWizardArguments) => {
     const onSourceConfigChange = (sourceConfig: Partial<EMSFileSourceDescriptor>) => {

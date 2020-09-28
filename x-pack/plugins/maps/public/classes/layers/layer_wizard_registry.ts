@@ -7,7 +7,7 @@
 
 import { ReactElement } from 'react';
 import { LayerDescriptor } from '../../../common/descriptor_types';
-import { LAYER_WIZARD_CATEGORY } from '../../../common/constants';
+import { DOMAIN_TYPE, LAYER_WIZARD_CATEGORY } from '../../../common/constants';
 
 export type RenderWizardArguments = {
   previewLayers: (layerDescriptors: LayerDescriptor[]) => void;
@@ -28,6 +28,7 @@ export type LayerWizard = {
   categories: LAYER_WIZARD_CATEGORY[];
   checkVisibility?: () => Promise<boolean>;
   description: string;
+  domainType: DOMAIN_TYPE;
   icon: string;
   prerequisiteSteps?: Array<{ id: string; label: string }>;
   renderWizard(renderWizardArguments: RenderWizardArguments): ReactElement<any>;
@@ -45,14 +46,18 @@ export function registerLayerWizard(layerWizard: LayerWizard) {
   });
 }
 
-export async function getLayerWizards(): Promise<LayerWizard[]> {
-  const promises = registry.map(async (layerWizard) => {
-    return {
-      ...layerWizard,
-      // @ts-ignore
-      isVisible: await layerWizard.checkVisibility(),
-    };
-  });
+export async function getLayerWizards(domainType: DOMAIN_TYPE): Promise<LayerWizard[]> {
+  const promises = registry
+    .filter((layerWizard) => {
+      return layerWizard.domainType === domainType;
+    })
+    .map(async (layerWizard) => {
+      return {
+        ...layerWizard,
+        // @ts-ignore
+        isVisible: await layerWizard.checkVisibility(),
+      };
+    });
   return (await Promise.all(promises)).filter(({ isVisible }) => {
     return isVisible;
   });

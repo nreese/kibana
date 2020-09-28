@@ -127,6 +127,8 @@ export const getHasLockedTooltips = (state: MapStoreState): boolean => {
 
 export const getMapReady = ({ map }: MapStoreState): boolean => map && map.ready;
 
+export const getDomainType = ({ map }: MapStoreState) => map.domainType;
+
 export const getMapInitError = ({ map }: MapStoreState): string | null | undefined =>
   map.mapInitError;
 

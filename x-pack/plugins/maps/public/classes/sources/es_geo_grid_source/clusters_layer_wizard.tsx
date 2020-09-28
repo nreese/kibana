@@ -22,6 +22,7 @@ import { VectorStyle } from '../../styles/vector/vector_style';
 import {
   COUNT_PROP_NAME,
   COLOR_MAP_TYPE,
+  DOMAIN_TYPE,
   FIELD_ORIGIN,
   LAYER_WIZARD_CATEGORY,
   RENDER_AS,
@@ -35,6 +36,7 @@ export const clustersLayerWizardConfig: LayerWizard = {
   description: i18n.translate('xpack.maps.source.esGridClustersDescription', {
     defaultMessage: 'Geospatial data grouped in grids with metrics for each gridded cell',
   }),
+  domainType: DOMAIN_TYPE.GEO,
   icon: 'logoElasticsearch',
   renderWizard: ({ previewLayers }: RenderWizardArguments) => {
     const onSourceConfigChange = (sourceConfig: Partial<ESGeoGridSourceDescriptor>) => {

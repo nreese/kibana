@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { i18n } from '@kbn/i18n';
-import { LAYER_WIZARD_CATEGORY } from '../../../../../common/constants';
+import { DOMAIN_TYPE, LAYER_WIZARD_CATEGORY } from '../../../../../common/constants';
 import { LayerWizard, RenderWizardArguments } from '../../layer_wizard_registry';
 import { ObservabilityLayerTemplate } from './observability_layer_template';
 import { APM_INDEX_PATTERN_ID } from './create_layer_descriptor';
@@ -25,6 +25,7 @@ export const ObservabilityLayerWizardConfig: LayerWizard = {
   description: i18n.translate('xpack.maps.observability.desc', {
     defaultMessage: 'APM layers',
   }),
+  domainType: DOMAIN_TYPE.GEO,
   icon: 'logoObservability',
   renderWizard: (renderWizardArguments: RenderWizardArguments) => {
     return <ObservabilityLayerTemplate {...renderWizardArguments} />;
