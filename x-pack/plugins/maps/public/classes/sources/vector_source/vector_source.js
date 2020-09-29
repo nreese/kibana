@@ -101,6 +101,10 @@ export class AbstractVectorSource extends AbstractSource {
     throw new Error('Should implement VectorSource#getGeoJson');
   }
 
+  async getDomain() {
+    return null;
+  }
+
   canFormatFeatureProperties() {
     return false;
   }

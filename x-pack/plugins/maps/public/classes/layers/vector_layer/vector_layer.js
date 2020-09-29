@@ -8,6 +8,7 @@ import React from 'react';
 import { AbstractLayer } from '../layer';
 import { VectorStyle } from '../../styles/vector/vector_style';
 import {
+  DOMAIN_DATA_REQUEST_ID,
   FEATURE_ID_PROPERTY_NAME,
   SOURCE_DATA_REQUEST_ID,
   SOURCE_META_DATA_REQUEST_ID,
@@ -27,6 +28,7 @@ import { EuiIcon } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { DataRequestAbortError } from '../../util/data_request';
 import {
+  canSkipDomainUpdate,
   canSkipSourceUpdate,
   canSkipStyleMetaUpdate,
   canSkipFormattersUpdate,
@@ -586,6 +588,48 @@ export class VectorLayer extends AbstractLayer {
       stopLoading(dataRequestId, requestToken, formatters, nextMeta);
     } catch (error) {
       onLoadError(dataRequestId, requestToken, error.message);
+    }
+  }
+
+  async syncDomain(syncContext) {
+    const {
+      startLoading,
+      stopLoading,
+      onLoadError,
+      registerCancelCallback,
+      dataFilters,
+    } = syncContext;
+    const dataRequestId = DOMAIN_DATA_REQUEST_ID;
+    const requestToken = Symbol(`layer-${this.getId()}-${dataRequestId}`);
+    const nextMeta = {
+      isTimeAware: await this.getSource().isTimeAware(),
+      sourceQuery: this.getQuery(),
+      timeFilters: dataFilters.timeFilters,
+    };
+    const prevDataRequest = this.getDomainDataRequest();
+    const canSkipFetch = await canSkipDomainUpdate({
+      prevDataRequest,
+      nextMeta,
+    });
+    if (canSkipFetch) {
+      return prevDataRequest.getData();
+    }
+
+    try {
+      startLoading(dataRequestId, requestToken, nextMeta);
+      const domain = await this.getSource().getDomain({
+        layerName: await this.getDisplayName(),
+        sourceQuery: nextMeta.sourceQuery,
+        timeFilters: nextMeta.timeFilters,
+        registerCancelCallback: registerCancelCallback.bind(null, requestToken),
+      });
+      stopLoading(dataRequestId, requestToken, domain, nextMeta);
+      return domain;
+    } catch (error) {
+      if (!(error instanceof DataRequestAbortError)) {
+        onLoadError(dataRequestId, requestToken, error.message);
+      }
+      return null;
     }
   }
 

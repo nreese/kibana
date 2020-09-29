@@ -11,10 +11,16 @@ import uuid from 'uuid/v4';
 import { multiPoint } from '@turf/helpers';
 import { FeatureCollection } from 'geojson';
 import { MapStoreState } from '../reducers/store';
-import { LAYER_STYLE_TYPE, LAYER_TYPE, SOURCE_DATA_REQUEST_ID } from '../../common/constants';
+import {
+  DOMAIN_TYPE,
+  LAYER_STYLE_TYPE,
+  LAYER_TYPE,
+  SOURCE_DATA_REQUEST_ID,
+} from '../../common/constants';
 import {
   getDataFilters,
   getDataRequestDescriptor,
+  getDomainType,
   getLayerById,
   getLayerList,
 } from '../selectors/map_selectors';
@@ -129,6 +135,14 @@ function getDataRequestContext(
 
 export function syncDataForAllLayers() {
   return async (dispatch: Dispatch, getState: () => MapStoreState) => {
+    if (getDomainType(getState()) === DOMAIN_TYPE.XY) {
+      const domainPromises = getLayerList(getState()).map((layer) => {
+        const dataRequestContext = getDataRequestContext(dispatch, getState, layer.getId());
+        return layer.syncDomain(dataRequestContext);
+      });
+      const domains = await Promise.all(domainPromises);
+    }
+
     const syncPromises = getLayerList(getState()).map((layer) => {
       return dispatch<any>(syncDataForLayer(layer));
     });

@@ -15,6 +15,7 @@ import { FeatureCollection } from 'geojson';
 import { DataRequest } from '../util/data_request';
 import {
   AGG_TYPE,
+  DOMAIN_DATA_REQUEST_ID,
   FIELD_ORIGIN,
   MAX_ZOOM,
   MB_SOURCE_ID_LAYER_ID_PREFIX_DELIMITER,
@@ -25,6 +26,7 @@ import {
 import { copyPersistentState } from '../../reducers/util';
 import {
   AggDescriptor,
+  Domain,
   JoinDescriptor,
   LayerDescriptor,
   MapExtent,
@@ -44,6 +46,7 @@ export interface ILayer {
   getSource(): ISource;
   getSourceForEditing(): ISource;
   syncData(syncContext: DataRequestContext): void;
+  syncDomain(syncContext: DataRequestContext): Domain | null;
   supportsElasticsearchFilters(): boolean;
   supportsFitToBounds(): Promise<boolean>;
   getAttributions(): Promise<Attribution[]>;
@@ -450,6 +453,10 @@ export class AbstractLayer implements ILayer {
     return this.getDataRequest(SOURCE_DATA_REQUEST_ID);
   }
 
+  getDomainDataRequest(): DataRequest | undefined {
+    return this.getDataRequest(DOMAIN_DATA_REQUEST_ID);
+  }
+
   getDataRequest(id: string): DataRequest | undefined {
     return this._dataRequests.find((dataRequest) => dataRequest.getDataId() === id);
   }
@@ -470,6 +477,10 @@ export class AbstractLayer implements ILayer {
 
   async syncData(syncContext: DataRequestContext) {
     // no-op by default
+  }
+
+  async syncDomain(syncContext: DataRequestContext) {
+    return null;
   }
 
   getMbLayerIds(): string[] {

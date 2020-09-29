@@ -10,6 +10,7 @@ import { Filter, TimeRange } from 'src/plugins/data/public';
 import { AbstractSource, ISource } from '../source';
 import { IField } from '../../fields/field';
 import {
+  Domain,
   ESSearchSourceResponseMeta,
   MapExtent,
   MapFilters,
@@ -55,6 +56,17 @@ export interface IVectorSource extends ISource {
   createField({ fieldName }: { fieldName: string }): IField;
   canFormatFeatureProperties(): boolean;
   getSupportedShapeTypes(): Promise<VECTOR_SHAPE_TYPE[]>;
+  getDomain({
+    layerName,
+    sourceQuery,
+    timeFilters,
+    registerCancelCallback,
+  }: {
+    layerName: string;
+    sourceQuery: MapQuery;
+    timeFilters: TimeRange;
+    registerCancelCallback: (callback: () => void) => void;
+  }): Promise<Domain | null>;
 }
 
 export class AbstractVectorSource extends AbstractSource implements IVectorSource {
@@ -77,6 +89,17 @@ export class AbstractVectorSource extends AbstractSource implements IVectorSourc
   getApplyGlobalQuery(): boolean;
   getFieldNames(): string[];
   createField({ fieldName }: { fieldName: string }): IField;
+  getDomain({
+    layerName,
+    sourceQuery,
+    timeFilters,
+    registerCancelCallback,
+  }: {
+    layerName: string;
+    sourceQuery: MapQuery;
+    timeFilters: TimeRange;
+    registerCancelCallback: (callback: () => void) => void;
+  }): Promise<Domain | null>;
 }
 
 export interface ITiledSingleLayerVectorSource extends IVectorSource {

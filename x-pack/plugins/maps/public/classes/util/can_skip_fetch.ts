@@ -191,3 +191,27 @@ export function canSkipFormattersUpdate({
 
   return _.isEqual(prevMeta.fieldNames, nextMeta.fieldNames);
 }
+
+export function canSkipDomainUpdate({
+  prevDataRequest,
+  nextMeta,
+}: {
+  prevDataRequest: DataRequest | undefined;
+  nextMeta: DataMeta;
+}): boolean {
+  if (!prevDataRequest) {
+    return false;
+  }
+  const prevMeta = prevDataRequest.getMeta();
+  if (!prevMeta) {
+    return false;
+  }
+
+  const updateDueToIsTimeAware = nextMeta.isTimeAware !== prevMeta.isTimeAware;
+  const updateDueToSourceQuery = !_.isEqual(prevMeta.sourceQuery, nextMeta.sourceQuery);
+  const updateDueToTime = nextMeta.isTimeAware
+    ? !_.isEqual(prevMeta.timeFilters, nextMeta.timeFilters)
+    : false;
+
+  return !updateDueToSourceQuery && !updateDueToIsTimeAware && !updateDueToTime;
+}

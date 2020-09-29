@@ -91,6 +91,7 @@ export enum FIELD_ORIGIN {
 }
 export const JOIN_FIELD_NAME_PREFIX = '__kbnjoin__';
 
+export const DOMAIN_DATA_REQUEST_ID = 'domain';
 export const META_DATA_REQUEST_ID_SUFFIX = 'meta';
 export const FORMATTERS_DATA_REQUEST_ID_SUFFIX = 'formatters';
 export const SOURCE_DATA_REQUEST_ID = 'source';

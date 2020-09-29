@@ -9,6 +9,17 @@ import { GeoJsonProperties } from 'geojson';
 import { Query } from '../../../../../src/plugins/data/common';
 import { DRAW_TYPE, ES_GEO_FIELD_TYPE, ES_SPATIAL_RELATIONS } from '../constants';
 
+export type Domain = {
+  xAxis: {
+    min: number;
+    max: number;
+  };
+  yAxis: {
+    min: number;
+    max: number;
+  };
+};
+
 export type MapExtent = {
   minLon: number;
   minLat: number;

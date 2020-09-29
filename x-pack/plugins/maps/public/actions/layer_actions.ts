@@ -14,6 +14,7 @@ import {
   getSelectedLayerId,
   getMapReady,
   getMapColors,
+  getDomainType,
 } from '../selectors/map_selectors';
 import { FLYOUT_STATE } from '../reducers/ui';
 import { cancelRequest } from '../reducers/non_serializable_instances';
@@ -35,12 +36,17 @@ import {
   UPDATE_LAYER_STYLE,
   UPDATE_SOURCE_PROP,
 } from './map_action_constants';
-import { clearDataRequests, syncDataForLayerId, updateStyleMeta } from './data_request_actions';
+import {
+  clearDataRequests,
+  syncDataForLayerId,
+  syncDataForAllLayers,
+  updateStyleMeta,
+} from './data_request_actions';
 import { cleanTooltipStateForLayer } from './tooltip_actions';
 import { JoinDescriptor, LayerDescriptor, StyleDescriptor } from '../../common/descriptor_types';
 import { ILayer } from '../classes/layers/layer';
 import { IVectorLayer } from '../classes/layers/vector_layer/vector_layer';
-import { LAYER_STYLE_TYPE, LAYER_TYPE } from '../../common/constants';
+import { DOMAIN_TYPE, LAYER_STYLE_TYPE, LAYER_TYPE } from '../../common/constants';
 import { IVectorStyle } from '../classes/styles/vector/vector_style';
 
 export function trackCurrentLayerState(layerId: string) {
@@ -122,7 +128,13 @@ export function addLayer(layerDescriptor: LayerDescriptor) {
       type: ADD_LAYER,
       layer: layerDescriptor,
     });
-    dispatch<any>(syncDataForLayerId(layerDescriptor.id));
+
+    if (getDomainType(getState()) === DOMAIN_TYPE.XY) {
+      // Adding layer may change domain range so need to resync all layers
+      dispatch<any>(syncDataForAllLayers());
+    } else {
+      dispatch<any>(syncDataForLayerId(layerDescriptor.id));
+    }
   };
 }
 
