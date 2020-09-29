@@ -80,6 +80,13 @@ export type ESTermSourceDescriptor = AbstractESAggSourceDescriptor & {
   whereQuery?: Query;
 };
 
+export type XYDocumentSourceDescriptor = AbstractSourceDescriptor & {
+  // id: UUID
+  indexPatternId: string;
+  xAxisField: string;
+  yAxisField: string;
+};
+
 export type KibanaRegionmapSourceDescriptor = AbstractSourceDescriptor & {
   name: string;
 };

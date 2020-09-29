@@ -27,6 +27,7 @@ import { mvtVectorSourceWizardConfig } from '../sources/mvt_single_layer_vector_
 import { ObservabilityLayerWizardConfig } from './solution_layers/observability';
 import { SecurityLayerWizardConfig } from './solution_layers/security';
 import { choroplethLayerWizardConfig } from './choropleth_layer_wizard';
+import { xyDocumentLayerWizardConfig } from '../sources/xy_document_source';
 
 let registered = false;
 export function registerLayerWizards() {
@@ -58,7 +59,9 @@ export function registerLayerWizards() {
   registerLayerWizard(tmsLayerWizardConfig);
   // @ts-ignore
   registerLayerWizard(wmsLayerWizardConfig);
-
   registerLayerWizard(mvtVectorSourceWizardConfig);
+
+  registerLayerWizard(xyDocumentLayerWizardConfig);
+
   registered = true;
 }
