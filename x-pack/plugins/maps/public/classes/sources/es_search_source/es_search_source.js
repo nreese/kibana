@@ -38,7 +38,7 @@ export const sourceTitle = i18n.translate('xpack.maps.source.esSearchTitle', {
   defaultMessage: 'Documents',
 });
 
-function getDocValueAndSourceFields(indexPattern, fieldNames) {
+export function getDocValueAndSourceFields(indexPattern, fieldNames) {
   const docValueFields = [];
   const sourceOnlyFields = [];
   const scriptFields = {};

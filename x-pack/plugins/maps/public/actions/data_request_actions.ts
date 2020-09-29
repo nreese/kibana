@@ -33,6 +33,7 @@ import {
 } from '../reducers/non_serializable_instances';
 import { cleanTooltipStateForLayer } from './tooltip_actions';
 import {
+  SET_DOMAIN,
   LAYER_DATA_LOAD_ENDED,
   LAYER_DATA_LOAD_ERROR,
   LAYER_DATA_LOAD_STARTED,
@@ -44,7 +45,7 @@ import {
 } from './map_action_constants';
 import { ILayer } from '../classes/layers/layer';
 import { IVectorLayer } from '../classes/layers/vector_layer/vector_layer';
-import { DataMeta, MapExtent, MapFilters } from '../../common/descriptor_types';
+import { DataMeta, Domain, MapExtent, MapFilters } from '../../common/descriptor_types';
 import { DataRequestAbortError } from '../classes/util/data_request';
 import { scaleBounds, turfBboxToBounds } from '../../common/elasticsearch_util';
 import { IVectorStyle } from '../classes/styles/vector/vector_style';
@@ -141,6 +142,30 @@ export function syncDataForAllLayers() {
         return layer.syncDomain(dataRequestContext);
       });
       const domains = await Promise.all(domainPromises);
+      const domain = domains.reduce((accumulator: Domain | null, currentValue: Domain | null) => {
+        if (!currentValue) {
+          return accumulator;
+        } else if (!accumulator) {
+          return currentValue;
+        } else {
+          return {
+            xAxis: {
+              min: Math.min(accumulator.xAxis.min, currentValue.xAxix.min),
+              max: Math.max(accumulator.xAxis.max, currentValue.xAxix.max),
+            },
+            yAxis: {
+              min: Math.min(accumulator.yAxis.min, currentValue.yAxix.min),
+              max: Math.max(accumulator.yAxis.max, currentValue.yAxix.max),
+            },
+          };
+        }
+      }, null);
+      if (domain) {
+        dispatch({
+          type: SET_DOMAIN,
+          domain,
+        });
+      }
     }
 
     const syncPromises = getLayerList(getState()).map((layer) => {

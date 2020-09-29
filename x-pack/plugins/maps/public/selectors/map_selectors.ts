@@ -25,6 +25,7 @@ import { InnerJoin } from '../classes/joins/inner_join';
 import { getSourceByType } from '../classes/sources/source_registry';
 import { GeojsonFileSource } from '../classes/sources/geojson_file_source';
 import {
+  DOMAIN_TYPE,
   SOURCE_DATA_REQUEST_ID,
   STYLE_TYPE,
   VECTOR_STYLES,
@@ -129,6 +130,8 @@ export const getMapReady = ({ map }: MapStoreState): boolean => map && map.ready
 
 export const getDomainType = ({ map }: MapStoreState) => map.domainType;
 
+export const getDomain = ({ map }: MapStoreState) => map.domain;
+
 export const getMapInitError = ({ map }: MapStoreState): string | null | undefined =>
   map.mapInitError;
 
@@ -231,7 +234,19 @@ export const getDataFilters = createSelector(
   getRefreshTimerLastTriggeredAt,
   getQuery,
   getFilters,
-  (mapExtent, mapBuffer, mapZoom, timeFilters, refreshTimerLastTriggeredAt, query, filters) => {
+  getDomain,
+  getDomainType,
+  (
+    mapExtent,
+    mapBuffer,
+    mapZoom,
+    timeFilters,
+    refreshTimerLastTriggeredAt,
+    query,
+    filters,
+    domain,
+    domainType
+  ) => {
     return {
       extent: mapExtent,
       buffer: mapBuffer,
@@ -240,6 +255,7 @@ export const getDataFilters = createSelector(
       refreshTimerLastTriggeredAt,
       query,
       filters,
+      domain: domainType === DOMAIN_TYPE.XY ? domain : undefined,
     };
   }
 );

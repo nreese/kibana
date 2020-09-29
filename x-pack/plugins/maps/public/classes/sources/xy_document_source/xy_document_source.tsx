@@ -5,11 +5,22 @@
  */
 
 import uuid from 'uuid/v4';
+import rison from 'rison-node';
+
 import { TimeRange } from 'src/plugins/data/public';
-import { SOURCE_TYPES } from '../../../../common/constants';
+import {
+  GIS_API_PATH,
+  MVT_GET_XY_TILE_API_PATH,
+  MVT_SOURCE_LAYER_NAME,
+  SOURCE_TYPES,
+  VECTOR_SHAPE_TYPE,
+} from '../../../../common/constants';
 import { AbstractESSource } from '../es_source';
 import { registerSource } from '../source_registry';
 import { Domain, MapQuery } from '../../../../common/descriptor_types';
+import { getDocValueAndSourceFields } from '../es_search_source/es_search_source';
+import { loadIndexSettings } from '../es_search_source/load_index_settings';
+import { getHttp } from '../../../kibana_services';
 
 export class XYDocumentSource extends AbstractESSource {
   static type = SOURCE_TYPES.XY_DOCUMENT;
@@ -24,6 +35,65 @@ export class XYDocumentSource extends AbstractESSource {
 
   isFilterByMapBounds() {
     return false;
+  }
+
+  getFieldNames() {
+    return [this._descriptor.xAxisField, this._descriptor.yAxisField];
+  }
+
+  getLayerName() {
+    return MVT_SOURCE_LAYER_NAME;
+  }
+
+  async getSupportedShapeTypes(): Promise<VECTOR_SHAPE_TYPE[]> {
+    return [VECTOR_SHAPE_TYPE.POINT];
+  }
+
+  getGeoJsonWithMeta(): Promise<GeoJsonWithMeta> {
+    // Having this method here is a consequence of ITiledSingleLayerVectorSource extending IVectorSource.
+    throw new Error('Does not implement getGeoJsonWithMeta');
+  }
+
+  async getUrlTemplateWithMeta(searchFilters) {
+    const indexPattern = await this.getIndexPattern();
+    const indexSettings = await loadIndexSettings(indexPattern.title);
+
+    const { docValueFields, sourceOnlyFields } = getDocValueAndSourceFields(
+      indexPattern,
+      searchFilters.fieldNames
+    );
+
+    const initialSearchContext = { docvalue_fields: docValueFields }; // Request fields in docvalue_fields insted of _source
+
+    const searchSource = await this.makeSearchSource(
+      searchFilters,
+      indexSettings.maxResultWindow,
+      initialSearchContext
+    );
+    searchSource.setField('fields', searchFilters.fieldNames); // Setting "fields" filters out unused scripted fields
+    if (sourceOnlyFields.length === 0) {
+      searchSource.setField('source', false); // do not need anything from _source
+    } else {
+      searchSource.setField('source', sourceOnlyFields);
+    }
+    /* if (this._hasSort()) {
+      searchSource.setField('sort', this._buildEsSort());
+    }*/
+
+    const dsl = await searchSource.getSearchRequestBody();
+    const risonDsl = rison.encode(dsl);
+
+    const mvtUrlServicePath = getHttp().basePath.prepend(
+      `/${GIS_API_PATH}/${MVT_GET_XY_TILE_API_PATH}`
+    );
+
+    const urlTemplate = `${mvtUrlServicePath}?x={x}&y={y}&z={z}&xAxisField=${this._descriptor.xAxisField}&xMin=${searchFilters.domain.xAxis.min}&xMax=${searchFilters.domain.xAxis.max}&yAxisField=${this._descriptor.yAxisField}&yMin=${searchFilters.domain.yAxis.min}&yMax=${searchFilters.domain.yAxis.max}&index=${indexPattern.title}&requestBody=${risonDsl}`;
+    return {
+      layerName: this.getLayerName(),
+      minSourceZoom: this.getMinZoom(),
+      maxSourceZoom: this.getMaxZoom(),
+      urlTemplate,
+    };
   }
 
   async getDomain({

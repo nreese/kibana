@@ -7,6 +7,7 @@
 
 import {
   DrawState,
+  Domain,
   Goto,
   LayerDescriptor,
   MapCenter,
@@ -62,6 +63,7 @@ export type MapSettings = {
 
 export type MapState = {
   domainType: DOMAIN_TYPE;
+  domain: Domain;
   ready: boolean;
   mapInitError?: string | null;
   goto?: Goto | null;

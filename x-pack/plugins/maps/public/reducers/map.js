@@ -49,6 +49,7 @@ import {
   ROLLBACK_MAP_SETTINGS,
   TRACK_MAP_SETTINGS,
   UPDATE_MAP_SETTING,
+  SET_DOMAIN,
   SET_DOMAIN_TYPE,
 } from '../actions';
 
@@ -104,6 +105,16 @@ const updateLayerSourceDescriptorProp = (state, layerId, propName, value) => {
 
 export const DEFAULT_MAP_STATE = {
   domainType: DOMAIN_TYPE.GEO,
+  domain: {
+    xAxis: {
+      min: 0,
+      max: 100,
+    },
+    yAxis: {
+      min: 0,
+      max: 100,
+    },
+  },
   ready: false,
   mapInitError: null,
   goto: null,
@@ -356,6 +367,11 @@ export function map(state = DEFAULT_MAP_STATE, action) {
       return {
         ...state,
         mapInitError: action.errorMessage,
+      };
+    case SET_DOMAIN:
+      return {
+        ...state,
+        domain: action.domain,
       };
     case SET_DOMAIN_TYPE:
       return {

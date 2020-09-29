@@ -38,6 +38,7 @@ export const API_ROOT_PATH = `/${GIS_API_PATH}`;
 
 export const MVT_GETTILE_API_PATH = 'mvt/getTile';
 export const MVT_GETGRIDTILE_API_PATH = 'mvt/getGridTile';
+export const MVT_GET_XY_TILE_API_PATH = 'mvt/getXYTile';
 export const MVT_SOURCE_LAYER_NAME = 'source_layer';
 export const KBN_TOO_MANY_FEATURES_PROPERTY = '__kbn_too_many_features__';
 export const KBN_TOO_MANY_FEATURES_IMAGE_ID = '__kbn_too_many_features_image_id__';
