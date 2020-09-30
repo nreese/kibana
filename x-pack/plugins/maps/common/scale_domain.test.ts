@@ -7,8 +7,8 @@
 import {
   scaleLonToXDomain,
   scaleLatToYDomain,
-  scaleXDomainToLat,
-  scaleYDomainToLon,
+  scaleXDomainToLon,
+  scaleYDomainToLat,
 } from './scale_domain';
 
 test('scaleLatToYDomain', () => {
@@ -27,18 +27,18 @@ test('scaleLonToXDomain', () => {
   expect(scaleLonToXDomain(0.25, xMin, xRange)).toBe(125);
 });
 
-test('scaleXDomainToLat', () => {
+test('scaleXDomainToLon', () => {
   const xMin = 100;
   const xMax = 200;
   const xRange = xMax - xMin;
-  expect(scaleXDomainToLat(150, xMin, xRange)).toBe(0.5);
-  expect(scaleXDomainToLat(125, xMin, xRange)).toBe(0.25);
+  expect(scaleXDomainToLon(150, xMin, xRange)).toBe(0.5);
+  expect(scaleXDomainToLon(125, xMin, xRange)).toBe(0.25);
 });
 
-test('scaleYDomainToLon', () => {
+test('scaleYDomainToLat', () => {
   const xMin = 100;
   const xMax = 200;
   const xRange = xMax - xMin;
-  expect(scaleYDomainToLon(150, xMin, xRange)).toBe(0.5);
-  expect(scaleYDomainToLon(125, xMin, xRange)).toBe(0.25);
+  expect(scaleYDomainToLat(150, xMin, xRange)).toBe(0.5);
+  expect(scaleYDomainToLat(125, xMin, xRange)).toBe(0.25);
 });

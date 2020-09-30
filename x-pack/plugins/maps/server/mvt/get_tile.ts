@@ -28,8 +28,8 @@ import { ESBounds, tile2lat, tile2long, tileToESBbox } from '../../common/geo_ti
 import {
   scaleLatToYDomain,
   scaleLonToXDomain,
-  scaleXDomainToLat,
-  scaleYDomainToLon,
+  scaleXDomainToLon,
+  scaleYDomainToLat,
 } from '../../common/scale_domain';
 
 export async function getGridTile({
@@ -328,8 +328,8 @@ export async function getXYTile({
         geometry: {
           type: 'Point',
           coordinates: [
-            scaleXDomainToLat(properties[xAxisField], xMin, xRange),
-            scaleYDomainToLon(properties[yAxisField], yMin, yRange),
+            scaleXDomainToLon(properties[xAxisField], xMin, xRange),
+            scaleYDomainToLat(properties[yAxisField], yMin, yRange),
           ],
         },
         id: featureId,

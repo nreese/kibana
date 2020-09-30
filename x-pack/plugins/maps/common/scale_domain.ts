@@ -17,11 +17,11 @@ export function scaleLatToYDomain(lat: number, yMin: number, yDomainRange: numbe
   return scale(lat, XY_MIN_LAT, LAT_RANGE, yMin, yDomainRange);
 }
 
-export function scaleXDomainToLat(x: number, xMin: number, xDomainRange: number) {
+export function scaleXDomainToLon(x: number, xMin: number, xDomainRange: number) {
   return scale(x, xMin, xDomainRange, XY_MIN_LON, LON_RANGE);
 }
 
-export function scaleYDomainToLon(x: number, yMin: number, yDomainRange: number) {
+export function scaleYDomainToLat(x: number, yMin: number, yDomainRange: number) {
   return scale(x, yMin, yDomainRange, XY_MIN_LAT, LAT_RANGE);
 }
 
