@@ -25,6 +25,7 @@ import { hitsToGeoJson } from '../../common/elasticsearch_util';
 import { flattenHit } from './util';
 import { convertRegularRespToGeoJson } from '../../common/elasticsearch_util';
 import { ESBounds, tile2lat, tile2long, tileToESBbox } from '../../common/geo_tile_utils';
+import { scaleLatToYDomain, scaleLonToXDomain } from '../../common/scale_domain';
 
 export async function getGridTile({
   logger,
@@ -223,6 +224,125 @@ export async function getTile({
   }
 }
 
+export async function getXYTile({
+  logger,
+  callElasticsearch,
+  index,
+  xAxisField,
+  isXAxisDate,
+  xMin,
+  xMax,
+  yAxisField,
+  isYAxisDate,
+  yMin,
+  yMax,
+  latMin,
+  latMax,
+  lonMin,
+  lonMax,
+  x,
+  y,
+  z,
+  requestBody = {},
+}: {
+  x: number;
+  y: number;
+  z: number;
+  xAxisField: string;
+  isXAxisDate: boolean;
+  xMin: number;
+  xMax: number;
+  yAxisField: string;
+  isYAxisDate: boolean;
+  yMin: number;
+  yMax: number;
+  index: string;
+  callElasticsearch: (type: string, ...args: any[]) => Promise<unknown>;
+  logger: Logger;
+  requestBody: any;
+}): Promise<Buffer | null> {
+  const xRange = xMax - xMin;
+  if (xRange <= 0) {
+    throw new Error(`X axis min: &{xMin}, X axis max: &{xMax}. Range is not a postive number`);
+  }
+  const yRange = yMax - yMin;
+  if (yRange <= 0) {
+    throw new Error(`Y axis min: &{yMin}, Y axis max: &{yMax}. Range is not a postive number`);
+  }
+
+  const wLon = tile2long(x, z);
+  const sLat = tile2lat(y + 1, z);
+  const eLon = tile2long(x + 1, z);
+  const nLat = tile2lat(y, z);
+
+  let resultFeatures: Feature[];
+  try {
+    try {
+      requestBody.query.bool.filter.push(
+        getRangeFilter(
+          scaleLonToXDomain(wLon, xMin, xRange),
+          scaleLonToXDomain(eLon, xMin, xRange),
+          xAxisField,
+          isXAxisDate
+        )
+      );
+
+      requestBody.query.bool.filter.push(
+        getRangeFilter(
+          scaleLatToYDomain(sLat, yMin, yRange),
+          scaleLatToYDomain(nLat, yMin, yRange),
+          yAxisField,
+          isYAxisDate
+        )
+      );
+
+      const esSearchQuery = {
+        index,
+        body: requestBody,
+      };
+
+      const result = await callElasticsearch('search', esSearchQuery);
+
+      // console.log(JSON.stringify(result, null, ' '));
+
+      // Todo: pass in epochMillies-fields
+      /* const featureCollection = hitsToGeoJson(
+        // @ts-expect-error
+        result.hits.hits,
+        (hit: Record<string, unknown>) => {
+          return flattenHit(geometryFieldName, hit);
+        },
+        geometryFieldName,
+        ES_GEO_FIELD_TYPE.GEO_SHAPE,
+        []
+      );
+
+      resultFeatures = featureCollection.features;
+
+      // Correct system-fields.
+      for (let i = 0; i < resultFeatures.length; i++) {
+        const props = resultFeatures[i].properties;
+        if (props !== null) {
+          props[FEATURE_ID_PROPERTY_NAME] = resultFeatures[i].id;
+        }
+      }*/
+    } catch (e) {
+      logger.warn(e.message);
+      throw e;
+    }
+
+    const featureCollection: FeatureCollection = {
+      features: resultFeatures,
+      type: 'FeatureCollection',
+    };
+
+    return createMvtTile(featureCollection, z, x, y);
+  } catch (e) {
+    logger.warn(`Cannot generate tile for ${z}/${x}/${y}: ${e.message}`);
+    return null;
+  }
+}
+
 function tileToGeoJsonPolygon(x: number, y: number, z: number): Polygon {
   const wLon = tile2long(x, z);
   const sLat = tile2lat(y + 1, z);
@@ -290,4 +410,25 @@ function createMvtTile(
   } else {
     return null;
   }
+}
+
+function getRangeFilter(min: number, max: number, fieldName: string, isDateField: boolean) {
+  return isDateField
+    ? {
+        range: {
+          [fieldName]: {
+            format: 'epoch_millis',
+            gte: Math.floor(min),
+            lt: Math.ceil(max),
+          },
+        },
+      }
+    : {
+        range: {
+          [fieldName]: {
+            gte: min,
+            lt: max,
+          },
+        },
+      };
 }

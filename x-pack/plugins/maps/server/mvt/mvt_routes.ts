@@ -15,16 +15,68 @@ import {
 import { IRouter } from 'src/core/server';
 import {
   MVT_GETTILE_API_PATH,
+  MVT_GET_XY_TILE_API_PATH,
   API_ROOT_PATH,
   MVT_GETGRIDTILE_API_PATH,
   ES_GEO_FIELD_TYPE,
   RENDER_AS,
 } from '../../common/constants';
-import { getGridTile, getTile } from './get_tile';
+import { getGridTile, getTile, getXYTile } from './get_tile';
 
 const CACHE_TIMEOUT = 0; // Todo. determine good value. Unsure about full-implications (e.g. wrt. time-based data).
 
 export function initMVTRoutes({ router, logger }: { logger: Logger; router: IRouter }) {
+  router.get(
+    {
+      path: `${API_ROOT_PATH}/${MVT_GET_XY_TILE_API_PATH}`,
+      validate: {
+        query: schema.object({
+          x: schema.number(),
+          y: schema.number(),
+          z: schema.number(),
+          xAxisField: schema.string(),
+          isXAxisDate: schema.boolean(),
+          xMin: schema.number(),
+          xMax: schema.number(),
+          yAxisField: schema.string(),
+          isYAxisDate: schema.boolean(),
+          yMin: schema.number(),
+          yMax: schema.number(),
+          requestBody: schema.string(),
+          index: schema.string(),
+        }),
+      },
+    },
+    async (
+      context: RequestHandlerContext,
+      request: KibanaRequest<unknown, Record<string, any>, unknown>,
+      response: KibanaResponseFactory
+    ) => {
+      const { query } = request;
+      const requestBodyDSL = rison.decode(query.requestBody as string);
+
+      const tile = await getXYTile({
+        logger,
+        callElasticsearch: makeCallElasticsearch(context),
+        xAxisField: query.xAxisField as string,
+        isXAxisDate: query.xAxisField as boolean,
+        xMin: query.xMin as number,
+        xMax: query.xMax as number,
+        yAxisField: query.yAxisField as string,
+        isYAxisDate: query.isYAxisDate as boolean,
+        yMin: query.yMin as number,
+        yMax: query.yMax as number,
+        x: query.x as number,
+        y: query.y as number,
+        z: query.z as number,
+        index: query.index as string,
+        requestBody: requestBodyDSL as any,
+      });
+
+      return sendResponse(response, tile);
+    }
+  );
+
   router.get(
     {
       path: `${API_ROOT_PATH}/${MVT_GETTILE_API_PATH}`,

@@ -87,7 +87,26 @@ export class XYDocumentSource extends AbstractESSource {
       `/${GIS_API_PATH}/${MVT_GET_XY_TILE_API_PATH}`
     );
 
-    const urlTemplate = `${mvtUrlServicePath}?x={x}&y={y}&z={z}&xAxisField=${this._descriptor.xAxisField}&xMin=${searchFilters.domain.xAxis.min}&xMax=${searchFilters.domain.xAxis.max}&yAxisField=${this._descriptor.yAxisField}&yMin=${searchFilters.domain.yAxis.min}&yMax=${searchFilters.domain.yAxis.max}&index=${indexPattern.title}&requestBody=${risonDsl}`;
+    const xAxisField = indexPattern.getFieldByName(this._descriptor.xAxisField);
+    const isXAxisDate = xAxisField ? xAxisField.type === 'date' : false;
+
+    const yAxisField = indexPattern.getFieldByName(this._descriptor.yAxisField);
+    const isYAxisDate = yAxisField ? yAxisField.type === 'date' : false;
+
+    const urlTemplate = `${mvtUrlServicePath}
+?x={x}
+&y={y}
+&z={z}
+&xAxisField=${this._descriptor.xAxisField}
+&isXAxisDate=${isXAxisDate}
+&xMin=${searchFilters.domain.xAxis.min}
+&xMax=${searchFilters.domain.xAxis.max}
+&yAxisField=${this._descriptor.yAxisField}
+&isYAxisDate=${isYAxisDate}
+&yMin=${searchFilters.domain.yAxis.min}
+&yMax=${searchFilters.domain.yAxis.max}
+&index=${indexPattern.title}
+&requestBody=${risonDsl}`;
     return {
       layerName: this.getLayerName(),
       minSourceZoom: this.getMinZoom(),

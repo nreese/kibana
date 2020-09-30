@@ -12,7 +12,12 @@ import { syncLayerOrder } from './sort_layers';
 import { getGlyphUrl, isRetina } from '../../../meta';
 import {
   DECIMAL_DEGREES_PRECISION,
+  DOMAIN_TYPE,
   KBN_TOO_MANY_FEATURES_IMAGE_ID,
+  XY_MIN_LAT,
+  XY_MAX_LAT,
+  XY_MIN_LON,
+  XY_MAX_LON,
   ZOOM_PRECISION,
 } from '../../../../common/constants';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl-csp';
@@ -131,16 +136,25 @@ export class MBMap extends React.Component {
         maxZoom: this.props.settings.maxZoom,
         minZoom: this.props.settings.minZoom,
       };
+
+      // narrow map bounds to limit web mercator distortion on linear projection to lat/lon space
+      if (this.props.domainType === DOMAIN_TYPE.XY) {
+        options.maxBounds = [XY_MIN_LON, XY_MIN_LAT, XY_MAX_LON, XY_MAX_LAT];
+      }
+
+      // Set initial map view
       if (initialView) {
         options.zoom = initialView.zoom;
         options.center = {
           lng: initialView.lon,
           lat: initialView.lat,
         };
-      } else {
+      } else if (this.props.domainType === DOMAIN_TYPE.GEO) {
         options.bounds = [-170, -60, 170, 75];
       }
+
       const mbMap = new mapboxgl.Map(options);
+      console.log(mbMap.getMaxBounds());
       mbMap.dragRotate.disable();
       mbMap.touchZoomRotate.disableRotation();
       if (!this.props.disableInteractive) {

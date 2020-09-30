@@ -25,12 +25,14 @@ import {
   isViewControlHidden,
   getSpatialFiltersLayer,
   getMapSettings,
+  getDomainType,
 } from '../../../selectors/map_selectors';
 
 import { getInspectorAdapters } from '../../../reducers/non_serializable_instances';
 
 function mapStateToProps(state = {}) {
   return {
+    domainType: getDomainType(state),
     isMapReady: getMapReady(state),
     settings: getMapSettings(state),
     layerList: getLayerList(state),
