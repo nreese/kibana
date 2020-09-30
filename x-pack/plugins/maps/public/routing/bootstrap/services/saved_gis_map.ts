@@ -21,6 +21,7 @@ import {
   getQuery,
   getFilters,
   getMapSettings,
+  getDomainType,
 } from '../../../selectors/map_selectors';
 import { getIsLayerTOCOpen, getOpenTOCDetails } from '../../../selectors/ui_selectors';
 import { copyPersistentState } from '../../../reducers/util';
@@ -105,6 +106,7 @@ export function createSavedGisMapClass(services: SavedObjectKibanaServices) {
       this.layerListJSON = JSON.stringify(layerListConfigOnly);
 
       this.mapStateJSON = JSON.stringify({
+        domainType: getDomainType(state),
         zoom: getMapZoom(state),
         center: getMapCenter(state),
         timeFilters: getTimeFilters(state),

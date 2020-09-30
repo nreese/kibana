@@ -13,8 +13,10 @@ import { getCoreChrome, getToasts } from '../../../kibana_services';
 import { getMapsSavedObjectLoader } from '../../bootstrap/services/gis_map_saved_object_loader';
 import { MapsAppView } from '.';
 import { ISavedGisMap } from '../../bootstrap/services/saved_gis_map';
+import { DOMAIN_TYPE } from '../../../../common/constants;';
 
 interface Props {
+  defaultDomainType?: DOMAIN_TYPE;
   savedMapId?: string;
   onAppLeave: AppMountParameters['onAppLeave'];
   stateTransfer: EmbeddableStateTransfer;
@@ -75,6 +77,7 @@ export const LoadMapAndRender = class extends React.Component<Props, State> {
 
     return savedMap ? (
       <MapsAppView
+        defaultDomainType={this.props.defaultDomainType}
         savedMap={savedMap}
         onAppLeave={this.props.onAppLeave}
         setHeaderActionMenu={this.props.setHeaderActionMenu}

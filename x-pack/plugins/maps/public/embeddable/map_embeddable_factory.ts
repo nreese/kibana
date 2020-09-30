@@ -13,6 +13,7 @@ import {
 } from '../../../../../src/plugins/embeddable/public';
 import '../index.scss';
 import {
+  DOMAIN_TYPE,
   getExistingMapPath,
   MAP_SAVED_OBJECT_TYPE,
   APP_ICON,
@@ -98,10 +99,14 @@ export class MapEmbeddableFactory implements EmbeddableFactoryDefinition {
     const indexPatterns = await this._getIndexPatterns(layerList);
 
     let settings;
+    let domainType = DOMAIN_TYPE.GEO;
     if (savedMap.mapStateJSON) {
       const mapState = JSON.parse(savedMap.mapStateJSON);
       if (mapState.settings) {
         settings = mapState.settings;
+      }
+      if (mapState.domainType) {
+        domainType = mapState.domainType;
       }
     }
 
@@ -115,6 +120,7 @@ export class MapEmbeddableFactory implements EmbeddableFactoryDefinition {
         indexPatterns,
         editable: await this.isEditable(),
         settings,
+        domainType,
       },
       input,
       parent

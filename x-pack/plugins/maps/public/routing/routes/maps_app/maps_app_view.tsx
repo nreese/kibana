@@ -56,6 +56,7 @@ import { ISavedGisMap } from '../../bootstrap/services/saved_gis_map';
 
 interface Props {
   domainType: DOMAIN_TYPE;
+  defaultDomainType?: DOMAIN_TYPE;
   savedMap: ISavedGisMap;
   onAppLeave: AppMountParameters['onAppLeave'];
   stateTransfer: EmbeddableStateTransfer;
@@ -91,6 +92,7 @@ interface Props {
   setOpenTOCDetails: (openTOCDetails: string[]) => void;
   query: MapQuery | undefined;
   setHeaderActionMenu: AppMountParameters['setHeaderActionMenu'];
+  setDomainType: (domainType: DOMAIN_TYPE) => void;
 }
 
 interface State {
@@ -265,14 +267,19 @@ export class MapsAppView extends React.Component<Props, State> {
     const mapStateJSON = this.props.savedMap.mapStateJSON;
 
     let savedObjectFilters = [];
+    let domainType = this.props.defaultDomainType ? this.props.defaultDomainType : DOMAIN_TYPE.GEO;
     if (mapStateJSON) {
       const mapState = JSON.parse(mapStateJSON);
       if (mapState.filters) {
         savedObjectFilters = mapState.filters;
       }
+      if (mapState.domainType) {
+        domainType = mapState.domainType;
+      }
     }
-    const appFilters = this._appStateManager.getFilters() || [];
+    this.props.setDomainType(domainType);
 
+    const appFilters = this._appStateManager.getFilters() || [];
     const query = getInitialQuery({
       mapStateJSON,
       appState: this._appStateManager.getAppState(),
@@ -300,7 +307,7 @@ export class MapsAppView extends React.Component<Props, State> {
     const layerList = getInitialLayers(
       this.props.savedMap.layerListJSON,
       getInitialLayersFromUrlParam(),
-      this.props.domainType
+      domainType
     );
     this.props.replaceLayerList(layerList);
     this.setState({

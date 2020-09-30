@@ -33,6 +33,7 @@ import {
   updateFlyout,
   enableFullScreen,
   openMapSettings,
+  setDomainType,
 } from '../../../actions';
 import { FLYOUT_STATE } from '../../../reducers/ui';
 import { getMapsCapabilities } from '../../../kibana_services';
@@ -98,6 +99,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<MapStoreState, void, AnyActi
     },
     enableFullScreen: () => dispatch(enableFullScreen()),
     openMapSettings: () => dispatch(openMapSettings()),
+    setDomainType: (domainType: DOMAIN_TYPE) => dispatch(setDomainType(domainType)),
   };
 }
 

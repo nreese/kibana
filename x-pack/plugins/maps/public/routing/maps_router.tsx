@@ -26,7 +26,6 @@ import { getStore } from './store_operations';
 import { LoadListAndRender } from './routes/list/load_list_and_render';
 import { LoadMapAndRender } from './routes/maps_app/load_map_and_render';
 import { DOMAIN_TYPE } from '../../common/constants';
-import { setDomainType } from '../actions';
 
 export let goToSpecifiedPath: (path: string) => void;
 export let kbnUrlStateStorage: IKbnUrlStateStorage;
@@ -87,19 +86,6 @@ const App: React.FC<Props> = ({ history, appBasePath, onAppLeave, setHeaderActio
     });
   }
 
-  function renderMap(domainType: DOMAIN_TYPE, savedMapId?: string) {
-    store.dispatch(setDomainType(domainType));
-    return (
-      <LoadMapAndRender
-        savedMapId={savedMapId}
-        onAppLeave={onAppLeave}
-        setHeaderActionMenu={setHeaderActionMenu}
-        stateTransfer={stateTransfer}
-        originatingApp={originatingApp}
-      />
-    );
-  }
-
   return (
     <I18nContext>
       <Provider store={store}>
@@ -107,29 +93,53 @@ const App: React.FC<Props> = ({ history, appBasePath, onAppLeave, setHeaderActio
           <Switch>
             <Route
               path={`/scatterplot/:savedMapId`}
-              render={(props) => {
-                return renderMap(DOMAIN_TYPE.XY, props.match.params.savedMapId);
-              }}
+              render={(props) => (
+                <LoadMapAndRender
+                  savedMapId={props.match.params.savedMapId}
+                  onAppLeave={onAppLeave}
+                  setHeaderActionMenu={setHeaderActionMenu}
+                  stateTransfer={stateTransfer}
+                  originatingApp={originatingApp}
+                />
+              )}
             />
             <Route
               exact
               path={`/scatterplot`}
-              render={() => {
-                return renderMap(DOMAIN_TYPE.XY);
-              }}
+              render={() => (
+                <LoadMapAndRender
+                  defaultDomainType={DOMAIN_TYPE.XY}
+                  onAppLeave={onAppLeave}
+                  setHeaderActionMenu={setHeaderActionMenu}
+                  stateTransfer={stateTransfer}
+                  originatingApp={originatingApp}
+                />
+              )}
             />
             <Route
               path={`/map/:savedMapId`}
-              render={(props) => {
-                return renderMap(DOMAIN_TYPE.GEO, props.match.params.savedMapId);
-              }}
+              render={(props) => (
+                <LoadMapAndRender
+                  savedMapId={props.match.params.savedMapId}
+                  onAppLeave={onAppLeave}
+                  setHeaderActionMenu={setHeaderActionMenu}
+                  stateTransfer={stateTransfer}
+                  originatingApp={originatingApp}
+                />
+              )}
             />
             <Route
               exact
               path={`/map`}
-              render={() => {
-                return renderMap(DOMAIN_TYPE.GEO);
-              }}
+              render={() => (
+                <LoadMapAndRender
+                  defaultDomainType={DOMAIN_TYPE.GEO}
+                  onAppLeave={onAppLeave}
+                  setHeaderActionMenu={setHeaderActionMenu}
+                  stateTransfer={stateTransfer}
+                  originatingApp={originatingApp}
+                />
+              )}
             />
             // Redirect other routes to list, or if hash-containing, their non-hash equivalents
             <Route

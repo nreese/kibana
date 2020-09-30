@@ -42,6 +42,7 @@ import {
   setReadOnly,
   setIsLayerTOCOpen,
   setOpenTOCDetails,
+  setDomainType,
 } from '../actions';
 import { getIsLayerTOCOpen, getOpenTOCDetails } from '../selectors/ui_selectors';
 import {
@@ -50,7 +51,7 @@ import {
   EventHandlers,
 } from '../reducers/non_serializable_instances';
 import { getMapCenter, getMapZoom, getHiddenLayerIds } from '../selectors/map_selectors';
-import { MAP_SAVED_OBJECT_TYPE } from '../../common/constants';
+import { DOMAIN_TYPE, MAP_SAVED_OBJECT_TYPE } from '../../common/constants';
 import { RenderToolTipContent } from '../classes/tooltips/tooltip_property';
 import { getUiActions, getCoreI18n } from '../kibana_services';
 import { LayerDescriptor } from '../../common/descriptor_types';
@@ -74,6 +75,7 @@ export class MapEmbeddable extends Embeddable<MapEmbeddableInput, MapEmbeddableO
   private _domNode?: HTMLElement;
   private _unsubscribeFromStore?: Unsubscribe;
   private _settings?: MapSettings;
+  private _domainType?: DOMAIN_TYPE;
 
   constructor(
     config: MapEmbeddableConfig,
@@ -99,6 +101,7 @@ export class MapEmbeddable extends Embeddable<MapEmbeddableInput, MapEmbeddableO
     this._eventHandlers = eventHandlers;
     this._layerList = config.layerList;
     this._settings = config.settings;
+    this._domainType = config.domainType;
     this._store = createMapStore();
 
     this._subscription = this.getInput$().subscribe((input) => this.onContainerStateChanged(input));
@@ -180,6 +183,10 @@ export class MapEmbeddable extends Embeddable<MapEmbeddableInput, MapEmbeddableO
 
     if (this._settings) {
       this._store.dispatch(setMapSettings(this._settings));
+    }
+
+    if (this._domainType) {
+      this._store.dispatch(setDomainType(this._domainType));
     }
 
     if (_.has(this.input, 'isLayerTOCOpen')) {

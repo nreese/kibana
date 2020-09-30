@@ -13,6 +13,7 @@ import {
 } from '../../../../../src/plugins/embeddable/public/lib/embeddables';
 import { Filter, Query, RefreshInterval, TimeRange } from '../../../../../src/plugins/data/common';
 import { LayerDescriptor, MapCenterAndZoom } from '../../common/descriptor_types';
+import { DOMAIN_TYPE } from '../../common/constants';
 
 export interface MapEmbeddableConfig {
   editUrl?: string;
@@ -23,6 +24,7 @@ export interface MapEmbeddableConfig {
   title?: string;
   layerList: LayerDescriptor[];
   settings?: MapSettings;
+  domainType?: DOMAIN_TYPE;
 }
 
 export interface MapEmbeddableInput extends EmbeddableInput {
