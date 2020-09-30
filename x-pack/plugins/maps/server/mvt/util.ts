@@ -13,7 +13,10 @@
 // todo: Ideally, this should adapt/reuse from https://github.com/elastic/kibana/blob/52b42a81faa9dd5c102b9fbb9a645748c3623121/src/plugins/data/common/index_patterns/index_patterns/flatten_hit.ts#L26
 import { GeoJsonProperties } from 'geojson';
 
-export function flattenHit(geometryField: string, hit: Record<string, unknown>): GeoJsonProperties {
+export function flattenHit(
+  geometryField: string | null,
+  hit: Record<string, unknown>
+): GeoJsonProperties {
   const flat: GeoJsonProperties = {};
   if (hit) {
     flattenSource(flat, '', hit._source as Record<string, unknown>, geometryField);
@@ -32,14 +35,14 @@ function flattenSource(
   accum: GeoJsonProperties,
   path: string,
   properties: Record<string, unknown> = {},
-  geometryField: string
+  geometryField: string | null
 ): GeoJsonProperties {
   accum = accum || {};
   for (const key in properties) {
     if (properties.hasOwnProperty(key)) {
       const newKey = path ? path + '.' + key : key;
       let value;
-      if (geometryField === newKey) {
+      if (geometryField && geometryField === newKey) {
         value = properties[key]; // do not deep-copy the geometry
       } else if (properties[key] !== null && typeof value === 'object' && !Array.isArray(value)) {
         value = flattenSource(

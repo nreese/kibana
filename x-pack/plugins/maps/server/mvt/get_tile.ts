@@ -25,7 +25,12 @@ import { hitsToGeoJson } from '../../common/elasticsearch_util';
 import { flattenHit } from './util';
 import { convertRegularRespToGeoJson } from '../../common/elasticsearch_util';
 import { ESBounds, tile2lat, tile2long, tileToESBbox } from '../../common/geo_tile_utils';
-import { scaleLatToYDomain, scaleLonToXDomain } from '../../common/scale_domain';
+import {
+  scaleLatToYDomain,
+  scaleLonToXDomain,
+  scaleXDomainToLat,
+  scaleYDomainToLon,
+} from '../../common/scale_domain';
 
 export async function getGridTile({
   logger,
@@ -263,11 +268,11 @@ export async function getXYTile({
 }): Promise<Buffer | null> {
   const xRange = xMax - xMin;
   if (xRange <= 0) {
-    throw new Error(`X axis min: &{xMin}, X axis max: &{xMax}. Range is not a postive number`);
+    throw new Error(`X axis min: ${xMin}, X axis max: ${xMax}. Range is not a postive number`);
   }
   const yRange = yMax - yMin;
   if (yRange <= 0) {
-    throw new Error(`Y axis min: &{yMin}, Y axis max: &{yMax}. Range is not a postive number`);
+    throw new Error(`Y axis min: ${yMin}, Y axis max: ${yMax}. Range is not a postive number`);
   }
 
   const wLon = tile2long(x, z);
@@ -275,64 +280,66 @@ export async function getXYTile({
   const eLon = tile2long(x + 1, z);
   const nLat = tile2lat(y, z);
 
-  let resultFeatures: Feature[];
+  const features: Feature[] = [];
   try {
-    try {
-      requestBody.query.bool.filter.push(
-        getRangeFilter(
-          scaleLonToXDomain(wLon, xMin, xRange),
-          scaleLonToXDomain(eLon, xMin, xRange),
-          xAxisField,
-          isXAxisDate
-        )
-      );
+    requestBody.query.bool.filter.push(
+      getRangeFilter(
+        scaleLonToXDomain(wLon, xMin, xRange),
+        scaleLonToXDomain(eLon, xMin, xRange),
+        xAxisField,
+        isXAxisDate
+      )
+    );
 
-      requestBody.query.bool.filter.push(
-        getRangeFilter(
-          scaleLatToYDomain(sLat, yMin, yRange),
-          scaleLatToYDomain(nLat, yMin, yRange),
-          yAxisField,
-          isYAxisDate
-        )
-      );
+    requestBody.query.bool.filter.push(
+      getRangeFilter(
+        scaleLatToYDomain(sLat, yMin, yRange),
+        scaleLatToYDomain(nLat, yMin, yRange),
+        yAxisField,
+        isYAxisDate
+      )
+    );
 
-      const esSearchQuery = {
-        index,
-        body: requestBody,
-      };
+    const esSearchQuery = {
+      index,
+      body: requestBody,
+    };
 
-      const result = await callElasticsearch('search', esSearchQuery);
+    const result = await callElasticsearch('search', esSearchQuery);
 
-      // console.log(JSON.stringify(result, null, ' '));
+    for (let i = 0; i < result.hits.hits.length; i++) {
+      const properties = flattenHit(null, result.hits.hits[i]);
 
-      // Todo: pass in epochMillies-fields
-      /* const featureCollection = hitsToGeoJson(
-        // @ts-expect-error
-        result.hits.hits,
-        (hit: Record<string, unknown>) => {
-          return flattenHit(geometryFieldName, hit);
+      // There is a bug in Elasticsearch API where epoch_millis are returned as a string instead of a number
+      // https://github.com/elastic/elasticsearch/issues/50622
+      // Convert these field values to integers.
+      if (isXAxisDate && typeof properties[xAxisField] === 'string') {
+        properties[xAxisField] = parseInt(properties[xAxisField], 10);
+      }
+      if (isYAxisDate && typeof properties[yAxisField] === 'string') {
+        properties[yAxisField] = parseInt(properties[yAxisField], 10);
+      }
+
+      // _id is not unique across Kibana index pattern. Multiple ES indices could have _id collisions
+      // Need to prefix with _index to guarantee uniqueness
+      const featureId = `${properties._index}:${properties._id}`;
+      features.push({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [
+            scaleXDomainToLat(properties[xAxisField], xMin, xRange),
+            scaleYDomainToLon(properties[yAxisField], yMin, yRange),
+          ],
         },
-        geometryFieldName,
-        ES_GEO_FIELD_TYPE.GEO_SHAPE,
-        []
-      );
-
-      resultFeatures = featureCollection.features;
-
-      // Correct system-fields.
-      for (let i = 0; i < resultFeatures.length; i++) {
-        const props = resultFeatures[i].properties;
-        if (props !== null) {
-          props[FEATURE_ID_PROPERTY_NAME] = resultFeatures[i].id;
-        }
-      }*/
-    } catch (e) {
-      logger.warn(e.message);
-      throw e;
+        id: featureId,
+        [FEATURE_ID_PROPERTY_NAME]: featureId,
+        properties,
+      });
     }
 
     const featureCollection: FeatureCollection = {
-      features: resultFeatures,
+      features,
       type: 'FeatureCollection',
     };
 
