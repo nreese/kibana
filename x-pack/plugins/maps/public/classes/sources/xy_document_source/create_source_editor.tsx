@@ -61,7 +61,11 @@ export class CreateSourceEditor extends Component<Props, State> {
         {
           indexPatternId,
           numericFields: indexPattern.fields.filter((field) => {
-            return !indexPatterns.isNestedField(field) && ['number', 'date'].includes(field.type);
+            return (
+              !indexPatterns.isNestedField(field) &&
+              !field.scripted &&
+              ['number', 'date'].includes(field.type)
+            );
           }),
         },
         this._previewLayer

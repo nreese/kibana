@@ -6,13 +6,14 @@
 
 import { connect } from 'react-redux';
 import { LayerPanel } from './view';
-import { getSelectedLayer } from '../../selectors/map_selectors';
+import { getDomainType, getSelectedLayer } from '../../selectors/map_selectors';
 import { updateSourceProp } from '../../actions';
 
 function mapStateToProps(state = {}) {
   const selectedLayer = getSelectedLayer(state);
   return {
     key: selectedLayer ? `${selectedLayer.getId()}${selectedLayer.showJoinEditor()}` : '',
+    domainType: getDomainType(state),
     selectedLayer,
   };
 }

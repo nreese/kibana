@@ -12,6 +12,7 @@ import {
   GIS_API_PATH,
   MVT_GET_XY_TILE_API_PATH,
   MVT_SOURCE_LAYER_NAME,
+  SCALING_TYPES,
   SOURCE_TYPES,
   VECTOR_SHAPE_TYPE,
 } from '../../../../common/constants';
@@ -20,7 +21,8 @@ import { registerSource } from '../source_registry';
 import { Domain, MapQuery } from '../../../../common/descriptor_types';
 import { getDocValueAndSourceFields } from '../es_search_source/es_search_source';
 import { loadIndexSettings } from '../es_search_source/load_index_settings';
-import { getHttp } from '../../../kibana_services';
+import { getHttp, getSearchService } from '../../../kibana_services';
+import { ESDocField } from '../../fields/es_doc_field';
 
 export class XYDocumentSource extends AbstractESSource {
   static type = SOURCE_TYPES.XY_DOCUMENT;
@@ -30,11 +32,48 @@ export class XYDocumentSource extends AbstractESSource {
       ...descriptor,
       id: descriptor.id ? descriptor.id : uuid(),
       type: XYDocumentSource.type,
+      tooltipProperties: descriptor.tooltipProperties
+        ? descriptor.tooltipProperties
+        : [descriptor.xAxisField, descriptor.yAxisField],
     };
+  }
+
+  constructor(descriptor, inspectorAdapters) {
+    super(descriptor, inspectorAdapters);
+
+    this._tooltipFields = this._descriptor.tooltipProperties.map((property) =>
+      this.createField({ fieldName: property })
+    );
   }
 
   isFilterByMapBounds() {
     return false;
+  }
+
+  async getFields() {
+    try {
+      const indexPattern = await this.getIndexPattern();
+      return indexPattern.fields
+        .filter((field) => {
+          // Ensure fielddata is enabled for field.
+          // Search does not request _source
+          return field.aggregatable;
+        })
+        .map((field) => {
+          return this.createField({ fieldName: field.name });
+        });
+    } catch (error) {
+      // failed index-pattern retrieval will show up as error-message in the layer-toc-entry
+      return [];
+    }
+  }
+
+  createField({ fieldName }) {
+    return new ESDocField({
+      fieldName,
+      source: this,
+      canReadFromGeoJson: false,
+    });
   }
 
   getFieldNames() {
@@ -181,6 +220,64 @@ export class XYDocumentSource extends AbstractESSource {
         max: resp.aggregations.yMax.value,
       },
     };
+  }
+
+  canFormatFeatureProperties() {
+    return this._tooltipFields.length > 0;
+  }
+
+  async _loadTooltipProperties(docId, index, indexPattern) {
+    if (this._tooltipFields.length === 0) {
+      return {};
+    }
+
+    const searchService = getSearchService();
+    const searchSource = searchService.searchSource.createEmpty();
+
+    searchSource.setField('index', indexPattern);
+    searchSource.setField('size', 1);
+
+    const query = {
+      language: 'kuery',
+      query: `_id:"${docId}" and _index:"${index}"`,
+    };
+
+    searchSource.setField('query', query);
+    searchSource.setField('fields', this._getTooltipPropertyNames());
+
+    const resp = await searchSource.fetch();
+
+    const hit = _.get(resp, 'hits.hits[0]');
+    if (!hit) {
+      throw new Error(
+        i18n.translate('xpack.maps.source.esSearch.loadTooltipPropertiesErrorMsg', {
+          defaultMessage: 'Unable to find document, _id: {docId}',
+          values: { docId },
+        })
+      );
+    }
+
+    const properties = indexPattern.flattenHit(hit);
+    indexPattern.metaFields.forEach((metaField) => {
+      if (!this._getTooltipPropertyNames().includes(metaField)) {
+        delete properties[metaField];
+      }
+    });
+    return properties;
+  }
+
+  async getTooltipProperties(properties) {
+    const indexPattern = await this.getIndexPattern();
+    const propertyValues = await this._loadTooltipProperties(
+      properties._id,
+      properties._index,
+      indexPattern
+    );
+    const tooltipProperties = this._tooltipFields.map((field) => {
+      const value = propertyValues[field.getName()];
+      return field.createTooltipProperty(value);
+    });
+    return Promise.all(tooltipProperties);
   }
 }
 

@@ -259,7 +259,7 @@ export class MBMap extends React.Component {
     );
 
     // Attach event only if view control is visible, which shows lat/lon
-    if (!this.props.hideViewControl) {
+    if (!this.props.hideViewControl && this.props.domainType === DOMAIN_TYPE.GEO) {
       const throttledSetMouseCoordinates = _.throttle((e) => {
         this.props.setMouseCoordinates({
           lat: e.lngLat.lat,

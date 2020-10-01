@@ -14,6 +14,13 @@ import {
   updateLayerAlpha,
   updateLabelsOnTop,
 } from '../../../actions';
+import { getDomainType } from '../../../selectors/map_selectors';
+
+function mapStateToProps(state = {}) {
+  return {
+    domainType: getDomainType(state),
+  };
+}
 
 function mapDispatchToProps(dispatch: Dispatch<AnyAction>) {
   return {
@@ -26,5 +33,5 @@ function mapDispatchToProps(dispatch: Dispatch<AnyAction>) {
   };
 }
 
-const connectedLayerSettings = connect(null, mapDispatchToProps)(LayerSettings);
+const connectedLayerSettings = connect(mapStateToProps, mapDispatchToProps)(LayerSettings);
 export { connectedLayerSettings as LayerSettings };

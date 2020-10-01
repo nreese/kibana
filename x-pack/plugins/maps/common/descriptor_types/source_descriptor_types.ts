@@ -85,6 +85,7 @@ export type XYDocumentSourceDescriptor = AbstractSourceDescriptor & {
   indexPatternId: string;
   xAxisField: string;
   yAxisField: string;
+  tooltipProperties?: string[];
 };
 
 export type KibanaRegionmapSourceDescriptor = AbstractSourceDescriptor & {

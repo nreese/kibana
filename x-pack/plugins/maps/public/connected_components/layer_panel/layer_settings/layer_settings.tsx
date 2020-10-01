@@ -16,12 +16,13 @@ import {
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
-import { MAX_ZOOM } from '../../../../common/constants';
+import { DOMAIN_TYPE, MAX_ZOOM } from '../../../../common/constants';
 import { AlphaSlider } from '../../../components/alpha_slider';
 import { ValidatedDualRange } from '../../../../../../../src/plugins/kibana_react/public';
 import { ILayer } from '../../../classes/layers/layer';
 
 interface Props {
+  domainType: DOMAIN_TYPE;
   layer: ILayer;
   updateLabel: (layerId: string, label: string) => void;
   updateMinZoom: (layerId: string, minZoom: number) => void;
@@ -54,6 +55,9 @@ export function LayerSettings(props: Props) {
   };
 
   const renderZoomSliders = () => {
+    if (props.domainType === DOMAIN_TYPE.XY) {
+      return null;
+    }
     return (
       <ValidatedDualRange
         label={i18n.translate('xpack.maps.layerPanel.settingsPanel.visibleZoomLabel', {

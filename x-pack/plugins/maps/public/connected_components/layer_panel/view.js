@@ -29,6 +29,7 @@ import {
 import { i18n } from '@kbn/i18n';
 import { KibanaContextProvider } from '../../../../../../src/plugins/kibana_react/public';
 import { Storage } from '../../../../../../src/plugins/kibana_utils/public';
+import { DOMAIN_TYPE } from '../../../common/constants';
 
 import { getData, getCore } from '../../kibana_services';
 
@@ -75,7 +76,7 @@ export class LayerPanel extends React.Component {
   };
 
   async _loadLeftJoinFields() {
-    if (!this.props.selectedLayer || !this.props.selectedLayer.showJoinEditor()) {
+    if (!this._supportsJoins()) {
       return;
     }
 
@@ -119,8 +120,16 @@ export class LayerPanel extends React.Component {
     );
   }
 
+  _supportsJoins() {
+    return (
+      this.props.selectedLayer &&
+      this.props.selectedLayer.showJoinEditor() &&
+      this.props.domainType === DOMAIN_TYPE.GEO
+    );
+  }
+
   _renderJoinSection() {
-    if (!this.props.selectedLayer.showJoinEditor()) {
+    if (!this._supportsJoins()) {
       return null;
     }
 
