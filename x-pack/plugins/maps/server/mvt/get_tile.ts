@@ -233,6 +233,10 @@ export async function getXYTile({
   logger,
   callElasticsearch,
   index,
+  minLon,
+  maxLon,
+  minLat,
+  maxLat,
   xAxisField,
   isXAxisDate,
   xMin,
@@ -253,6 +257,10 @@ export async function getXYTile({
   x: number;
   y: number;
   z: number;
+  minLon: number;
+  maxLon: number;
+  minLat: number;
+  maxLat: number;
   xAxisField: string;
   isXAxisDate: boolean;
   xMin: number;
@@ -275,6 +283,17 @@ export async function getXYTile({
     throw new Error(`Y axis min: ${yMin}, Y axis max: ${yMax}. Range is not a postive number`);
   }
 
+  const lonRange = maxLon - minLon;
+  if (lonRange <= 0) {
+    throw new Error(`Longitude min: ${minLon}, max: ${maxLon}. Range is not a postive number`);
+  }
+  const latRange = maxLat - minLat;
+  if (latRange <= 0) {
+    throw new Error(
+      `Latitude min: ${minLat}, Y axis max: ${maxLat}. Range is not a postive number`
+    );
+  }
+
   const wLon = tile2long(x, z);
   const sLat = tile2lat(y + 1, z);
   const eLon = tile2long(x + 1, z);
@@ -284,8 +303,8 @@ export async function getXYTile({
   try {
     requestBody.query.bool.filter.push(
       getRangeFilter(
-        scaleLonToXDomain(wLon, xMin, xRange),
-        scaleLonToXDomain(eLon, xMin, xRange),
+        scaleLonToXDomain(wLon, minLon, lonRange, xMin, xRange),
+        scaleLonToXDomain(eLon, minLon, lonRange, xMin, xRange),
         xAxisField,
         isXAxisDate
       )
@@ -293,8 +312,8 @@ export async function getXYTile({
 
     requestBody.query.bool.filter.push(
       getRangeFilter(
-        scaleLatToYDomain(sLat, yMin, yRange),
-        scaleLatToYDomain(nLat, yMin, yRange),
+        scaleLatToYDomain(sLat, minLat, latRange, yMin, yRange),
+        scaleLatToYDomain(nLat, minLat, latRange, yMin, yRange),
         yAxisField,
         isYAxisDate
       )
@@ -328,8 +347,8 @@ export async function getXYTile({
         geometry: {
           type: 'Point',
           coordinates: [
-            scaleXDomainToLon(properties[xAxisField], xMin, xRange),
-            scaleYDomainToLat(properties[yAxisField], yMin, yRange),
+            scaleXDomainToLon(properties[xAxisField], xMin, xRange, minLon, lonRange),
+            scaleYDomainToLat(properties[yAxisField], yMin, yRange, minLat, latRange),
           ],
         },
         id: featureId,

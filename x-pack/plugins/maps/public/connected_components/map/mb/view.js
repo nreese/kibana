@@ -14,10 +14,6 @@ import {
   DECIMAL_DEGREES_PRECISION,
   DOMAIN_TYPE,
   KBN_TOO_MANY_FEATURES_IMAGE_ID,
-  XY_MIN_LAT,
-  XY_MAX_LAT,
-  XY_MIN_LON,
-  XY_MAX_LON,
   ZOOM_PRECISION,
 } from '../../../../common/constants';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl-csp';
@@ -34,6 +30,24 @@ import { getPreserveDrawingBuffer } from '../../../kibana_services';
 
 mapboxgl.workerUrl = mbWorkerUrl;
 mapboxgl.setRTLTextPlugin(mbRtlPlugin);
+
+const METERS_PER_DEGREE = 111320; // at equator which is ok since XY map is bound to within a degree of equator
+const MB_PIXELS_PER_METER_ZOOM_9 = 152.874; // https://docs.mapbox.com/help/glossary/zoom-level/
+
+export function calculateDomainGeoRange(screenWidth, screenHight) {
+  // scale screen dimensions by a small amount so scatterplot does not go right up to map edge when zoomed out
+  const scaleFactor = 0.95;
+  const screenWidthDegrees =
+    (screenWidth * scaleFactor * MB_PIXELS_PER_METER_ZOOM_9) / METERS_PER_DEGREE;
+  const screenHeightDegrees =
+    (screenHight * scaleFactor * MB_PIXELS_PER_METER_ZOOM_9) / METERS_PER_DEGREE;
+  return {
+    minLon: (-1 * screenWidthDegrees) / 4,
+    minLat: (-1 * screenHeightDegrees) / 4,
+    maxLon: screenWidthDegrees / 4,
+    maxLat: screenHeightDegrees / 4,
+  };
+}
 
 export class MBMap extends React.Component {
   state = {
@@ -137,11 +151,6 @@ export class MBMap extends React.Component {
         minZoom: this.props.settings.minZoom,
       };
 
-      // narrow map bounds to limit web mercator distortion on linear projection to lat/lon space
-      if (this.props.domainType === DOMAIN_TYPE.XY) {
-        options.maxBounds = [XY_MIN_LON, XY_MIN_LAT, XY_MAX_LON, XY_MAX_LAT];
-      }
-
       // Set initial map view
       if (initialView) {
         options.zoom = initialView.zoom;
@@ -149,12 +158,18 @@ export class MBMap extends React.Component {
           lng: initialView.lon,
           lat: initialView.lat,
         };
-      } else if (this.props.domainType === DOMAIN_TYPE.GEO) {
+      } else if (this.props.domainType === DOMAIN_TYPE.XY) {
+        options.zoom = 9;
+        options.center = {
+          lng: 0,
+          lat: 0,
+        };
+      } else {
         options.bounds = [-170, -60, 170, 75];
       }
 
       const mbMap = new mapboxgl.Map(options);
-      console.log(mbMap.getMaxBounds());
+
       mbMap.dragRotate.disable();
       mbMap.touchZoomRotate.disableRotation();
       if (!this.props.disableInteractive) {
@@ -203,8 +218,25 @@ export class MBMap extends React.Component {
       this._loadMakiSprites();
       this._initResizerChecker();
       this._registerMapEventListeners();
+      this._setDomainGeoRange();
       this.props.onMapReady(this._getMapState());
     });
+  }
+
+  _setDomainGeoRange() {
+    if (this.props.domainType === DOMAIN_TYPE.XY) {
+      const canvas = this.state.mbMap.getCanvas();
+      const domainGeoRange = calculateDomainGeoRange(canvas.width, canvas.height);
+      this.props.setDomainGeoRange(domainGeoRange);
+
+      // Constrain map bounds for XY scatter plots to limit web mercator distortion
+      this.state.mbMap.setMaxBounds([
+        domainGeoRange.minLon * 1.2,
+        domainGeoRange.minLat * 1.2,
+        domainGeoRange.maxLon * 1.2,
+        domainGeoRange.maxLat * 1.2,
+      ]);
+    }
   }
 
   _registerMapEventListeners() {
@@ -218,6 +250,14 @@ export class MBMap extends React.Component {
         this.props.extentChanged(this._getMapState());
       }, 100)
     );
+
+    this.state.mbMap.on(
+      'resize',
+      _.debounce(() => {
+        this._setDomainGeoRange();
+      }, 100)
+    );
+
     // Attach event only if view control is visible, which shows lat/lon
     if (!this.props.hideViewControl) {
       const throttledSetMouseCoordinates = _.throttle((e) => {

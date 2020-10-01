@@ -132,6 +132,8 @@ export const getDomainType = ({ map }: MapStoreState) => map.domainType;
 
 export const getDomain = ({ map }: MapStoreState) => map.domain;
 
+export const getDomainGeoRange = ({ map }: MapStoreState) => map.domainGeoRange;
+
 export const getMapInitError = ({ map }: MapStoreState): string | null | undefined =>
   map.mapInitError;
 
@@ -235,7 +237,7 @@ export const getDataFilters = createSelector(
   getQuery,
   getFilters,
   getDomain,
-  getDomainType,
+  getDomainGeoRange,
   (
     mapExtent,
     mapBuffer,
@@ -245,7 +247,7 @@ export const getDataFilters = createSelector(
     query,
     filters,
     domain,
-    domainType
+    domainGeoRange
   ) => {
     return {
       extent: mapExtent,
@@ -255,7 +257,8 @@ export const getDataFilters = createSelector(
       refreshTimerLastTriggeredAt,
       query,
       filters,
-      domain: domainType === DOMAIN_TYPE.XY ? domain : undefined,
+      domain,
+      domainGeoRange,
     };
   }
 );

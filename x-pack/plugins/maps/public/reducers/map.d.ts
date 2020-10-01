@@ -64,6 +64,12 @@ export type MapSettings = {
 export type MapState = {
   domainType: DOMAIN_TYPE;
   domain: Domain;
+  /*
+   * Map bounds used to scale domain to latitude/longitude.
+   * domainGeoRange is a static value does not change as the map is panned and zoomed.
+   * domainGeoRange is derived from map container dimension so scaled values fill the viewable area when the map is zoomed all of the way out.
+   */
+  domainGeoRange: MapExtent;
   ready: boolean;
   mapInitError?: string | null;
   goto?: Goto | null;

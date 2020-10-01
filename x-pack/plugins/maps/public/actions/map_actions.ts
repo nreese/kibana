@@ -31,6 +31,7 @@ import {
   MAP_READY,
   ROLLBACK_MAP_SETTINGS,
   SET_DOMAIN_TYPE,
+  SET_DOMAIN_GEO_RANGE,
   SET_GOTO,
   SET_INTERACTIVE,
   SET_MAP_INIT_ERROR,
@@ -68,6 +69,13 @@ export function setDomainType(domainType: DOMAIN_TYPE) {
   return {
     type: SET_DOMAIN_TYPE,
     domainType,
+  };
+}
+
+export function setDomainGeoRange(domainGeoRange: MapExtent) {
+  return {
+    type: SET_DOMAIN_GEO_RANGE,
+    domainGeoRange,
   };
 }
 

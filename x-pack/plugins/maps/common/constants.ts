@@ -279,8 +279,3 @@ export enum MB_LOOKUP_FUNCTION {
 export type RawValue = string | number | boolean | undefined | null;
 
 export type FieldFormatter = (value: RawValue) => string | number;
-
-export const XY_MIN_LAT = 0;
-export const XY_MAX_LAT = 1;
-export const XY_MIN_LON = 0;
-export const XY_MAX_LON = 1;

@@ -14,6 +14,7 @@ import {
   clearMouseCoordinates,
   clearGoto,
   setMapInitError,
+  setDomainGeoRange,
 } from '../../../actions';
 import {
   getLayerList,
@@ -70,6 +71,9 @@ function mapDispatchToProps(dispatch) {
     },
     setMapInitError(errorMessage) {
       dispatch(setMapInitError(errorMessage));
+    },
+    setDomainGeoRange(domainGeoRange) {
+      dispatch(setDomainGeoRange(domainGeoRange));
     },
   };
 }

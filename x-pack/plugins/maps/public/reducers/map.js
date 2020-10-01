@@ -51,6 +51,7 @@ import {
   UPDATE_MAP_SETTING,
   SET_DOMAIN,
   SET_DOMAIN_TYPE,
+  SET_DOMAIN_GEO_RANGE,
 } from '../actions';
 
 import { getDefaultMapSettings } from './default_map_settings';
@@ -114,6 +115,12 @@ export const DEFAULT_MAP_STATE = {
       min: 0,
       max: 100,
     },
+  },
+  domainGeoRange: {
+    minLon: -0.5,
+    minLat: -0.5,
+    maxLon: 0.5,
+    maxLat: 0.5,
   },
   ready: false,
   mapInitError: null,
@@ -377,6 +384,11 @@ export function map(state = DEFAULT_MAP_STATE, action) {
       return {
         ...state,
         domainType: action.domainType,
+      };
+    case SET_DOMAIN_GEO_RANGE:
+      return {
+        ...state,
+        domainGeoRange: action.domainGeoRange,
       };
     case SET_INTERACTIVE:
       return {

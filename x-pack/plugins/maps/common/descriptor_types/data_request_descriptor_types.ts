@@ -12,7 +12,8 @@ import { Filter, TimeRange } from '../../../../../src/plugins/data/common';
 // Global map state passed to every layer.
 export type MapFilters = {
   buffer?: MapExtent; // extent with additional buffer
-  domain?: Domain;
+  domain: Domain;
+  domainGeoRange: MapExtent;
   extent?: MapExtent; // map viewport
   filters: Filter[];
   query?: MapQuery;

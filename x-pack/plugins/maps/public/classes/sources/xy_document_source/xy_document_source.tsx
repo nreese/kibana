@@ -97,6 +97,10 @@ export class XYDocumentSource extends AbstractESSource {
 ?x={x}
 &y={y}
 &z={z}
+&minLon=${searchFilters.domainGeoRange.minLon}
+&maxLon=${searchFilters.domainGeoRange.maxLon}
+&minLat=${searchFilters.domainGeoRange.minLat}
+&maxLat=${searchFilters.domainGeoRange.maxLat}
 &xAxisField=${this._descriptor.xAxisField}
 &isXAxisDate=${isXAxisDate}
 &xMin=${searchFilters.domain.xAxis.min}
