@@ -5,7 +5,7 @@
  */
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
-import { ReactElement } from 'react';
+import { ReactElement, FunctionComponent } from 'react';
 import { LayerDescriptor } from '../../../common/descriptor_types';
 import { DOMAIN_TYPE, LAYER_WIZARD_CATEGORY } from '../../../common/constants';
 
@@ -29,7 +29,7 @@ export type LayerWizard = {
   checkVisibility?: () => Promise<boolean>;
   description: string;
   domainType: DOMAIN_TYPE;
-  icon: string;
+  icon: string | FunctionComponent<any>;
   prerequisiteSteps?: Array<{ id: string; label: string }>;
   renderWizard(renderWizardArguments: RenderWizardArguments): ReactElement<any>;
   title: string;

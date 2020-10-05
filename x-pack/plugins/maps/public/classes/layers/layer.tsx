@@ -36,6 +36,7 @@ import { Attribution, ImmutableSourceProperty, ISource, SourceEditorArgs } from 
 import { DataRequestContext } from '../../actions';
 import { IStyle } from '../styles/style';
 import { getJoinAggKey } from '../../../common/get_agg_key';
+import { LICENSED_FEATURES } from '../../licensed_features';
 
 export interface ILayer {
   getBounds(dataRequestContext: DataRequestContext): Promise<MapExtent | null>;
@@ -94,6 +95,7 @@ export interface ILayer {
   showJoinEditor(): boolean;
   getJoinsDisabledReason(): string | null;
   isFittable(): Promise<boolean>;
+  getLicensedFeatures(): Promise<LICENSED_FEATURES[]>;
 }
 export type Footnote = {
   icon: ReactElement<any>;
@@ -113,13 +115,11 @@ export type CustomIconAndTooltipContent = {
 export interface ILayerArguments {
   layerDescriptor: LayerDescriptor;
   source: ISource;
-  style: IStyle;
 }
 
 export class AbstractLayer implements ILayer {
   protected readonly _descriptor: LayerDescriptor;
   protected readonly _source: ISource;
-  protected readonly _style: IStyle;
   protected readonly _dataRequests: DataRequest[];
 
   static createDescriptor(options: Partial<LayerDescriptor>): LayerDescriptor {
@@ -143,10 +143,9 @@ export class AbstractLayer implements ILayer {
     }
   }
 
-  constructor({ layerDescriptor, source, style }: ILayerArguments) {
+  constructor({ layerDescriptor, source }: ILayerArguments) {
     this._descriptor = AbstractLayer.createDescriptor(layerDescriptor);
     this._source = source;
-    this._style = style;
     if (this._descriptor.__dataRequests) {
       this._dataRequests = this._descriptor.__dataRequests.map(
         (dataRequest) => new DataRequest(dataRequest)
@@ -260,11 +259,15 @@ export class AbstractLayer implements ILayer {
   }
 
   getStyleForEditing(): IStyle {
-    return this._style;
+    throw new Error('Should implement AbstractLayer#getStyleForEditing');
   }
 
-  getStyle() {
-    return this._style;
+  getStyle(): IStyle {
+    throw new Error('Should implement AbstractLayer#getStyle');
+  }
+
+  getCurrentStyle(): IStyle {
+    throw new Error('Should implement AbstractLayer#getCurrentStyle');
   }
 
   getLabel(): string {
@@ -415,10 +418,6 @@ export class AbstractLayer implements ILayer {
     return this._descriptor.query ? this._descriptor.query : null;
   }
 
-  getCurrentStyle(): IStyle {
-    return this._style;
-  }
-
   async getImmutableSourceProperties() {
     const source = this.getSource();
     return await source.getImmutableProperties();
@@ -551,5 +550,9 @@ export class AbstractLayer implements ILayer {
 
   supportsLabelsOnTop(): boolean {
     return false;
+  }
+
+  async getLicensedFeatures(): Promise<LICENSED_FEATURES[]> {
+    return [];
   }
 }

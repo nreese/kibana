@@ -15,6 +15,7 @@ import { BlendedVectorLayer } from '../../layers/blended_vector_layer/blended_ve
 import { VectorLayer } from '../../layers/vector_layer/vector_layer';
 import { DOMAIN_TYPE, LAYER_WIZARD_CATEGORY, SCALING_TYPES } from '../../../../common/constants';
 import { TiledVectorLayer } from '../../layers/tiled_vector_layer/tiled_vector_layer';
+import { EsDocumentsLayerIcon } from './es_documents_layer_icon';
 
 export function createDefaultLayerDescriptor(sourceConfig: unknown, mapColors: string[]) {
   const sourceDescriptor = ESSearchSource.createDescriptor(sourceConfig);
@@ -34,7 +35,7 @@ export const esDocumentsLayerWizardConfig: LayerWizard = {
     defaultMessage: 'Points, lines, and polygons from Elasticsearch',
   }),
   domainType: DOMAIN_TYPE.GEO,
-  icon: 'logoElasticsearch',
+  icon: EsDocumentsLayerIcon,
   renderWizard: ({ previewLayers, mapColors }: RenderWizardArguments) => {
     const onSourceConfigChange = (sourceConfig: unknown) => {
       if (!sourceConfig) {
