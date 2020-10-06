@@ -63,6 +63,7 @@ export { MapEmbeddableInput, MapEmbeddableConfig };
 export class MapEmbeddable extends Embeddable<MapEmbeddableInput, MapEmbeddableOutput> {
   type = MAP_SAVED_OBJECT_TYPE;
 
+  private _description: string;
   private _renderTooltipContent?: RenderToolTipContent;
   private _eventHandlers?: EventHandlers;
   private _layerList: LayerDescriptor[];
@@ -97,6 +98,7 @@ export class MapEmbeddable extends Embeddable<MapEmbeddableInput, MapEmbeddableO
       parent
     );
 
+    this._description = config.description ? config.description : '';
     this._renderTooltipContent = renderTooltipContent;
     this._eventHandlers = eventHandlers;
     this._layerList = config.layerList;
@@ -105,6 +107,10 @@ export class MapEmbeddable extends Embeddable<MapEmbeddableInput, MapEmbeddableO
     this._store = createMapStore();
 
     this._subscription = this.getInput$().subscribe((input) => this.onContainerStateChanged(input));
+  }
+
+  public getDescription() {
+    return this._description;
   }
 
   supportedTriggers(): Array<keyof TriggerContextMapping> {
@@ -245,6 +251,8 @@ export class MapEmbeddable extends Embeddable<MapEmbeddableInput, MapEmbeddableO
             getFilterActions={this.getFilterActions}
             getActionContext={this.getActionContext}
             renderTooltipContent={this._renderTooltipContent}
+            title={this.getTitle()}
+            description={this._description}
           />
         </I18nContext>
       </Provider>,
