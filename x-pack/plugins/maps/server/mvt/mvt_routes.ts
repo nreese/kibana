@@ -96,6 +96,7 @@ export function initMVTRoutes({ router, logger }: { logger: Logger; router: IRou
           geometryFieldName: schema.string(),
           requestBody: schema.string(),
           index: schema.string(),
+          geoFieldType: schema.string(),
         }),
       },
     },
@@ -116,6 +117,7 @@ export function initMVTRoutes({ router, logger }: { logger: Logger; router: IRou
         z: query.z as number,
         index: query.index as string,
         requestBody: requestBodyDSL as any,
+        geoFieldType: query.geoFieldType as ES_GEO_FIELD_TYPE,
       });
 
       return sendResponse(response, tile);

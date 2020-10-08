@@ -9,7 +9,7 @@ import { render, unmountComponentAtNode } from 'react-dom';
 import { Router, Switch, Route, Redirect, RouteComponentProps } from 'react-router-dom';
 import { i18n } from '@kbn/i18n';
 import { Provider } from 'react-redux';
-import { AppMountContext, AppMountParameters } from 'kibana/public';
+import { AppMountParameters } from 'kibana/public';
 import {
   getCoreChrome,
   getCoreI18n,
@@ -30,10 +30,13 @@ import { DOMAIN_TYPE } from '../../common/constants';
 export let goToSpecifiedPath: (path: string) => void;
 export let kbnUrlStateStorage: IKbnUrlStateStorage;
 
-export async function renderApp(
-  context: AppMountContext,
-  { appBasePath, element, history, onAppLeave, setHeaderActionMenu }: AppMountParameters
-) {
+export async function renderApp({
+  appBasePath,
+  element,
+  history,
+  onAppLeave,
+  setHeaderActionMenu,
+}: AppMountParameters) {
   goToSpecifiedPath = (path) => history.push(path);
   kbnUrlStateStorage = createKbnUrlStateStorage({
     useHash: false,

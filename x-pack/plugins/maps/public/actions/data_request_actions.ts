@@ -5,7 +5,8 @@
  */
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
-import { Dispatch } from 'redux';
+import { AnyAction, Dispatch } from 'redux';
+import { ThunkDispatch } from 'redux-thunk';
 import bbox from '@turf/bbox';
 import uuid from 'uuid/v4';
 import { multiPoint } from '@turf/helpers';
@@ -77,9 +78,12 @@ export function clearDataRequests(layer: ILayer) {
 }
 
 export function cancelAllInFlightRequests() {
-  return (dispatch: Dispatch, getState: () => MapStoreState) => {
+  return (
+    dispatch: ThunkDispatch<MapStoreState, void, AnyAction>,
+    getState: () => MapStoreState
+  ) => {
     getLayerList(getState()).forEach((layer) => {
-      dispatch<any>(clearDataRequests(layer));
+      dispatch(clearDataRequests(layer));
     });
   };
 }
@@ -107,20 +111,20 @@ export function updateStyleMeta(layerId: string | null) {
 }
 
 function getDataRequestContext(
-  dispatch: Dispatch,
+  dispatch: ThunkDispatch<MapStoreState, void, AnyAction>,
   getState: () => MapStoreState,
   layerId: string
 ): DataRequestContext {
   return {
     dataFilters: getDataFilters(getState()),
     startLoading: (dataId: string, requestToken: symbol, meta: DataMeta) =>
-      dispatch<any>(startDataLoad(layerId, dataId, requestToken, meta)),
+      dispatch(startDataLoad(layerId, dataId, requestToken, meta)),
     stopLoading: (dataId: string, requestToken: symbol, data: object, meta: DataMeta) =>
-      dispatch<any>(endDataLoad(layerId, dataId, requestToken, data, meta)),
+      dispatch(endDataLoad(layerId, dataId, requestToken, data, meta)),
     onLoadError: (dataId: string, requestToken: symbol, errorMessage: string) =>
-      dispatch<any>(onDataLoadError(layerId, dataId, requestToken, errorMessage)),
+      dispatch(onDataLoadError(layerId, dataId, requestToken, errorMessage)),
     updateSourceData: (newData: unknown) => {
-      dispatch<any>(updateSourceDataRequest(layerId, newData));
+      dispatch(updateSourceDataRequest(layerId, newData));
     },
     isRequestStillActive: (dataId: string, requestToken: symbol) => {
       const dataRequest = getDataRequestDescriptor(getState(), layerId, dataId);
@@ -135,7 +139,10 @@ function getDataRequestContext(
 }
 
 export function syncDataForAllLayers() {
-  return async (dispatch: Dispatch, getState: () => MapStoreState) => {
+  return async (
+    dispatch: ThunkDispatch<MapStoreState, void, AnyAction>,
+    getState: () => MapStoreState
+  ) => {
     if (getDomainType(getState()) === DOMAIN_TYPE.XY) {
       const domainPromises = getLayerList(getState()).map((layer) => {
         const dataRequestContext = getDataRequestContext(dispatch, getState, layer.getId());
@@ -169,20 +176,23 @@ export function syncDataForAllLayers() {
     }
 
     const syncPromises = getLayerList(getState()).map((layer) => {
-      return dispatch<any>(syncDataForLayer(layer));
+      return dispatch(syncDataForLayer(layer));
     });
     await Promise.all(syncPromises);
   };
 }
 
 function syncDataForAllJoinLayers() {
-  return async (dispatch: Dispatch, getState: () => MapStoreState) => {
+  return async (
+    dispatch: ThunkDispatch<MapStoreState, void, AnyAction>,
+    getState: () => MapStoreState
+  ) => {
     const syncPromises = getLayerList(getState())
       .filter((layer) => {
         return 'hasJoins' in layer ? (layer as IVectorLayer).hasJoins() : false;
       })
       .map((layer) => {
-        return dispatch<any>(syncDataForLayer(layer));
+        return dispatch(syncDataForLayer(layer));
       });
     await Promise.all(syncPromises);
   };
@@ -199,10 +209,13 @@ export function syncDataForLayer(layer: ILayer) {
 }
 
 export function syncDataForLayerId(layerId: string | null) {
-  return async (dispatch: Dispatch, getState: () => MapStoreState) => {
+  return async (
+    dispatch: ThunkDispatch<MapStoreState, void, AnyAction>,
+    getState: () => MapStoreState
+  ) => {
     const layer = getLayerById(layerId, getState());
     if (layer) {
-      dispatch<any>(syncDataForLayer(layer));
+      dispatch(syncDataForLayer(layer));
     }
   };
 }
@@ -219,10 +232,13 @@ function setLayerDataLoadErrorStatus(layerId: string, errorMessage: string | nul
 }
 
 function startDataLoad(layerId: string, dataId: string, requestToken: symbol, meta: DataMeta) {
-  return (dispatch: Dispatch, getState: () => MapStoreState) => {
+  return (
+    dispatch: ThunkDispatch<MapStoreState, void, AnyAction>,
+    getState: () => MapStoreState
+  ) => {
     const layer = getLayerById(layerId, getState());
     if (layer) {
-      dispatch<any>(cancelRequest(layer.getPrevRequestToken(dataId)));
+      dispatch(cancelRequest(layer.getPrevRequestToken(dataId)));
     }
 
     const eventHandlers = getEventHandlers(getState());
@@ -250,7 +266,10 @@ function endDataLoad(
   data: object,
   meta: DataMeta
 ) {
-  return async (dispatch: Dispatch, getState: () => MapStoreState) => {
+  return async (
+    dispatch: ThunkDispatch<MapStoreState, void, AnyAction>,
+    getState: () => MapStoreState
+  ) => {
     dispatch(unregisterCancelCallback(requestToken));
 
     const features = data && 'features' in data ? (data as FeatureCollection).features : [];
@@ -270,7 +289,7 @@ function endDataLoad(
       });
     }
 
-    dispatch<any>(cleanTooltipStateForLayer(layerId, features));
+    dispatch(cleanTooltipStateForLayer(layerId, features));
     dispatch({
       type: LAYER_DATA_LOAD_ENDED,
       layerId,
@@ -283,9 +302,9 @@ function endDataLoad(
     // Clear any data-load errors when there is a succesful data return.
     // Co this on end-data-load iso at start-data-load to avoid blipping the error status between true/false.
     // This avoids jitter in the warning icon of the TOC when the requests continues to return errors.
-    dispatch<any>(setLayerDataLoadErrorStatus(layerId, null));
+    dispatch(setLayerDataLoadErrorStatus(layerId, null));
 
-    dispatch<any>(updateStyleMeta(layerId));
+    dispatch(updateStyleMeta(layerId));
   };
 }
 
@@ -295,7 +314,10 @@ function onDataLoadError(
   requestToken: symbol,
   errorMessage: string
 ) {
-  return async (dispatch: Dispatch, getState: () => MapStoreState) => {
+  return async (
+    dispatch: ThunkDispatch<MapStoreState, void, AnyAction>,
+    getState: () => MapStoreState
+  ) => {
     dispatch(unregisterCancelCallback(requestToken));
 
     const eventHandlers = getEventHandlers(getState());
@@ -307,7 +329,7 @@ function onDataLoadError(
       });
     }
 
-    dispatch<any>(cleanTooltipStateForLayer(layerId));
+    dispatch(cleanTooltipStateForLayer(layerId));
     dispatch({
       type: LAYER_DATA_LOAD_ERROR,
       data: null,
@@ -316,12 +338,12 @@ function onDataLoadError(
       requestToken,
     });
 
-    dispatch<any>(setLayerDataLoadErrorStatus(layerId, errorMessage));
+    dispatch(setLayerDataLoadErrorStatus(layerId, errorMessage));
   };
 }
 
 export function updateSourceDataRequest(layerId: string, newData: unknown) {
-  return (dispatch: Dispatch) => {
+  return (dispatch: ThunkDispatch<MapStoreState, void, AnyAction>) => {
     dispatch({
       type: UPDATE_SOURCE_DATA_REQUEST,
       dataId: SOURCE_DATA_REQUEST_ID,
@@ -329,7 +351,7 @@ export function updateSourceDataRequest(layerId: string, newData: unknown) {
       newData,
     });
 
-    dispatch<any>(updateStyleMeta(layerId));
+    dispatch(updateStyleMeta(layerId));
   };
 }
 
@@ -424,7 +446,7 @@ export function fitToDataBounds(onNoBounds?: () => void) {
 
 let lastSetQueryCallId: string = '';
 export function autoFitToBounds() {
-  return async (dispatch: Dispatch) => {
+  return async (dispatch: ThunkDispatch<MapStoreState, void, AnyAction>) => {
     // Method can be triggered before async actions complete
     // Use localSetQueryCallId to only continue execution path if method has not been re-triggered.
     const localSetQueryCallId = uuid();
@@ -433,17 +455,17 @@ export function autoFitToBounds() {
     // Joins are performed on the client.
     // As a result, bounds for join layers must also be performed on the client.
     // Therefore join layers need to fetch data prior to auto fitting bounds.
-    await dispatch<any>(syncDataForAllJoinLayers());
+    await dispatch(syncDataForAllJoinLayers());
 
     if (localSetQueryCallId === lastSetQueryCallId) {
       // In cases where there are no bounds, such as no matching documents, fitToDataBounds does not trigger setGotoWithBounds.
       // Ensure layer syncing occurs when setGotoWithBounds is not triggered.
       function onNoBounds() {
         if (localSetQueryCallId === lastSetQueryCallId) {
-          dispatch<any>(syncDataForAllLayers());
+          dispatch(syncDataForAllLayers());
         }
       }
-      dispatch<any>(fitToDataBounds(onNoBounds));
+      dispatch(fitToDataBounds(onNoBounds));
     }
   };
 }
