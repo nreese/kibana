@@ -97,9 +97,11 @@ export class GeoJsonImporter extends Importer {
     let success = true;
     const failures: ImportFailure[] = [...this._invalidFeatures];
     let error;
+    let importPromise: Promise<ImportResponse> | undefined;
 
-    while ((this._features.length > 0 || this._hasNext) && this._isActive) {
+    while ((this._features.length > 0 || this._hasNext) && this._isActive && success) {
       await this._readUntil(undefined, IMPORT_CHUNK_SIZE_MB);
+
       if (!this._isActive) {
         return {
           success: false,
@@ -108,6 +110,59 @@ export class GeoJsonImporter extends Importer {
         };
       }
 
+      const data = toEsDocs(this._features, this._geoFieldType);
+      const progress = Math.round((this._totalBytesProcessed / this._file.size) * 100);
+      setImportProgress(progress);
+      this._features = [];
+      this._unimportedBytesProcessed = 0;
+
+      // wait for previous import call to finish before starting next import
+      if (importPromise !== undefined) {
+        const resp = await importPromise;
+        importPromise = undefined;
+        failures.push(...resp.failures);
+
+        if (!resp.success) {
+          success = false;
+          error = resp.error;
+        }
+      }
+
+      importPromise = this._importWithRetries({
+        id,
+        index,
+        data,
+        settings: {},
+        mappings: {},
+        ingestPipeline: {
+          id: pipelineId,
+        },
+      });
+    }
+
+    // wait for last import call
+    if (importPromise) {
+      const resp = await importPromise;
+      failures.push(...resp.failures);
+
+      if (!resp.success) {
+        success = false;
+        error = resp.error;
+      }
+    }
+
+    setImportProgress(100);
+
+    return {
+      success,
+      failures,
+      docCount: this._totalFeatures,
+      error,
+    };
+  }
+
+  private _importWithRetries(importArgs): Promise<ImportResponse> {
+    return new Promise(async (resolve) => {
       let retries = IMPORT_RETRIES;
       let resp: ImportResponse = {
         success: false,
@@ -117,23 +172,9 @@ export class GeoJsonImporter extends Importer {
         index: '',
         pipelineId: '',
       };
-      const data = toEsDocs(this._features, this._geoFieldType);
-      const progress = Math.round((this._totalBytesProcessed / this._file.size) * 100);
-      this._features = [];
-      this._unimportedBytesProcessed = 0;
-
       while (resp.success === false && retries > 0) {
         try {
-          resp = await callImportRoute({
-            id,
-            index,
-            data,
-            settings: {},
-            mappings: {},
-            ingestPipeline: {
-              id: pipelineId,
-            },
-          });
+          resp = await callImportRoute(importArgs);
 
           if (retries < IMPORT_RETRIES) {
             // eslint-disable-next-line no-console
@@ -147,31 +188,8 @@ export class GeoJsonImporter extends Importer {
           retries = 0;
         }
       }
-
-      failures.push(...resp.failures);
-
-      if (!resp.success) {
-        success = false;
-        error = resp.error;
-        break;
-      }
-
-      setImportProgress(progress);
-    }
-
-    const result: ImportResults = {
-      success,
-      failures,
-      docCount: this._totalFeatures,
-    };
-
-    if (success) {
-      setImportProgress(100);
-    } else {
-      result.error = error;
-    }
-
-    return result;
+      resolve(resp);
+    });
   }
 
   private async _readUntil(rowLimit?: number, sizeLimit?: number) {
