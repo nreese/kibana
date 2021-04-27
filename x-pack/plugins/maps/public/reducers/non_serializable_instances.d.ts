@@ -8,11 +8,20 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
 import { Adapters } from 'src/plugins/inspector/public';
+import { IndexPattern } from 'src/plugins/data/public';
 import { AnyAction } from 'redux';
 import { MapStoreState } from './store';
 
+export type GeoFieldWithIndex = {
+  geoFieldName: string;
+  geoFieldType: string;
+  indexPatternTitle: string;
+  indexPatternId: string;
+};
+
 export type NonSerializableState = {
   inspectorAdapters: Adapters;
+  indexPatterns: IndexPattern[];
   cancelRequestCallbacks: Map<symbol, () => {}>; // key is request token, value is cancel callback
   eventHandlers: Partial<EventHandlers>;
   chartsPaletteServiceGetColor: (value: string) => string | null;
@@ -72,3 +81,7 @@ export function cancelRequest(requestToken?: symbol): AnyAction;
 export function registerCancelCallback(requestToken: symbol, callback: () => void): AnyAction;
 
 export function unregisterCancelCallback(requestToken: symbol): AnyAction;
+
+export function getIndexPatterns(state: MapStoreState): IndexPattern[];
+
+export function getGeoFields(state: MapStoreState): GeoFieldWithIndex[];

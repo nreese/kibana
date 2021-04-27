@@ -38,7 +38,6 @@ import {
   QueryState,
 } from '../../../../../../../src/plugins/data/public';
 import { MapContainer } from '../../../connected_components/map_container';
-import { getIndexPatternsFromIds } from '../../../index_pattern_util';
 import { getTopNavConfig } from '../top_nav_config';
 import { MapRefreshConfig, MapQuery } from '../../../../common/descriptor_types';
 import { goToSpecifiedPath } from '../../../render_app';
@@ -64,7 +63,7 @@ export interface Props {
   enableFullScreen: () => void;
   openMapSettings: () => void;
   inspectorAdapters: Adapters;
-  nextIndexPatternIds: string[];
+  indexPatterns: IndexPattern[];
   dispatchSetQuery: ({
     forceRefresh,
     filters,
@@ -86,7 +85,6 @@ export interface Props {
 
 export interface State {
   initialized: boolean;
-  indexPatterns: IndexPattern[];
   savedQuery?: SavedQuery;
 }
 
@@ -101,7 +99,6 @@ export class MapApp extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      indexPatterns: [],
       initialized: false,
     };
   }
@@ -129,10 +126,6 @@ export class MapApp extends React.Component<Props, State> {
       }
       return actions.default() as AppLeaveAction;
     });
-  }
-
-  componentDidUpdate() {
-    this._updateIndexPatterns();
   }
 
   componentWillUnmount() {
@@ -166,21 +159,6 @@ export class MapApp extends React.Component<Props, State> {
 
     this._onQueryChange({ time: globalState.time });
   };
-
-  async _updateIndexPatterns() {
-    const { nextIndexPatternIds } = this.props;
-
-    if (_.isEqual(nextIndexPatternIds, this._prevIndexPatternIds)) {
-      return;
-    }
-
-    this._prevIndexPatternIds = nextIndexPatternIds;
-
-    const indexPatterns = await getIndexPatternsFromIds(nextIndexPatternIds);
-    if (this._isMounted) {
-      this.setState({ indexPatterns });
-    }
-  }
 
   _onQueryChange = ({
     filters,
@@ -358,7 +336,7 @@ export class MapApp extends React.Component<Props, State> {
         setMenuMountPoint={this.props.setHeaderActionMenu}
         appName="maps"
         config={topNavConfig}
-        indexPatterns={this.state.indexPatterns}
+        indexPatterns={this.props.indexPatterns}
         filters={this.props.filters}
         query={this.props.query}
         onQuerySubmit={({ dateRange, query }) => {

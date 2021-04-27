@@ -14,14 +14,16 @@ import { getFlyoutDisplay, getIsFullScreen } from '../../../selectors/ui_selecto
 import {
   getFilters,
   getQuery,
-  getQueryableUniqueIndexPatternIds,
   getRefreshConfig,
   getTimeFilters,
   hasDirtyState,
 } from '../../../selectors/map_selectors';
 import { setQuery, setRefreshConfig, enableFullScreen, openMapSettings } from '../../../actions';
 import { FLYOUT_STATE } from '../../../reducers/ui';
-import { getInspectorAdapters } from '../../../reducers/non_serializable_instances';
+import {
+  getInspectorAdapters,
+  getIndexPatterns,
+} from '../../../reducers/non_serializable_instances';
 import { MapStoreState } from '../../../reducers/store';
 import { MapRefreshConfig } from '../../../../common/descriptor_types';
 
@@ -31,7 +33,7 @@ function mapStateToProps(state: MapStoreState) {
     isOpenSettingsDisabled: getFlyoutDisplay(state) !== FLYOUT_STATE.NONE,
     isSaveDisabled: hasDirtyState(state),
     inspectorAdapters: getInspectorAdapters(state),
-    nextIndexPatternIds: getQueryableUniqueIndexPatternIds(state),
+    indexPatterns: getIndexPatterns(state),
     flyoutDisplay: getFlyoutDisplay(state),
     refreshConfig: getRefreshConfig(state),
     filters: getFilters(state),

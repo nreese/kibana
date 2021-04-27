@@ -18,6 +18,7 @@ import {
   getMapSettings,
   getQueryableUniqueIndexPatternIds,
 } from '../../selectors/map_selectors';
+import { getIndexPatterns, getGeoFields } from '../../reducers/non_serializable_instances';
 import { MapStoreState } from '../../reducers/store';
 import { getCoreChrome } from '../../kibana_services';
 
@@ -28,7 +29,7 @@ function mapStateToProps(state: MapStoreState) {
     isFullScreen: getIsFullScreen(state),
     refreshConfig: getRefreshConfig(state),
     mapInitError: getMapInitError(state),
-    indexPatternIds: getQueryableUniqueIndexPatternIds(state),
+    geoFields: getGeoFields(state),
     settings: getMapSettings(state),
   };
 }

@@ -17,9 +17,10 @@ import {
   getMapReady,
   getMapColors,
   createLayerInstance,
+  getQueryableUniqueIndexPatternIds,
 } from '../selectors/map_selectors';
 import { FLYOUT_STATE } from '../reducers/ui';
-import { cancelRequest } from '../reducers/non_serializable_instances';
+import { cancelRequest, SET_INDEX_PATTERNS } from '../reducers/non_serializable_instances';
 import { updateFlyout } from './ui_actions';
 import {
   ADD_LAYER,
@@ -48,6 +49,7 @@ import { IVectorStyle } from '../classes/styles/vector/vector_style';
 import { notifyLicensedFeatureUsage } from '../licensed_features';
 import { IESAggField } from '../classes/fields/agg';
 import { IField } from '../classes/fields/field';
+import { getIndexPatternService } from '../kibana_services';
 
 export function trackCurrentLayerState(layerId: string) {
   return {
@@ -133,6 +135,7 @@ export function addLayer(layerDescriptor: LayerDescriptor) {
         type: ADD_WAITING_FOR_MAP_READY_LAYER,
         layer: layerDescriptor,
       });
+      dispatch(addIndexPatternsFromLayer(layerDescriptor.id));
       return;
     }
 
@@ -140,6 +143,7 @@ export function addLayer(layerDescriptor: LayerDescriptor) {
       type: ADD_LAYER,
       layer: layerDescriptor,
     });
+    dispatch(addIndexPatternsFromLayer(layerDescriptor.id));
     dispatch(syncDataForLayerId(layerDescriptor.id));
 
     const layer = createLayerInstance(layerDescriptor);
@@ -217,7 +221,12 @@ export function setLayerVisibility(layerId: string, makeVisible: boolean) {
       visibility: makeVisible,
     });
     if (makeVisible) {
+      // show layer
+      dispatch(addIndexPatternsFromLayer(layerId));
       dispatch(syncDataForLayerId(layerId));
+    } else {
+      // hide layer
+      dispatch(removeIndexPatternsFromLayer(layerId));
     }
   };
 }
@@ -445,6 +454,7 @@ function removeLayerFromLayerList(layerId: string) {
       type: REMOVE_LAYER,
       id: layerId,
     });
+    dispatch(removeIndexPatternsFromLayer(layerId));
   };
 }
 
@@ -546,5 +556,93 @@ export function setAreTilesLoaded(layerId: string, areTilesLoaded: boolean) {
     id: layerId,
     propName: '__areTilesLoaded',
     newValue: areTilesLoaded,
+  };
+}
+
+function addIndexPatternsFromLayer(layerId: string) {
+  return (
+    dispatch: ThunkDispatch<MapStoreState, void, AnyAction>,
+    getState: () => MapStoreState
+  ) => {
+    const layer = getLayerById(layerId, getState());
+    if (!layer) {
+      return;
+    }
+
+    layer.getQueryableIndexPatternIds().forEach((indexPatternId) => {
+      dispatch(addIndexPattern(indexPatternId));
+    });
+  };
+}
+
+function addIndexPattern(indexPatternId: string) {
+  return async (
+    dispatch: ThunkDispatch<MapStoreState, void, AnyAction>,
+    getState: () => MapStoreState
+  ) => {
+    let indexPattern;
+    try {
+      indexPattern = await getIndexPatternService().get(indexPatternId);
+    } catch (error) {
+      // Unable to load index pattern, better to not throw error so map can render
+      // Error will be surfaced by layer since it too will be unable to locate the index pattern
+      return;
+    }
+
+    const indexPatternIds = getQueryableUniqueIndexPatternIds(getState());
+    if (!indexPatternIds.includes(indexPatternId)) {
+      // index pattern no longer needed after async look-up and store updates in-between
+      return;
+    }
+
+    const indexPatterns = getIndexPatterns(getState());
+    const hasIndexPattern = indexPatterns.some((it) => {
+      return it.id === indexPatternId;
+    });
+    if (hasIndexPattern) {
+      // index pattern already added by another layer, nothing to do
+      return;
+    }
+
+    dispatch({
+      type: SET_INDEX_PATTERNS,
+      indexPatterns: [...indexPatterns, indexPattern],
+    });
+  };
+}
+
+function removeIndexPatternsFromLayer(layerId: string) {
+  return (
+    dispatch: ThunkDispatch<MapStoreState, void, AnyAction>,
+    getState: () => MapStoreState
+  ) => {
+    const layer = getLayerById(layerId, getState());
+    if (!layer) {
+      return;
+    }
+
+    layer.getQueryableIndexPatternIds().forEach((indexPatternId) => {
+      dispatch(removeIndexPattern(indexPatternId));
+    });
+  };
+}
+
+function removeIndexPattern(indexPatternId: string) {
+  return (
+    dispatch: ThunkDispatch<MapStoreState, void, AnyAction>,
+    getState: () => MapStoreState
+  ) => {
+    const indexPatternIds = getQueryableUniqueIndexPatternIds(getState());
+    if (indexPatternIds.includes(indexPatternId)) {
+      // index pattern still used by another layer, nothing to do
+      return;
+    }
+
+    dispatch({
+      type: SET_INDEX_PATTERNS,
+      indexPatterns: getIndexPatterns(getState()).filter((indexPattern) => {
+        return indexPattern.id !== indexPatternId;
+      }),
+    });
   };
 }

@@ -5,14 +5,18 @@
  * 2.0.
  */
 
+import { createSelector } from 'reselect';
 import { RequestAdapter } from '../../../../../src/plugins/inspector/common/adapters/request';
 import { MapAdapter } from '../inspector/adapters/map_adapter';
+import { ES_GEO_FIELD_TYPE } from '../../common/constants';
 import { getShowMapsInspectorAdapter } from '../kibana_services';
+import { indexPatterns as indexPatternsUtils } from '../../../../../src/plugins/data/public';
 
 const REGISTER_CANCEL_CALLBACK = 'REGISTER_CANCEL_CALLBACK';
 const UNREGISTER_CANCEL_CALLBACK = 'UNREGISTER_CANCEL_CALLBACK';
 const SET_EVENT_HANDLERS = 'SET_EVENT_HANDLERS';
 const SET_CHARTS_PALETTE_SERVICE_GET_COLOR = 'SET_CHARTS_PALETTE_SERVICE_GET_COLOR';
+export const SET_INDEX_PATTERNS = 'SET_INDEX_PATTERNS';
 
 function createInspectorAdapters() {
   const inspectorAdapters = {
@@ -28,6 +32,7 @@ function createInspectorAdapters() {
 export function nonSerializableInstances(state, action = {}) {
   if (!state) {
     return {
+      indexPatterns: [],
       inspectorAdapters: createInspectorAdapters(),
       cancelRequestCallbacks: new Map(), // key is request token, value is cancel callback
       eventHandlers: {},
@@ -56,6 +61,12 @@ export function nonSerializableInstances(state, action = {}) {
       return {
         ...state,
         chartsPaletteServiceGetColor: action.chartsPaletteServiceGetColor,
+      };
+    }
+    case SET_INDEX_PATTERNS: {
+      return {
+        ...state,
+        indexPatterns: action.indexPatterns,
       };
     }
     default:
@@ -123,3 +134,28 @@ export function setChartsPaletteServiceGetColor(chartsPaletteServiceGetColor) {
     chartsPaletteServiceGetColor,
   };
 }
+
+export function getIndexPatterns({ nonSerializableInstances }) {
+  return nonSerializableInstances.indexPatterns;
+}
+
+export const getGeoFields = createSelector(getIndexPatterns, (indexPatterns) => {
+  const geoFields = [];
+  indexPatterns.forEach((indexPattern) => {
+    indexPattern.fields.forEach((field) => {
+      if (
+        indexPattern.id &&
+        !indexPatternsUtils.isNestedField(field) &&
+        (field.type === ES_GEO_FIELD_TYPE.GEO_POINT || field.type === ES_GEO_FIELD_TYPE.GEO_SHAPE)
+      ) {
+        geoFields.push({
+          geoFieldName: field.name,
+          geoFieldType: field.type,
+          indexPatternTitle: indexPattern.title,
+          indexPatternId: indexPattern.id,
+        });
+      }
+    });
+  });
+  return geoFields;
+});
