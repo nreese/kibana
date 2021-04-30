@@ -26,6 +26,7 @@ interface Props {
   popoverButtonLabel: string;
   popoverButtonAriaLabel: string;
   popoverButtonIcon: string;
+  popoverButtonClassName?: string;
   label: string;
   url: string;
 }
@@ -74,6 +75,7 @@ export class AttributionPopover extends Component<Props, State> {
   _renderPopoverButton() {
     return (
       <EuiButtonEmpty
+        className={this.props.popoverButtonClassName}
         aria-label={this.props.popoverButtonAriaLabel}
         onClick={this._togglePopover}
         size="xs"
