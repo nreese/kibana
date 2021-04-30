@@ -24,6 +24,7 @@ import { Attribution } from '../../../../common/descriptor_types';
 interface Props {
   onChange: (attribution: Attribution) => void;
   popoverButtonLabel: string;
+  popoverButtonAriaLabel: string;
   popoverButtonIcon: string;
   label: string;
   url: string;
@@ -73,9 +74,11 @@ export class AttributionPopover extends Component<Props, State> {
   _renderPopoverButton() {
     return (
       <EuiButtonEmpty
+        aria-label={this.props.popoverButtonAriaLabel}
         onClick={this._togglePopover}
         size="xs"
         iconType={this.props.popoverButtonIcon}
+        flush="left"
       >
         {this.props.popoverButtonLabel}
       </EuiButtonEmpty>
@@ -99,7 +102,12 @@ export class AttributionPopover extends Component<Props, State> {
           })}
           fullWidth
         >
-          <EuiFieldText fullWidth value={this.state.label} onChange={this._onLabelChange} />
+          <EuiFieldText
+            compressed
+            fullWidth
+            value={this.state.label}
+            onChange={this._onLabelChange}
+          />
         </EuiFormRow>
         <EuiFormRow
           label={i18n.translate('xpack.maps.attribution.urlLabel', {
@@ -107,7 +115,15 @@ export class AttributionPopover extends Component<Props, State> {
           })}
           fullWidth
         >
-          <EuiFieldText fullWidth value={this.state.url} onChange={this._onUrlChange} />
+          <EuiFieldText
+            compressed
+            fullWidth
+            value={this.state.url}
+            onChange={this._onUrlChange}
+            placeholder={i18n.translate('xpack.maps.attribution.urlPlaceholder', {
+              defaultMessage: 'http://myurl.com',
+            })}
+          />
         </EuiFormRow>
         <EuiSpacer size="xs" />
         <EuiPopoverFooter>
@@ -130,6 +146,7 @@ export class AttributionPopover extends Component<Props, State> {
     return (
       <EuiPopover
         id="attributionPopover"
+        panelPaddingSize="s"
         anchorPosition="leftCenter"
         button={this._renderPopoverButton()}
         isOpen={this.state.isPopoverOpen}

@@ -14,6 +14,7 @@ import {
   EuiSpacer,
   EuiSwitch,
   EuiSwitchEvent,
+  EuiHorizontalRule,
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { FormattedMessage } from '@kbn/i18n/react';
@@ -139,6 +140,7 @@ export function LayerSettings(props: Props) {
         {renderZoomSliders()}
         <AlphaSlider alpha={props.layer.getAlpha()} onChange={onAlphaChange} />
         {renderShowLabelsOnTop()}
+        <EuiHorizontalRule margin="s" />
         <AttributionFormRow layer={props.layer} onChange={onAttributionChange} />
       </EuiPanel>
 
