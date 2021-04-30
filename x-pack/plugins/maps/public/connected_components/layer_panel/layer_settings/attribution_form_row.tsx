@@ -39,7 +39,7 @@ export function AttributionFormRow(props: Props) {
             popoverButtonLabel={i18n.translate('xpack.maps.attribution.addBtnLabel', {
               defaultMessage: 'Add attribution',
             })}
-            popoverButtonAriaLabel={i18n.translate('xpack.maps.attribution.addBtnLabel', {
+            popoverButtonAriaLabel={i18n.translate('xpack.maps.attribution.addBtnAriaLabel', {
               defaultMessage: 'Add attribution',
             })}
             label={''}
@@ -57,7 +57,7 @@ export function AttributionFormRow(props: Props) {
               <AttributionPopover
                 onChange={props.onChange}
                 popoverButtonIcon="pencil"
-                popoverButtonAriaLabel={i18n.translate('xpack.maps.attribution.addBtnLabel', {
+                popoverButtonAriaLabel={i18n.translate('xpack.maps.attribution.addBtnAriaLabel', {
                   defaultMessage: 'Edit attribution',
                 })}
                 popoverButtonLabel={i18n.translate('xpack.maps.attribution.editBtnLabel', {
