@@ -10,6 +10,8 @@ import { PluginInitializerContext } from 'kibana/public';
 import { MapsPlugin, MapsPluginSetup, MapsPluginStart } from './plugin';
 import { MapsXPackConfig } from '../config';
 
+export type { MapsPluginSetup, MapsPluginStart };
+
 export const plugin: PluginInitializer<MapsPluginSetup, MapsPluginStart> = (
   initContext: PluginInitializerContext<MapsXPackConfig>
 ) => {
@@ -18,6 +20,8 @@ export const plugin: PluginInitializer<MapsPluginSetup, MapsPluginStart> = (
 };
 
 export { MAP_SAVED_OBJECT_TYPE } from '../common/constants';
+
+export type { LayerWizard, RenderWizardArguments } from './classes/layers/layer_wizard_registry';
 
 export type { RenderTooltipContentParams } from './classes/tooltips/tooltip_property';
 

@@ -33,7 +33,7 @@ export type LayerWizard = {
   description: string;
   disabledReason?: string;
   getIsDisabled?: () => Promise<boolean> | boolean;
-  icon: string | FunctionComponent<any>;
+  icon?: string | FunctionComponent<any>;
   prerequisiteSteps?: Array<{ id: string; label: string }>;
   renderWizard(renderWizardArguments: RenderWizardArguments): ReactElement<any>;
   title: string;
