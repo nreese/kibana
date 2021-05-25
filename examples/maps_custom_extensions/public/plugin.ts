@@ -8,7 +8,11 @@
 
 import { Plugin, CoreSetup, CoreStart } from '../../../src/core/public';
 import { MapsPluginStart } from '../../../x-pack/plugins/maps/public';
-import { dayNightTerminatorWizardConfig } from './day_night_terminator';
+import {
+  dayNightTerminatorWizardConfig,
+  DayNightTerminatorSource,
+  DAY_NIGHT_TERMINATOR_SOURCE_TYPE,
+} from './day_night_terminator';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface SetupDependencies {}
@@ -23,6 +27,10 @@ export class MapsCustomExtensionsPlugin
 
   public start(core: CoreStart, plugins: StartDependencies) {
     plugins.maps.registerLayerWizard(dayNightTerminatorWizardConfig);
+    plugins.maps.registerSource({
+      ConstructorFunction: DayNightTerminatorSource,
+      type: DAY_NIGHT_TERMINATOR_SOURCE_TYPE,
+    });
   }
 
   public stop() {}

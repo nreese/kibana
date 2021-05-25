@@ -6,4 +6,6 @@
  */
 
 export * from './constants';
+export * from './descriptor_types';
+export * from './elasticsearch_util';
 export * from './types';

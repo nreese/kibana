@@ -58,7 +58,6 @@ export interface IVectorSource extends ISource {
   getFieldByName(fieldName: string): IField | null;
   getLeftJoinFields(): Promise<IField[]>;
   getSyncMeta(): VectorSourceSyncMeta | null;
-  getFieldNames(): string[];
   createField({ fieldName }: { fieldName: string }): IField;
   hasTooltipProperties(): boolean;
   getSupportedShapeTypes(): Promise<VECTOR_SHAPE_TYPE[]>;
@@ -67,10 +66,6 @@ export interface IVectorSource extends ISource {
 }
 
 export class AbstractVectorSource extends AbstractSource implements IVectorSource {
-  getFieldNames(): string[] {
-    return [];
-  }
-
   createField({ fieldName }: { fieldName: string }): IField {
     throw new Error('Not implemented');
   }

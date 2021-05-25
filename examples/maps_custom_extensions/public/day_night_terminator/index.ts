@@ -7,3 +7,4 @@
  */
 
 export { dayNightTerminatorWizardConfig } from './wizard';
+export { DayNightTerminatorSource, DAY_NIGHT_TERMINATOR_SOURCE_TYPE } from './source';
