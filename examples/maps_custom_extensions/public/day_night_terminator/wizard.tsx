@@ -7,14 +7,31 @@
  */
 
 import React from 'react';
-import { LAYER_WIZARD_CATEGORY } from '../../../../x-pack/plugins/maps/common/constants';
+import uuid from 'uuid/v4';
+import { LAYER_TYPE, LAYER_WIZARD_CATEGORY } from '../../../../x-pack/plugins/maps/common';
 import { LayerWizard, RenderWizardArguments } from '../../../../x-pack/plugins/maps/public';
+import { DayNightTerminatorSource, SourceDescriptor } from './source';
+import { CreateSourceEditor } from './create_source_editor';
 
 export const dayNightTerminatorWizardConfig: LayerWizard = {
   categories: [LAYER_WIZARD_CATEGORY.REFERENCE],
-  description: 'Show the boundary of where night starts, and day begins.',
+  description: 'Show the boundary where day ends and night begins.',
   renderWizard: ({ previewLayers, mapColors }: RenderWizardArguments) => {
-    return <div>Hello world</div>;
+    const onSourceConfigChange = (sourceConfig: Partial<SourceDescriptor>) => {
+      if (!sourceConfig) {
+        previewLayers([]);
+        return;
+      }
+
+      const layerDescriptor = {
+        id: uuid(),
+        sourceDescriptor: DayNightTerminatorSource.createDescriptor(sourceConfig),
+        type: LAYER_TYPE.VECTOR,
+      };
+      previewLayers([layerDescriptor]);
+    };
+
+    return <CreateSourceEditor onSourceConfigChange={onSourceConfigChange} />;
   },
   title: 'Day night terminator',
 };

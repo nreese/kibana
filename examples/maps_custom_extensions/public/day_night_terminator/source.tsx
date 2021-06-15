@@ -191,7 +191,26 @@ export class DayNightTerminatorSource implements IVectorSource {
     registerCancelCallback: (callback: () => void) => void,
     isRequestStillActive: () => boolean
   ): Promise<GeoJsonWithMeta> {
-    const featureCollection = EMPTY_FEATURE_COLLECTION;
+    const featureCollection = {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: {
+            coordinates: [
+              [
+                [100, 5],
+                [95, -5],
+                [105, -5],
+                [100, 5],
+              ],
+            ],
+            type: 'Polygon',
+          },
+          properties: {},
+        },
+      ],
+    };
     return {
       data: featureCollection,
     };
