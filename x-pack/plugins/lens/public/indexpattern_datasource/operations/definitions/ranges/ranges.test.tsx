@@ -102,6 +102,9 @@ const defaultOptions = {
     ]),
   },
   operationDefinitionMap: {},
+  isFullscreen: false,
+  toggleFullscreen: jest.fn(),
+  setIsCloseable: jest.fn(),
 };
 
 describe('ranges', () => {
@@ -172,7 +175,8 @@ describe('ranges', () => {
         'col1',
         {} as IndexPattern,
         layer,
-        uiSettingsMock
+        uiSettingsMock,
+        []
       );
       expect(esAggsFn).toMatchInlineSnapshot(`
         Object {
@@ -219,7 +223,8 @@ describe('ranges', () => {
         'col1',
         {} as IndexPattern,
         layer,
-        uiSettingsMock
+        uiSettingsMock,
+        []
       );
 
       expect(esAggsFn).toEqual(
@@ -240,7 +245,8 @@ describe('ranges', () => {
         'col1',
         {} as IndexPattern,
         layer,
-        uiSettingsMock
+        uiSettingsMock,
+        []
       );
 
       expect(esAggsFn).toEqual(
@@ -261,7 +267,8 @@ describe('ranges', () => {
         'col1',
         {} as IndexPattern,
         layer,
-        uiSettingsMock
+        uiSettingsMock,
+        []
       );
 
       expect((esAggsFn as { arguments: unknown }).arguments).toEqual(
