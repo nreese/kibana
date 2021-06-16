@@ -7,7 +7,9 @@
  */
 
 import { Plugin, CoreSetup, CoreStart } from '../../../src/core/public';
+import type { DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { MapsPluginStart } from '../../../x-pack/plugins/maps/public';
+import { setStartServices } from './kibana_services';
 import {
   dayNightTerminatorWizardConfig,
   DayNightTerminatorSource,
@@ -18,6 +20,7 @@ import {
 interface SetupDependencies {}
 
 interface StartDependencies {
+  data: DataPublicPluginStart;
   maps: MapsPluginStart;
 }
 
@@ -26,6 +29,8 @@ export class MapsCustomExtensionsPlugin
   public setup(core: CoreSetup, plugins: SetupDependencies) {}
 
   public start(core: CoreStart, plugins: StartDependencies) {
+    setStartServices(core, plugins);
+
     plugins.maps.registerLayerWizard(dayNightTerminatorWizardConfig);
     plugins.maps.registerSource({
       ConstructorFunction: DayNightTerminatorSource,

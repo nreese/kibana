@@ -34,12 +34,24 @@ import {
   VectorSourceRequestMeta,
   VectorSourceSyncMeta,
 } from '../../../../x-pack/plugins/maps/common';
+import { getDayNightTerminator } from './get_day_night_terminator';
+import { getTimeFilter } from '../kibana_services';
 
 export const DAY_NIGHT_TERMINATOR_SOURCE_TYPE = 'DAY_NIGHT';
 
 interface SourceDescriptor {
   type: string;
   numSamples: number;
+}
+
+export function timerangeToTimeextent(timerange: TimeRange): Timeslice | undefined {
+  const timeRangeBounds = getTimeFilter().calculateBounds(timerange);
+  return timeRangeBounds.min !== undefined && timeRangeBounds.max !== undefined
+    ? {
+        from: timeRangeBounds.min.valueOf(),
+        to: timeRangeBounds.max.valueOf(),
+      }
+    : undefined;
 }
 
 export class DayNightTerminatorSource implements IVectorSource {
@@ -191,6 +203,13 @@ export class DayNightTerminatorSource implements IVectorSource {
     registerCancelCallback: (callback: () => void) => void,
     isRequestStillActive: () => boolean
   ): Promise<GeoJsonWithMeta> {
+    const timeExtent =
+      searchFilters.timeslice !== undefined
+        ? searchFilters.timeslice
+        : timerangeToTimeextent(searchFilters.timeFilters);
+
+    const dayNightTerminator = getDayNightTerminator(timeExtent);
+
     const featureCollection = {
       type: 'FeatureCollection',
       features: [
