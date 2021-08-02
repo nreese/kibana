@@ -80,6 +80,7 @@ export const sourceTitle = i18n.translate('xpack.maps.source.esSearchTitle', {
 export class ESSearchSource extends AbstractESSource implements ITiledSingleLayerVectorSource {
   readonly _descriptor: ESSearchSourceDescriptor;
   protected readonly _tooltipFields: ESDocField[];
+  _isFirstHit = false;
 
   static createDescriptor(descriptor: Partial<ESSearchSourceDescriptor>): ESSearchSourceDescriptor {
     const normalizedDescriptor = AbstractESSource.createDescriptor(descriptor);
@@ -397,6 +398,8 @@ export class ESSearchSource extends AbstractESSource implements ITiledSingleLaye
       requestDescription: 'Elasticsearch document request',
       searchSessionId: searchFilters.searchSessionId,
     });
+    console.log(`count: `, resp.hits.hits.length);
+    console.log(`resp: `, resp);
 
     const isTimeExtentForTimeslice =
       searchFilters.timeslice !== undefined && !useSearchFiltersWithoutTimeslice;
@@ -457,8 +460,16 @@ export class ESSearchSource extends AbstractESSource implements ITiledSingleLaye
     const unusedMetaFields = indexPattern.metaFields.filter((metaField) => {
       return !['_id', '_index'].includes(metaField);
     });
+    this._isFirstHit = true;
     const flattenHit = (hit: Record<string, any>) => {
+      if (this._isFirstHit) {
+        console.log('hit: ', hit);
+      }
       const properties = indexPattern.flattenHit(hit);
+      if (this._isFirstHit) {
+        console.log('properties: ', properties);
+      }
+      this._isFirstHit = false;
       // remove metaFields
       unusedMetaFields.forEach((metaField) => {
         delete properties[metaField];
@@ -489,6 +500,8 @@ export class ESSearchSource extends AbstractESSource implements ITiledSingleLaye
         })
       );
     }
+    console.log('feature collection count: ', featureCollection.features.length);
+    console.log('feature collection: ', featureCollection);
 
     return {
       data: featureCollection,
