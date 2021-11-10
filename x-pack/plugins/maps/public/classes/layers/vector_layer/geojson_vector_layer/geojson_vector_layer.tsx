@@ -8,6 +8,7 @@
 import React from 'react';
 import { i18n } from '@kbn/i18n';
 import { EuiIcon } from '@elastic/eui';
+import { asyncForEach } from '@kbn/std';
 import { Feature, FeatureCollection } from 'geojson';
 import type { Map as MbMap, GeoJSONSource as MbGeoJSONSource } from '@kbn/mapbox-gl';
 import {
@@ -208,46 +209,72 @@ export class GeoJsonVectorLayer extends AbstractVectorLayer {
       return;
     }
 
-    try {
-      await this._syncSourceStyleMeta(syncContext, source, style);
-      await this._syncSourceFormatters(syncContext, source, style);
-      const sourceResult = await syncVectorSource({
-        layerId: this.getId(),
-        layerName: await this.getDisplayName(source),
-        prevDataRequest: this.getSourceDataRequest(),
-        requestMeta: await this._getVectorSourceRequestMeta(
-          syncContext.isForceRefresh,
-          syncContext.dataFilters,
-          source,
-          style
-        ),
-        syncContext,
+    const syncSourceStyleMetaSuccess = await this._syncSourceStyleMeta(syncContext, source, style);
+    if (!syncSourceStyleMetaSuccess) {
+      return;
+    }
+
+    const syncSourceFormattersSuccess = await this._syncSourceFormatters(
+      syncContext,
+      source,
+      style
+    );
+    if (!syncSourceFormattersSuccess) {
+      return;
+    }
+
+    const sourceResult = await syncVectorSource({
+      layerId: this.getId(),
+      layerName: await this.getDisplayName(source),
+      prevDataRequest: this.getSourceDataRequest(),
+      requestMeta: await this._getVectorSourceRequestMeta(
+        syncContext.isForceRefresh,
+        syncContext.dataFilters,
         source,
-        getUpdateDueToTimeslice: (timeslice?: Timeslice) => {
-          return this._getUpdateDueToTimesliceFromSourceRequestMeta(source, timeslice);
-        },
-      });
-      await this._syncSupportsFeatureEditing({ syncContext, source });
-      if (
-        !sourceResult.featureCollection ||
-        !sourceResult.featureCollection.features.length ||
-        !this.hasJoins()
-      ) {
+        style
+      ),
+      syncContext,
+      source,
+      getUpdateDueToTimeslice: (timeslice?: Timeslice) => {
+        return this._getUpdateDueToTimesliceFromSourceRequestMeta(source, timeslice);
+      },
+    });
+    if (!sourceResult.success) {
+      return;
+    }
+
+    const syncSupportsFeatureEditing = await this._syncSupportsFeatureEditing({
+      syncContext,
+      source,
+    });
+    if (!syncSupportsFeatureEditing) {
+      return;
+    }
+
+    if (!sourceResult.featureCollection.features.length || !this.hasJoins()) {
+      return;
+    }
+
+    const joinSyncs: Array<Promise<JoinState>> = [];
+    await asyncForEach(this.getValidJoins(), async (join) => {
+      const syncJoinStyleMeta = await this._syncJoinStyleMeta(syncContext, join, style);
+      if (!syncJoinStyleMeta) {
         return;
       }
-
-      const joinStates = await this._syncJoins(syncContext, style);
-      performInnerJoins(
-        sourceResult,
-        joinStates,
-        syncContext.updateSourceData,
-        syncContext.onJoinError
-      );
-    } catch (error) {
-      if (!(error instanceof DataRequestAbortError)) {
-        throw error;
+      const syncJoinFormatters = await this._syncJoinFormatters(syncContext, join, style);
+      if (!syncJoinFormatters) {
+        return;
       }
-    }
+      joinSyncs.push(this._syncJoin({ join, ...syncContext }));
+    });
+    const joinStates = await Promise.all(joinSyncs);
+
+    performInnerJoins(
+      sourceResult,
+      joinStates,
+      syncContext.updateSourceData,
+      syncContext.onJoinError
+    );
   }
 
   async _syncJoin({
@@ -309,21 +336,18 @@ export class GeoJsonVectorLayer extends AbstractVectorLayer {
       if (!(error instanceof DataRequestAbortError)) {
         onLoadError(sourceDataId, requestToken, `Join error: ${error.message}`);
       }
-      throw error;
+      return {
+        dataHasChanged: false,
+        join,
+      };
     }
   }
 
-  async _syncJoins(syncContext: DataRequestContext, style: IVectorStyle) {
-    const joinSyncs = this.getValidJoins().map(async (join) => {
-      await this._syncJoinStyleMeta(syncContext, join, style);
-      await this._syncJoinFormatters(syncContext, join, style);
-      return this._syncJoin({ join, ...syncContext });
-    });
-
-    return await Promise.all(joinSyncs);
-  }
-
-  async _syncJoinStyleMeta(syncContext: DataRequestContext, join: InnerJoin, style: IVectorStyle) {
+  async _syncJoinStyleMeta(
+    syncContext: DataRequestContext,
+    join: InnerJoin,
+    style: IVectorStyle
+  ): Promise<boolean> {
     const joinSource = join.getRightJoinSource();
     return this._syncStyleMeta({
       source: joinSource,
@@ -344,7 +368,11 @@ export class GeoJsonVectorLayer extends AbstractVectorLayer {
     });
   }
 
-  async _syncJoinFormatters(syncContext: DataRequestContext, join: InnerJoin, style: IVectorStyle) {
+  async _syncJoinFormatters(
+    syncContext: DataRequestContext,
+    join: InnerJoin,
+    style: IVectorStyle
+  ): Promise<boolean> {
     const joinSource = join.getRightJoinSource();
     return this._syncFormatters({
       source: joinSource,
@@ -368,24 +396,26 @@ export class GeoJsonVectorLayer extends AbstractVectorLayer {
   }: {
     syncContext: DataRequestContext;
     source: IVectorSource;
-  }) {
+  }): Promise<boolean> {
     if (syncContext.dataFilters.isReadOnly) {
-      return;
+      return true;
     }
     const { startLoading, stopLoading, onLoadError } = syncContext;
     const dataRequestId = SUPPORTS_FEATURE_EDITING_REQUEST_ID;
     const requestToken = Symbol(`layer-${this.getId()}-${dataRequestId}`);
     const prevDataRequest = this.getDataRequest(dataRequestId);
     if (prevDataRequest) {
-      return;
+      return true;
     }
+
     try {
       startLoading(dataRequestId, requestToken);
       const supportsFeatureEditing = await source.supportsFeatureEditing();
       stopLoading(dataRequestId, requestToken, { supportsFeatureEditing });
+      return true;
     } catch (error) {
       onLoadError(dataRequestId, requestToken, error.message);
-      throw error;
+      return false;
     }
   }
 

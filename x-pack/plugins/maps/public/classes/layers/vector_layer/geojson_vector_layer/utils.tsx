@@ -67,7 +67,7 @@ export async function syncVectorSource({
   syncContext: DataRequestContext;
   source: IVectorSource;
   getUpdateDueToTimeslice: (timeslice?: Timeslice) => boolean;
-}): Promise<{ refreshed: boolean; featureCollection: FeatureCollection }> {
+}): Promise<{ success: boolean; refreshed: boolean; featureCollection: FeatureCollection }> {
   const { startLoading, stopLoading, onLoadError, registerCancelCallback, isRequestStillActive } =
     syncContext;
   const dataRequestId = SOURCE_DATA_REQUEST_ID;
@@ -85,6 +85,7 @@ export async function syncVectorSource({
 
   if (canSkipFetch) {
     return {
+      success: true,
       refreshed: false,
       featureCollection: prevDataRequest
         ? (prevDataRequest.getData() as FeatureCollection)
@@ -119,6 +120,7 @@ export async function syncVectorSource({
     }
     stopLoading(dataRequestId, requestToken, layerFeatureCollection, responseMeta);
     return {
+      success: true,
       refreshed: true,
       featureCollection: layerFeatureCollection,
     };
@@ -126,7 +128,11 @@ export async function syncVectorSource({
     if (!(error instanceof DataRequestAbortError)) {
       onLoadError(dataRequestId, requestToken, error.message);
     }
-    throw error;
+    return {
+      success: false,
+      refreshed: false,
+      featureCollection: EMPTY_FEATURE_COLLECTION,
+    };
   }
 }
 

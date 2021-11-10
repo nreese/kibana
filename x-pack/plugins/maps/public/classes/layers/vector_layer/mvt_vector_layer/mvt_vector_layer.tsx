@@ -163,16 +163,26 @@ export class MvtVectorLayer extends AbstractVectorLayer {
     return data ? data.maxResultWindow : undefined;
   }
 
-  async _syncMaxResultWindow({ startLoading, stopLoading }: DataRequestContext) {
+  async _syncMaxResultWindow({
+    startLoading,
+    stopLoading,
+    onLoadError,
+  }: DataRequestContext): Promise<boolean> {
     const prevDataRequest = this.getDataRequest(MAX_RESULT_WINDOW_DATA_REQUEST_ID);
     if (prevDataRequest) {
-      return;
+      return true;
     }
 
     const requestToken = Symbol(`${this.getId()}-${MAX_RESULT_WINDOW_DATA_REQUEST_ID}`);
-    startLoading(MAX_RESULT_WINDOW_DATA_REQUEST_ID, requestToken);
-    const maxResultWindow = await (this.getSource() as ESSearchSource).getMaxResultWindow();
-    stopLoading(MAX_RESULT_WINDOW_DATA_REQUEST_ID, requestToken, { maxResultWindow });
+    try {
+      startLoading(MAX_RESULT_WINDOW_DATA_REQUEST_ID, requestToken);
+      const maxResultWindow = await (this.getSource() as ESSearchSource).getMaxResultWindow();
+      stopLoading(MAX_RESULT_WINDOW_DATA_REQUEST_ID, requestToken, { maxResultWindow });
+      return true;
+    } catch (error) {
+      onLoadError(MAX_RESULT_WINDOW_DATA_REQUEST_ID, requestToken, error.message);
+      return false;
+    }
   }
 
   async _syncMVTUrlTemplate({
@@ -250,10 +260,30 @@ export class MvtVectorLayer extends AbstractVectorLayer {
 
   async syncData(syncContext: DataRequestContext) {
     if (this.getSource().getType() === SOURCE_TYPES.ES_SEARCH) {
-      await this._syncMaxResultWindow(syncContext);
+      const syncMaxResultWindow = await this._syncMaxResultWindow(syncContext);
+      if (!syncMaxResultWindow) {
+        return;
+      }
     }
-    await this._syncSourceStyleMeta(syncContext, this._source, this._style as IVectorStyle);
-    await this._syncSourceFormatters(syncContext, this._source, this._style as IVectorStyle);
+
+    const syncSourceStyleMetaSuccess = await this._syncSourceStyleMeta(
+      syncContext,
+      this._source,
+      this._style as IVectorStyle
+    );
+    if (!syncSourceStyleMetaSuccess) {
+      return;
+    }
+
+    const syncSourceFormattersSuccess = await this._syncSourceFormatters(
+      syncContext,
+      this._source,
+      this._style as IVectorStyle
+    );
+    if (!syncSourceFormattersSuccess) {
+      return;
+    }
+
     await this._syncMVTUrlTemplate(syncContext);
   }
 

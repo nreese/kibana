@@ -373,7 +373,7 @@ export class AbstractVectorLayer extends AbstractLayer implements IVectorLayer {
     syncContext: DataRequestContext,
     source: IVectorSource,
     style: IVectorStyle
-  ) {
+  ): Promise<boolean> {
     const sourceQuery = this.getQuery();
     return this._syncStyleMeta({
       source,
@@ -407,9 +407,9 @@ export class AbstractVectorLayer extends AbstractLayer implements IVectorLayer {
     source: IVectorSource | ITermJoinSource;
     sourceQuery?: Query;
     style: IVectorStyle;
-  } & DataRequestContext) {
+  } & DataRequestContext): Promise<boolean> {
     if (!source.isESSource() || dynamicStyleProps.length === 0) {
-      return;
+      return true;
     }
 
     const dynamicStyleFields = dynamicStyleProps.map((dynamicStyleProp) => {
@@ -426,7 +426,7 @@ export class AbstractVectorLayer extends AbstractLayer implements IVectorLayer {
     const prevDataRequest = this.getDataRequest(dataRequestId);
     const canSkipFetch = canSkipStyleMetaUpdate({ prevDataRequest, nextMeta });
     if (canSkipFetch) {
-      return;
+      return true;
     }
 
     const requestToken = Symbol(`layer-${this.getId()}-${dataRequestId}`);
@@ -445,11 +445,12 @@ export class AbstractVectorLayer extends AbstractLayer implements IVectorLayer {
       });
 
       stopLoading(dataRequestId, requestToken, styleMeta, nextMeta);
+      return true;
     } catch (error) {
       if (!(error instanceof DataRequestAbortError)) {
         onLoadError(dataRequestId, requestToken, error.message);
       }
-      throw error;
+      return false;
     }
   }
 
@@ -457,7 +458,7 @@ export class AbstractVectorLayer extends AbstractLayer implements IVectorLayer {
     syncContext: DataRequestContext,
     source: IVectorSource,
     style: IVectorStyle
-  ) {
+  ): Promise<boolean> {
     return this._syncFormatters({
       source,
       dataRequestId: SOURCE_FORMATTERS_DATA_REQUEST_ID,
@@ -484,9 +485,9 @@ export class AbstractVectorLayer extends AbstractLayer implements IVectorLayer {
     dataRequestId: string;
     fields: IField[];
     source: IVectorSource | ITermJoinSource;
-  } & DataRequestContext) {
+  } & DataRequestContext): Promise<boolean> {
     if (fields.length === 0) {
-      return;
+      return true;
     }
 
     const fieldNames = fields.map((field) => {
@@ -498,7 +499,7 @@ export class AbstractVectorLayer extends AbstractLayer implements IVectorLayer {
     const prevDataRequest = this.getDataRequest(dataRequestId);
     const canSkipUpdate = canSkipFormattersUpdate({ prevDataRequest, nextMeta });
     if (canSkipUpdate) {
-      return;
+      return true;
     }
 
     const requestToken = Symbol(`layer-${this.getId()}-${dataRequestId}`);
@@ -516,9 +517,10 @@ export class AbstractVectorLayer extends AbstractLayer implements IVectorLayer {
       await Promise.all(promises);
 
       stopLoading(dataRequestId, requestToken, formatters, nextMeta);
+      return true;
     } catch (error) {
       onLoadError(dataRequestId, requestToken, error.message);
-      throw error;
+      return false;
     }
   }
 
