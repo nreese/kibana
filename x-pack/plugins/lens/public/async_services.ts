@@ -20,6 +20,8 @@ export * from './metric_visualization/metric_visualization';
 export * from './metric_visualization';
 export * from './pie_visualization/pie_visualization';
 export * from './pie_visualization';
+export * from './regionmap_visualization/regionmap_visualization';
+export * from './regionmap_visualization';
 export * from './xy_visualization/xy_visualization';
 export * from './xy_visualization';
 export * from './heatmap_visualization/heatmap_visualization';
