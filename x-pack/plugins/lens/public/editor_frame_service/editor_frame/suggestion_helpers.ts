@@ -153,7 +153,8 @@ export function getSuggestions({
             },
             currentVisualizationState,
             subVisualizationId,
-            palette
+            palette,
+            activeData,
           );
         });
     })
@@ -199,7 +200,8 @@ function getVisualizationSuggestions(
   datasourceSuggestion: DatasourceSuggestion & { datasourceId: string },
   currentVisualizationState: unknown,
   subVisualizationId?: string,
-  mainPalette?: PaletteOutput
+  mainPalette?: PaletteOutput,
+  activeData?: Record<string, Datatable>,
 ) {
   return visualization
     .getSuggestions({
@@ -208,6 +210,7 @@ function getVisualizationSuggestions(
       keptLayerIds: datasourceSuggestion.keptLayerIds,
       subVisualizationId,
       mainPalette,
+      activeData,
     })
     .map(({ state, ...visualizationSuggestion }) => ({
       ...visualizationSuggestion,
