@@ -16,15 +16,26 @@ import { getMapEmbeddableDisplayName } from '../../common/i18n_getters';
 import { MapByReferenceInput, MapEmbeddableInput, MapByValueInput } from './types';
 import { lazyLoadMapModules } from '../lazy_load_bundle';
 import { extractReferences } from '../../common/migrations/references';
+import { getEmsFileLayers } from '../util';
+import type { FileLayer } from '@elastic/ems-client';
+import { emsAutoSuggest } from '../ems_autosuggest/ems_autosuggest';
 
 export class MapEmbeddableFactory implements EmbeddableFactoryDefinition {
   type = MAP_SAVED_OBJECT_TYPE;
+  test = 'hello';
   savedObjectMetaData = {
     name: i18n.translate('xpack.maps.mapSavedObjectLabel', {
       defaultMessage: 'Map',
     }),
     type: MAP_SAVED_OBJECT_TYPE,
     getIconForSavedObject: () => APP_ICON,
+    // TODO hack, move registerVisualization into maps plugin so these do not need to be exposed on MapEmbeddableFactory
+    getEmsFileLayers: async () => {
+      return getEmsFileLayers();
+    },
+    emsAutoSuggest: (sampleValuesConfig: SampleValuesConfig, fileLayers: FileLayer[]) => {
+      return emsAutoSuggest(sampleValuesConfig, fileLayers);
+    }
   };
 
   async isEditable() {

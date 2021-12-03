@@ -26,11 +26,27 @@ export class RegionmapVisualization {
     editorFrame.registerVisualization(async () => {
       const { getRegionmapVisualization, getRegionmapChartRenderer } = await import('../async_services');
       const palettes = await charts.palettes.getPalettes();
+      const [, { embeddable }] = await core.getStartServices();
+      const mapEmbeddableFactory = embeddable.getEmbeddableFactory('map');
+      console.log(mapEmbeddableFactory);
+
+      if (!mapEmbeddableFactory) {
+        return;
+      }
+
+      const fileLayers = await mapEmbeddableFactory.savedObjectMetaData.getEmsFileLayers();
+      console.log(fileLayers);
 
       expressions.registerRenderer(() =>
         getRegionmapChartRenderer(formatFactory, core.uiSettings, core.theme)
       );
-      return getRegionmapVisualization({ paletteService: palettes, theme: core.theme });
+      return getRegionmapVisualization({ 
+        paletteService: palettes,
+        theme: core.theme,
+        emsAutoSuggest: (sampleValuesConfig: SampleValuesConfig) => {
+          return mapEmbeddableFactory.savedObjectMetaData.emsAutoSuggest(sampleValuesConfig, fileLayers);
+        }
+      });
     });
   }
 }

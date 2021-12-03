@@ -18,8 +18,9 @@ export function getSuggestions({
   state,
   keptLayerIds,
   activeData,
-}: SuggestionRequest<RegionmapState>): Array<VisualizationSuggestion<RegionmapState>> {
-  
+}: SuggestionRequest<RegionmapState>,
+emsAutoSuggest: (sampleValuesConfig: SampleValuesConfig) => unknown): Array<VisualizationSuggestion<RegionmapState>> {
+  console.log(emsAutoSuggest);
   console.log(activeData);
   return [];
 }

@@ -66,9 +66,11 @@ const toExpression = (
 export const getRegionmapVisualization = ({
   paletteService,
   theme,
+  emsAutoSuggest,
 }: {
   paletteService: PaletteRegistry;
   theme: ThemeServiceStart;
+  emsAutoSuggest: (sampleValuesConfig: SampleValuesConfig) => unknown;
 }): Visualization<RegionmapState> => ({
   id: 'lnsRegionmap',
 
@@ -110,7 +112,9 @@ export const getRegionmapVisualization = ({
     };
   },
 
-  getSuggestions,
+  getSuggestions(suggestionRequest: SuggestionRequest<RegionmapState>) {
+    return getSuggestions(suggestionRequest, emsAutoSuggest);
+  },
 
   initialize(addNewLayer, state) {
     return (
