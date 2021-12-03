@@ -15,14 +15,6 @@ import type {
   ExpressionRenderDefinition,
   IInterpreterRenderHandlers,
 } from '../../../../../src/plugins/expressions/public';
-import {
-  ColorMode,
-  CustomPaletteState,
-  PaletteOutput,
-} from '../../../../../src/plugins/charts/public';
-import { AutoScale } from './auto_scale';
-import { VisualizationContainer } from '../visualization_container';
-import { EmptyPlaceholder, getContrastColor } from '../shared_components';
 import type { FormatFactory } from '../../common';
 import type { RegionmapChartProps } from '../../common/expressions';
 export type { RegionmapChartProps, RegionmapState, RegionmapConfig } from '../../common/expressions';
@@ -37,7 +29,7 @@ export const getRegionmapChartRenderer = (
   help: 'Regionmap chart renderer',
   validate: () => undefined,
   reuseDomNode: true,
-  render: (domNode: Element, config: MetricChartProps, handlers: IInterpreterRenderHandlers) => {
+  render: (domNode: Element, config: RegionmapChartProps, handlers: IInterpreterRenderHandlers) => {
     ReactDOM.render(
       <KibanaThemeProvider theme$={theme.theme$}>
         <I18nProvider>
@@ -53,62 +45,14 @@ export const getRegionmapChartRenderer = (
   },
 });
 
-function getColorStyling(
-  value: number,
-  colorMode: ColorMode,
-  palette: PaletteOutput<CustomPaletteState> | undefined,
-  isDarkTheme: boolean
-) {
-  if (
-    colorMode === ColorMode.None ||
-    !palette?.params ||
-    !palette?.params.colors?.length ||
-    isNaN(value)
-  ) {
-    return {};
-  }
-
-  const { continuity = 'above', rangeMin, stops, colors } = palette.params;
-  const penultimateStop = stops[stops.length - 2];
-
-  if (continuity === 'none' && (value < rangeMin || value > penultimateStop)) {
-    return {};
-  }
-  if (continuity === 'below' && value > penultimateStop) {
-    return {};
-  }
-  if (continuity === 'above' && value < rangeMin) {
-    return {};
-  }
-  const cssProp = colorMode === ColorMode.Background ? 'backgroundColor' : 'color';
-  const rawIndex = stops.findIndex((v) => v > value);
-
-  let colorIndex = rawIndex;
-  if (['all', 'below'].includes(continuity) && value < rangeMin && colorIndex < 0) {
-    colorIndex = 0;
-  }
-  if (['all', 'above'].includes(continuity) && value > penultimateStop && colorIndex < 0) {
-    colorIndex = stops.length - 1;
-  }
-
-  const color = colors[colorIndex];
-  const styling = {
-    [cssProp]: color,
-  };
-  if (colorMode === ColorMode.Background && color) {
-    styling.color = getContrastColor(color, isDarkTheme);
-  }
-  return styling;
-}
-
 export function RegionmapChart({
   data,
   args,
   formatFactory,
   uiSettings,
 }: RegionmapChartProps & { formatFactory: FormatFactory; uiSettings: IUiSettingsClient }) {
-  const { metricTitle, accessor, mode, colorMode, palette } = args;
-  const firstTable = Object.values(data.tables)[0];
+  //const { metricTitle, accessor, mode, colorMode, palette } = args;
+  //const firstTable = Object.values(data.tables)[0];
 
   return <div>Regionmap</div>;
 

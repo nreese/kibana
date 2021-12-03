@@ -5,15 +5,5 @@
  * 2.0.
  */
 
-import { LayerType } from '../../types';
-
-export interface RegionmapState {
-  layerId: string;
-  accessor?: string;
-  layerType: LayerType;
-}
-
-export interface RegionmapConfig extends RegionmapState {
-  title: string;
-  description: string;
-}
+export * from './expression';
+export * from './visualization';

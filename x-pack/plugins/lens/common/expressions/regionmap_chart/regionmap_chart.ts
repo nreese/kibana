@@ -6,7 +6,6 @@
  */
 
 import { i18n } from '@kbn/i18n';
-import { ColorMode } from '../../../../../../src/plugins/charts/common';
 import type { ExpressionFunctionDefinition } from '../../../../../../src/plugins/expressions/common';
 import type { LensMultiTable } from '../../types';
 import type { RegionmapConfig } from './types';
@@ -47,29 +46,6 @@ export const regionmapChart: ExpressionFunctionDefinition<
       help: i18n.translate('xpack.lens.metric.accessor.help', {
         defaultMessage: 'The column whose value is being displayed',
       }),
-    },
-    colorMode: {
-      types: ['string'],
-      default: `"${ColorMode.None}"`,
-      options: [ColorMode.None, ColorMode.Labels, ColorMode.Background],
-      help: i18n.translate('xpack.lens.metric.colorMode.help', {
-        defaultMessage: 'Which part of metric to color',
-      }),
-    },
-    palette: {
-      types: ['palette'],
-      help: i18n.translate('xpack.lens.metric.palette.help', {
-        defaultMessage: 'Provides colors for the values',
-      }),
-    },
-    hideLabels: {
-      types: ['boolean'],
-      help: '',
-    },
-    legendDisplay: {
-      types: ['string'],
-      options: ['default', 'show', 'hide'],
-      help: '',
     },
   },
   inputTypes: ['lens_multitable'],
