@@ -56,6 +56,10 @@ import type {
   PieVisualization as PieVisualizationType,
   PieVisualizationPluginSetupPlugins,
 } from './pie_visualization';
+import type {
+  RegionmapVisualization as RegionmapVisualizationType,
+  RegionmapVisualizationPluginSetupPlugins,
+} from './regionmap_visualization';
 import type { HeatmapVisualization as HeatmapVisualizationType } from './heatmap_visualization';
 import type { SavedObjectTaggingPluginStart } from '../../saved_objects_tagging/public';
 
@@ -168,6 +172,7 @@ export class LensPlugin {
   private xyVisualization: XyVisualizationType | undefined;
   private metricVisualization: MetricVisualizationType | undefined;
   private pieVisualization: PieVisualizationType | undefined;
+  private regionmapVisualization: RegionmapVisualizationType | undefined;
   private heatmapVisualization: HeatmapVisualizationType | undefined;
 
   private stopReportManager?: () => void;
@@ -307,6 +312,7 @@ export class LensPlugin {
       XyVisualization,
       MetricVisualization,
       PieVisualization,
+      RegionmapVisualization,
       HeatmapVisualization,
     } = await import('./async_services');
     this.datatableVisualization = new DatatableVisualization();
@@ -315,6 +321,7 @@ export class LensPlugin {
     this.xyVisualization = new XyVisualization();
     this.metricVisualization = new MetricVisualization();
     this.pieVisualization = new PieVisualization();
+    this.regionmapVisualization = new RegionmapVisualization();
     this.heatmapVisualization = new HeatmapVisualization();
 
     const editorFrameSetupInterface = this.editorFrameService.setup();
@@ -323,7 +330,8 @@ export class LensPlugin {
       XyVisualizationPluginSetupPlugins &
       DatatableVisualizationPluginSetupPlugins &
       MetricVisualizationPluginSetupPlugins &
-      PieVisualizationPluginSetupPlugins = {
+      PieVisualizationPluginSetupPlugins &
+      RegionmapVisualizationPluginSetupPlugins = {
       expressions,
       data,
       fieldFormats,
@@ -336,6 +344,7 @@ export class LensPlugin {
     this.datatableVisualization.setup(core, dependencies);
     this.metricVisualization.setup(core, dependencies);
     this.pieVisualization.setup(core, dependencies);
+    this.regionmapVisualization.setup(core, dependencies);
     this.heatmapVisualization.setup(core, dependencies);
   }
 

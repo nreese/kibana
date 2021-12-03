@@ -5,7 +5,6 @@
  * 2.0.
  */
 
-import './expression.scss';
 import { I18nProvider } from '@kbn/i18n-react';
 import React from 'react';
 import ReactDOM from 'react-dom';
