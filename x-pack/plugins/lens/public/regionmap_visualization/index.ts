@@ -34,8 +34,7 @@ export class RegionmapVisualization {
         return;
       }
 
-      const fileLayers = await mapEmbeddableFactory.savedObjectMetaData.getEmsFileLayers();
-      console.log(fileLayers);
+      const emsFileLayers = await mapEmbeddableFactory.savedObjectMetaData.getEmsFileLayers();
 
       expressions.registerRenderer(() =>
         getRegionmapChartRenderer(formatFactory, core.uiSettings, core.theme)
@@ -44,8 +43,8 @@ export class RegionmapVisualization {
         paletteService: palettes,
         theme: core.theme,
         emsAutoSuggest: (sampleValuesConfig: SampleValuesConfig) => {
-          return mapEmbeddableFactory.savedObjectMetaData.emsAutoSuggest(sampleValuesConfig, fileLayers);
-        }
+          return mapEmbeddableFactory.savedObjectMetaData.emsAutoSuggest(sampleValuesConfig, emsFileLayers);
+        },
       });
     });
   }

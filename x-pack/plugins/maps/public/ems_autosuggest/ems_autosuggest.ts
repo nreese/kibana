@@ -16,6 +16,7 @@ export interface SampleValuesConfig {
 export interface EMSTermJoinConfig {
   layerId: string;
   field: string;
+  displayName: string;
 }
 
 interface UniqueMatch {
@@ -97,6 +98,7 @@ function suggestByName(
       const emsConfig = {
         layerId: fileLayer.getId(),
         field: emsField.id,
+        displayName: fileLayer.getDisplayName(),
       };
       emsField.alias.forEach((alias: string) => {
         const regex = new RegExp(alias, 'i');
@@ -149,6 +151,7 @@ function suggestByIdValues(
       const emsConfig = {
         layerId: fileLayer.getId(),
         field: emsField.id,
+        displayName: fileLayer.getDisplayName(),
       };
       if (allSamplesMatch(sampleValues, emsField.values)) {
         matches.push(emsConfig);

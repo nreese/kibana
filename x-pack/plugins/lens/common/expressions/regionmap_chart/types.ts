@@ -9,8 +9,10 @@ import { LayerType } from '../../types';
 
 export interface RegionmapState {
   layerId: string;
-  accessor?: string;
   layerType: LayerType;
+  emsLayerId: string;
+  emsField: string;
+  accessor: string;
 }
 
 export interface RegionmapConfig extends RegionmapState {

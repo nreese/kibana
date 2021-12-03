@@ -283,6 +283,8 @@ export function suggestions({
     });
   }
 
+  console.log(results);
+
   return [...results]
     .map((suggestion) => ({
       ...suggestion,
