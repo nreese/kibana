@@ -61,8 +61,8 @@ emsAutoSuggest: (sampleValuesConfig: SampleValuesConfig) => unknown): Array<Visu
             state: {
               emsLayerId: emsSuggestion.layerId,
               emsField: emsSuggestion.field,
-              metricColId: metric.columnId,
-              bucketColId: bucket.columnId,
+              metricColumnId: metric.columnId,
+              bucketColumnId: bucket.columnId,
             },
             previewIcon: RegionmapChartIcon,
           });

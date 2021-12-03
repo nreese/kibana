@@ -28,7 +28,6 @@ export class RegionmapVisualization {
       const palettes = await charts.palettes.getPalettes();
       const [, { embeddable }] = await core.getStartServices();
       const mapEmbeddableFactory = embeddable.getEmbeddableFactory('map');
-      console.log(mapEmbeddableFactory);
 
       if (!mapEmbeddableFactory) {
         return;

@@ -15,10 +15,10 @@ import { KibanaThemeProvider } from '../../../../../src/plugins/kibana_react/pub
 import { ColorMode } from '../../../../../src/plugins/charts/common';
 import { PaletteRegistry } from '../../../../../src/plugins/charts/public';
 import { getSuggestions } from './regionmap_suggestions';
-import { LensIconChartMetric } from '../assets/chart_metric';
 import { Visualization, OperationMetadata, DatasourcePublicAPI } from '../types';
 import type { RegionmapConfig, RegionmapState } from '../../common/expressions';
 import { layerTypes } from '../../common';
+import { RegionmapChartIcon } from './regionmap_chart_icon';
 
 const toExpression = (
   paletteService: PaletteRegistry,
@@ -26,29 +26,6 @@ const toExpression = (
   datasourceLayers: Record<string, DatasourcePublicAPI>,
   attributes?: Partial<Omit<RegionmapConfig, keyof RegionmapState>>
 ): Ast | null => {
-  if (!state.accessor) {
-    return null;
-  }
-
-  /*const [datasource] = Object.values(datasourceLayers);
-  const operation = datasource && datasource.getOperationForColumnId(state.accessor);
-
-  const stops = state.palette?.params?.stops || [];
-  const isCustomPalette = state.palette?.params?.name === CUSTOM_PALETTE;
-
-  const paletteParams = {
-    ...state.palette?.params,
-    colors: stops.map(({ color }) => color),
-    stops:
-      isCustomPalette || state.palette?.params?.rangeMax == null
-        ? stops.map(({ stop }) => stop)
-        : shiftPalette(
-            stops,
-            Math.max(state.palette?.params?.rangeMax, ...stops.map(({ stop }) => stop))
-          ).map(({ stop }) => stop),
-    reverse: false,
-  };*/
-
   return {
     type: 'expression',
     chain: [
@@ -58,6 +35,10 @@ const toExpression = (
         arguments: {
           title: [attributes?.title || ''],
           description: [attributes?.description || ''],
+          emsField: [state.emsField],
+          emsLayerId: [state.emsLayerId],
+          bucketColumnId: [state.bucketColumnId],
+          metricColumnId: [state.metricColumnId],
         },
       },
     ],
@@ -77,12 +58,12 @@ export const getRegionmapVisualization = ({
   visualizationTypes: [
     {
       id: 'lnsRegionmap',
-      icon: LensIconChartMetric,
+      icon: RegionmapChartIcon,
       label: i18n.translate('xpack.lens.regionmap.label', {
         defaultMessage: 'Regionmap',
       }),
-      groupLabel: i18n.translate('xpack.lens.metric.groupLabel', {
-        defaultMessage: 'Single value',
+      groupLabel: i18n.translate('xpack.lens.map.groupLabel', {
+        defaultMessage: 'Map',
       }),
       sortPriority: 3,
     },
@@ -105,7 +86,7 @@ export const getRegionmapVisualization = ({
 
   getDescription() {
     return {
-      icon: LensIconChartMetric,
+      icon: RegionmapChartIcon,
       label: i18n.translate('xpack.lens.metric.label', {
         defaultMessage: 'Regionmap',
       }),

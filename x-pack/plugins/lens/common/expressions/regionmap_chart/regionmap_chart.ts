@@ -41,11 +41,21 @@ export const regionmapChart: ExpressionFunctionDefinition<
       types: ['string'],
       help: '',
     },
-    accessor: {
+    emsField: {
       types: ['string'],
-      help: i18n.translate('xpack.lens.metric.accessor.help', {
-        defaultMessage: 'The column whose value is being displayed',
-      }),
+      help: 'emsField',
+    },
+    emsLayerId: {
+      types: ['string'],
+      help: 'emsLayerId',
+    },
+    bucketColumnId: {
+      types: ['string'],
+      help: 'bucketColumnId',
+    },
+    metricColumnId: {
+      types: ['string'],
+      help: 'metricColumnId',
     },
   },
   inputTypes: ['lens_multitable'],

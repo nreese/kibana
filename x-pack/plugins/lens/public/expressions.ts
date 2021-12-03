@@ -29,6 +29,7 @@ import { formatColumn } from '../common/expressions/format_column';
 import { counterRate } from '../common/expressions/counter_rate';
 import { getTimeScale } from '../common/expressions/time_scale/time_scale';
 import { metricChart } from '../common/expressions/metric_chart/metric_chart';
+import { regionmapChart } from '../common/expressions/regionmap_chart/regionmap_chart';
 import { lensMultitable } from '../common/expressions';
 
 export const setupExpressions = (
@@ -44,6 +45,7 @@ export const setupExpressions = (
     mergeTables,
     counterRate,
     metricChart,
+    regionmapChart,
     yAxisConfig,
     layerConfig,
     formatColumn,
