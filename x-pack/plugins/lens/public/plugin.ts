@@ -89,6 +89,8 @@ import { createStartServicesGetter } from '../../../../src/plugins/kibana_utils/
 import { setupExpressions } from './expressions';
 import { getSearchProvider } from './search_provider';
 
+import { MapsStartApi } from '../maps/public';
+
 export interface LensPluginSetupDependencies {
   urlForwarding: UrlForwardingSetup;
   expressions: ExpressionsSetup;
@@ -117,6 +119,7 @@ export interface LensPluginStartDependencies {
   inspector: InspectorStartContract;
   spaces: SpacesPluginStart;
   usageCollection?: UsageCollectionStart;
+  maps?: MapsStartApi;
 }
 
 export interface LensPublicStart {

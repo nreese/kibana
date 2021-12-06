@@ -25,7 +25,8 @@
     "taskManager",
     "globalSearch",
     "savedObjectsTagging",
-    "spaces"
+    "spaces",
+    "maps"
   ],
   "configPath": [
     "xpack",
@@ -39,7 +40,8 @@
     "kibanaUtils",
     "kibanaReact",
     "embeddable",
-    "fieldFormats"
+    "fieldFormats",
+    "maps"
   ],
   "owner": {
     "name": "Vis Editors",

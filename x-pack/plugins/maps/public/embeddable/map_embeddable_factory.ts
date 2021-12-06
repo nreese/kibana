@@ -35,7 +35,7 @@ export class MapEmbeddableFactory implements EmbeddableFactoryDefinition {
     },
     emsAutoSuggest: (sampleValuesConfig: SampleValuesConfig, fileLayers: FileLayer[]) => {
       return emsAutoSuggest(sampleValuesConfig, fileLayers);
-    }
+    },
   };
 
   async isEditable() {
