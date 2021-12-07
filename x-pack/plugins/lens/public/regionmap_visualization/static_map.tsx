@@ -59,10 +59,10 @@ export class StaticMap extends Component<Props, State> {
       hideFilterActions: true,
       // can use mapSettings to center map on anomalies
       mapSettings: {
-        disableInteractive: true,
+        disableInteractive: false,
         hideToolbarOverlay: true,
         hideLayerControl: false,
-        hideViewControl: true,
+        hideViewControl: false,
         initialLocation: 'AUTO_FIT_TO_BOUNDS', // this will startup based on data-extent
         autoFitToDataBounds: true, // this will auto-fit when there are changes to the filter and/or query
       },

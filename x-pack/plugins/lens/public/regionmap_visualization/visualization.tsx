@@ -24,7 +24,7 @@ const toExpression = (
   paletteService: PaletteRegistry,
   state: RegionmapState,
   datasourceLayers: Record<string, DatasourcePublicAPI>,
-  attributes?: Partial<Omit<RegionmapConfig, keyof RegionmapState>>
+  attributes?: { title?: string, description?: string, isPreview: boolean },
 ): Ast | null => {
   return {
     type: 'expression',
@@ -35,6 +35,7 @@ const toExpression = (
         arguments: {
           title: [attributes?.title || ''],
           description: [attributes?.description || ''],
+          isPreview: [attributes.isPreview],
           layerId: [state.layerId],
           emsField: [state.emsField],
           emsLayerId: [state.emsLayerId],
@@ -151,9 +152,9 @@ export const getRegionmapVisualization = ({
   },
 
   toExpression: (state, datasourceLayers, attributes) =>
-    toExpression(paletteService, state, datasourceLayers, { ...attributes }),
+    toExpression(paletteService, state, datasourceLayers, { title: attributes.title, description: attributes.description, isPreview: false }),
   toPreviewExpression: (state, datasourceLayers) =>
-    toExpression(paletteService, state, datasourceLayers, {}),
+    toExpression(paletteService, state, datasourceLayers, { isPreview: true }),
 
   setDimension({ prevState, columnId }) {
     return { ...prevState, accessor: columnId };

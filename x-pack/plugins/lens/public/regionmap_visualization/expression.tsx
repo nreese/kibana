@@ -27,6 +27,7 @@ import {
   COLOR_MAP_TYPE,
   VectorLayerDescriptor,
 } from '../../../maps/common';
+import { RegionmapChartIcon } from './regionmap_chart_icon';
 
 export const getRegionmapChartRenderer = (
   formatFactory: FormatFactory,
@@ -69,6 +70,10 @@ export function RegionmapChart({
   mapEmbeddableFactory: EmbeddableFactory<MapEmbeddableInput, MapEmbeddableOutput, MapEmbeddable>;
   baseMapLayer: LayerDescriptor;
 }) {
+  if (args.isPreview) {
+    return <RegionmapChartIcon />;
+  }
+  
   const regionmapLayerDescriptor = args.layerId
     ? {
       id: uuid(),
