@@ -35,6 +35,7 @@ const toExpression = (
         arguments: {
           title: [attributes?.title || ''],
           description: [attributes?.description || ''],
+          layerId: [state.layerId],
           emsField: [state.emsField],
           emsLayerId: [state.emsLayerId],
           bucketColumnId: [state.bucketColumnId],

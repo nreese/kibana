@@ -69,12 +69,7 @@ export function RegionmapChart({
   mapEmbeddableFactory: EmbeddableFactory<MapEmbeddableInput, MapEmbeddableOutput, MapEmbeddable>;
   baseMapLayer: LayerDescriptor;
 }) {
-  console.log(data);
-  console.log(args);
-
-  const tableKeys = Object.keys(data.tables)
-
-  const regionmapLayerDescriptor = tableKeys.length
+  const regionmapLayerDescriptor = args.layerId
     ? {
       id: uuid(),
       label: args.title,
@@ -84,7 +79,7 @@ export function RegionmapChart({
           right: {
             id: args.metricColumnId,
             type: SOURCE_TYPES.TABLE_SOURCE,
-            __rows: data.tables[tableKeys[0]].rows,
+            __rows: data.tables[args.layerId].rows,
             __columns: [
               {
                 name: args.bucketColumnId,

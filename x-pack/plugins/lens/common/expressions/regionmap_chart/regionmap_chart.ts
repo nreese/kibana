@@ -41,6 +41,10 @@ export const regionmapChart: ExpressionFunctionDefinition<
       types: ['string'],
       help: '',
     },
+    layerId: {
+      types: ['string'],
+      help: '',
+    },
     emsField: {
       types: ['string'],
       help: 'emsField',

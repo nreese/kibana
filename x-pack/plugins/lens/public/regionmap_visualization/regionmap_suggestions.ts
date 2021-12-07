@@ -35,38 +35,39 @@ emsAutoSuggest: (sampleValuesConfig: SampleValuesConfig) => unknown): Array<Visu
       return col.operation.dataType === 'string';
     })
     .forEach(bucket => {
-      const sampleValues: string[] = [];
-      for (const key in activeData) {
-        const dataTable = activeData[key];
-        dataTable.rows.forEach(row => {
+      for (const tableId in activeData) {
+        const sampleValues: string[] = [];
+        const table = activeData[tableId];
+        table.rows.forEach(row => {
           const value = row[bucket.columnId];
           if (value && value !== '__other__' && !sampleValues.includes(value)) {
             sampleValues.push(value);
           }
         });
-      }
 
-      const emsSuggestion = emsAutoSuggest({ sampleValues });
-      if (emsSuggestion) {
-        metrics.forEach(metric => {
-          suggestions.push({
-            title: i18n.translate('xpack.lens.regionmap.suggestionLabel', {
-              defaultMessage: '{emsLayerLabel} by {metricLabel}',
-              values: {
-                emsLayerLabel: emsSuggestion.displayName,
-                metricLabel: metric.operation.label.toLowerCase(),
+        const emsSuggestion = emsAutoSuggest({ sampleValues });
+        if (emsSuggestion) {
+          metrics.forEach(metric => {
+            suggestions.push({
+              title: i18n.translate('xpack.lens.regionmap.suggestionLabel', {
+                defaultMessage: '{emsLayerLabel} by {metricLabel}',
+                values: {
+                  emsLayerLabel: emsSuggestion.displayName,
+                  metricLabel: metric.operation.label.toLowerCase(),
+                },
+              }),
+              score: 0.5,
+              state: {
+                layerId: tableId,
+                emsLayerId: emsSuggestion.layerId,
+                emsField: emsSuggestion.field,
+                metricColumnId: metric.columnId,
+                bucketColumnId: bucket.columnId,
               },
-            }),
-            score: 0.5,
-            state: {
-              emsLayerId: emsSuggestion.layerId,
-              emsField: emsSuggestion.field,
-              metricColumnId: metric.columnId,
-              bucketColumnId: bucket.columnId,
-            },
-            previewIcon: RegionmapChartIcon,
+              previewIcon: RegionmapChartIcon,
+            });
           });
-        });
+        }
       }
     });
 
