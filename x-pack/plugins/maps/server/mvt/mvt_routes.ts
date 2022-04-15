@@ -127,16 +127,16 @@ export function initMVTRoutes({
 
 function sendResponse(
   response: KibanaResponseFactory,
-  gzipTileStream: Stream | null,
+  stream: Stream | null,
   headers?: IncomingHttpHeaders
 ) {
   const cacheControl = `public, max-age=${CACHE_TIMEOUT_SECONDS}`;
   const lastModified = `${new Date().toUTCString()}`;
-  if (gzipTileStream && headers) {
+  if (stream && headers) {
     // use the content-encoding and content-length headers from elasticsearch if they exist
     const { 'content-length': contentLength, 'content-encoding': contentEncoding } = headers;
     return response.ok({
-      body: gzipTileStream,
+      body: stream,
       headers: {
         'content-disposition': 'inline',
         ...(contentLength && { 'content-length': contentLength }),
