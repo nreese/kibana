@@ -55,6 +55,7 @@ type Props = ReduxStateProps & ReduxDispatchProps & OwnProps;
 interface State {
   displayName: string;
   hasLegendDetails: boolean;
+  isActionPopoverOpen: boolean;
   shouldShowModal: boolean;
   supportsFitToBounds: boolean;
 }
@@ -63,12 +64,14 @@ export class TOCEntry extends Component<Props, State> {
   private _isMounted = false;
   state: State = {
     displayName: '',
+    isActionPopoverOpen: false,
     hasLegendDetails: false,
     shouldShowModal: false,
     supportsFitToBounds: false,
   };
 
   componentDidMount() {
+    console.log('componentDidMount');
     this._isMounted = true;
     this._updateDisplayName();
     this._loadHasLegendDetails();
@@ -206,6 +209,23 @@ export class TOCEntry extends Component<Props, State> {
           onClick={this._openLayerPanelWithCheck}
         />
       );
+    }
+
+    quickActions.push(
+      <EuiButtonIcon
+        key="moreActions"
+        iconType="boxesHorizontal"
+        title={i18n.translate('xpack.maps.layerControl.tocEntry.moreActionsTitle', {
+          defaultMessage: 'More actions',
+        })}
+        aria-label={i18n.translate('xpack.maps.layerControl.tocEntry.moreActionsAriaLabel', {
+          defaultMessage: 'More actions',
+        })}
+        onClick={this._toggleActionsPopover}
+      />
+    );
+
+    if (!this.props.isReadOnly) {
       quickActions.push(
         <EuiButtonIcon
           key="reorder"
@@ -222,6 +242,7 @@ export class TOCEntry extends Component<Props, State> {
       );
     }
 
+    
     return <div className="mapTocEntry__layerIcons">{quickActions}</div>;
   }
 
@@ -265,6 +286,24 @@ export class TOCEntry extends Component<Props, State> {
     );
   }
 
+  _toggleActionsPopover = () => {
+    this.setState((prevState) => {
+      console.log('prevState.isActionPopoverOpen', prevState.isActionPopoverOpen);
+      return {
+        isActionPopoverOpen: !prevState.isActionPopoverOpen,
+      };
+    },
+    () => {
+      console.log('post _toggleActionsPopover: isActionPopoverOpen', this.state.isActionPopoverOpen);
+    });
+  };
+
+  _closeActionsPopover = () => {
+    this.setState(() => ({
+      isActionPopoverOpen: false,
+    }));
+  };
+
   _renderLayerHeader() {
     const { layer, zoom } = this.props;
     return (
@@ -279,6 +318,9 @@ export class TOCEntry extends Component<Props, State> {
           layer={layer}
           displayName={this.state.displayName}
           escapedDisplayName={escapeLayerName(this.state.displayName)}
+          isPopoverOpen={this.state.isActionPopoverOpen}
+          togglePopover={this._toggleActionsPopover}
+          closePopover={this._closeActionsPopover}
           openLayerSettings={this._openLayerPanelWithCheck}
           isEditButtonDisabled={this.props.isEditButtonDisabled}
           supportsFitToBounds={this.state.supportsFitToBounds}

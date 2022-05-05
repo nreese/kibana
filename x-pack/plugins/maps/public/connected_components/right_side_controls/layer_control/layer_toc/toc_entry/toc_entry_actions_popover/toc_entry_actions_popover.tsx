@@ -37,17 +37,18 @@ export interface Props {
   supportsFitToBounds: boolean;
   toggleVisible: (layerId: string) => void;
   numLayers: number;
+  isPopoverOpen: boolean;
+  togglePopover(): void;
+  closePopover(): void;
 }
 
 interface State {
-  isPopoverOpen: boolean;
   supportsFeatureEditing: boolean;
   isFeatureEditingEnabled: boolean;
 }
 
 export class TOCEntryActionsPopover extends Component<Props, State> {
   state: State = {
-    isPopoverOpen: false,
     supportsFeatureEditing: false,
     isFeatureEditingEnabled: false,
   };
@@ -99,18 +100,6 @@ export class TOCEntryActionsPopover extends Component<Props, State> {
     return true;
   }
 
-  _togglePopover = () => {
-    this.setState((prevState) => ({
-      isPopoverOpen: !prevState.isPopoverOpen,
-    }));
-  };
-
-  _closePopover = () => {
-    this.setState(() => ({
-      isPopoverOpen: false,
-    }));
-  };
-
   _cloneLayer() {
     this.props.cloneLayer(this.props.layer.getId());
   }
@@ -140,7 +129,7 @@ export class TOCEntryActionsPopover extends Component<Props, State> {
             }),
         disabled: !this.props.supportsFitToBounds,
         onClick: () => {
-          this._closePopover();
+          this.props.closePopover();
           this._fitToBounds();
         },
       },
@@ -150,7 +139,7 @@ export class TOCEntryActionsPopover extends Component<Props, State> {
         'data-test-subj': 'layerVisibilityToggleButton',
         toolTipContent: null,
         onClick: () => {
-          this._closePopover();
+          this.props.closePopover();
           this._toggleVisible();
         },
       },
@@ -164,7 +153,7 @@ export class TOCEntryActionsPopover extends Component<Props, State> {
         'data-test-subj': 'showThisLayerOnlyButton',
         toolTipContent: null,
         onClick: () => {
-          this._closePopover();
+          this.props.closePopover();
           this.props.showThisLayerOnly(this.props.layer.getId());
         },
       });
@@ -178,7 +167,7 @@ export class TOCEntryActionsPopover extends Component<Props, State> {
         'data-test-subj': 'layerSettingsButton',
         toolTipContent: null,
         onClick: () => {
-          this._closePopover();
+          this.props.closePopover();
           this.props.openLayerSettings();
         },
       });
@@ -195,7 +184,7 @@ export class TOCEntryActionsPopover extends Component<Props, State> {
               }),
           disabled: !this.state.isFeatureEditingEnabled,
           onClick: async () => {
-            this._closePopover();
+            this.props.closePopover();
             const supportedShapeTypes = await (
               this.props.layer.getSource() as ESSearchSource
             ).getSupportedShapeTypes();
@@ -218,7 +207,7 @@ export class TOCEntryActionsPopover extends Component<Props, State> {
         toolTipContent: null,
         'data-test-subj': 'cloneLayerButton',
         onClick: () => {
-          this._closePopover();
+          this.props.closePopover();
           this._cloneLayer();
         },
       });
@@ -230,7 +219,7 @@ export class TOCEntryActionsPopover extends Component<Props, State> {
         toolTipContent: null,
         'data-test-subj': 'removeLayerButton',
         onClick: () => {
-          this._closePopover();
+          this.props.closePopover();
           this._removeLayer();
         },
       });
@@ -255,11 +244,11 @@ export class TOCEntryActionsPopover extends Component<Props, State> {
             layer={this.props.layer}
             displayName={this.props.displayName}
             escapedDisplayName={this.props.escapedDisplayName}
-            onClick={this._togglePopover}
+            onClick={this.props.togglePopover}
           />
         }
-        isOpen={this.state.isPopoverOpen}
-        closePopover={this._closePopover}
+        isOpen={this.props.isPopoverOpen}
+        closePopover={this.props.closePopover}
         panelPaddingSize="none"
         anchorPosition="leftUp"
         anchorClassName="mapLayTocActions__popoverAnchor"
