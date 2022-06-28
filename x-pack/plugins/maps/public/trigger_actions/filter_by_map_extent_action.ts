@@ -31,11 +31,17 @@ export const filterByMapExtentAction = createAction<FilterByMapExtentActionConte
   getDisplayName: ({ embeddable }: FilterByMapExtentActionContext) => {
     return getFilterByMapExtent(embeddable.getInput())
       ? i18n.translate('xpack.maps.filterByMapExtentMenuItem.disableDisplayName', {
-          defaultMessage: 'Disable filter by map extent',
+          defaultMessage: 'Disable filter by map bounds',
         })
       : i18n.translate('xpack.maps.filterByMapExtentMenuItem.enableDisplayName', {
-          defaultMessage: 'Enable filter by map extent',
+          defaultMessage: 'Enable filter by map bounds',
         });
+  },
+  getDisplayNameTooltip: () => {
+    return i18n.translate('xpack.maps.filterByMapExtentMenuItem.tooltipContent', {
+      defaultMessage:
+        'As you pan and zoom your map, all panels will update to only include data that is visible in your map',
+    });
   },
   getIconType: () => {
     return 'filter';
@@ -43,7 +49,6 @@ export const filterByMapExtentAction = createAction<FilterByMapExtentActionConte
   isCompatible: async ({ embeddable }: FilterByMapExtentActionContext) => {
     return (
       embeddable.type === MAP_SAVED_OBJECT_TYPE &&
-      embeddable.getInput().viewMode === ViewMode.EDIT &&
       !embeddable.getInput().disableTriggers
     );
   },
