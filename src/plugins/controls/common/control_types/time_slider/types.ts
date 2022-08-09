@@ -6,10 +6,11 @@
  * Side Public License, v 1.
  */
 
-import { DataControlInput } from '../../types';
+import type { TimeRange } from '@kbn/es-query';
+import type { ControlInput } from '../../types';
 
 export const TIME_SLIDER_CONTROL = 'timeSlider';
 
-export interface TimeSliderControlEmbeddableInput extends DataControlInput {
-  value?: [number | null, number | null];
+export interface TimeSliderControlEmbeddableInput extends ControlInput {
+  value?: TimeRange;
 }

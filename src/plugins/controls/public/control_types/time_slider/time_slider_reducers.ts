@@ -7,13 +7,14 @@
  */
 
 import { PayloadAction } from '@reduxjs/toolkit';
+import type { TimeRange } from '@kbn/es-query';
 import { WritableDraft } from 'immer/dist/types/types-external';
 import { TimeSliderReduxState } from './types';
 
 export const timeSliderReducers = {
   selectRange: (
     state: WritableDraft<TimeSliderReduxState>,
-    action: PayloadAction<[number | null, number | null]>
+    action: PayloadAction<TimeRange>
   ) => {
     state.explicitInput.value = action.payload;
   },

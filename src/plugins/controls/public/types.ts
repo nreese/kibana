@@ -6,7 +6,7 @@
  * Side Public License, v 1.
  */
 
-import { Filter } from '@kbn/es-query';
+import { Filter, TimeRange } from '@kbn/es-query';
 
 import {
   EmbeddableFactory,
@@ -24,6 +24,7 @@ import { ControlsService } from './services/controls';
 export interface CommonControlOutput {
   filters?: Filter[];
   dataViewId?: string;
+  timeslice?: TimeRange;
 }
 
 export type ControlOutput = EmbeddableOutput & CommonControlOutput;

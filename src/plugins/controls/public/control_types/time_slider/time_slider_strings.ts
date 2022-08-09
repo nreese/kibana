@@ -17,30 +17,4 @@ export const TimeSliderStrings = {
     i18n.translate('controls.timeSlider.description', {
       defaultMessage: 'Add a slider for selecting a time range',
     }),
-  editor: {
-    getDataViewTitle: () =>
-      i18n.translate('controls.timeSlider.editor.dataViewTitle', {
-        defaultMessage: 'Data view',
-      }),
-    getNoDataViewTitle: () =>
-      i18n.translate('controls.timeSlider.editor.noDataViewTitle', {
-        defaultMessage: 'Select data view',
-      }),
-    getFieldTitle: () =>
-      i18n.translate('controls.timeSlider.editor.fieldTitle', {
-        defaultMessage: 'Field',
-      }),
-  },
-  resetButton: {
-    getLabel: () =>
-      i18n.translate('controls.timeSlider.resetButton.label', {
-        defaultMessage: 'Reset selections',
-      }),
-  },
-  noDocumentsPopover: {
-    getLabel: () =>
-      i18n.translate('controls.timeSlider.noDocuments.label', {
-        defaultMessage: 'There were no documents found.  Range selection unavailable.',
-      }),
-  },
 };

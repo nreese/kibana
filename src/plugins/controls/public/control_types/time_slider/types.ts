@@ -14,13 +14,7 @@ import { TimeSliderControlEmbeddableInput } from '../../../common/control_types/
 export * from '../../../common/control_types/time_slider/types';
 
 // Component state is only used by public components.
-export interface TimeSliderSubjectState {
-  range?: {
-    min?: number;
-    max?: number;
-  };
-  loading: boolean;
-}
+export interface TimeSliderSubjectState {}
 
 // public only - redux embeddable state type
 export type TimeSliderReduxState = ReduxEmbeddableState<

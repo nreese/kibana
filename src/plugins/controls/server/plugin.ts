@@ -25,8 +25,7 @@ interface SetupDeps {
 export class ControlsPlugin implements Plugin<object, object, SetupDeps> {
   public setup(core: CoreSetup, { embeddable, unifiedSearch }: SetupDeps) {
     embeddable.registerEmbeddableFactory(optionsListPersistableStateServiceFactory());
-    // Temporary disabling Time Slider
-    // embeddable.registerEmbeddableFactory(timeSliderPersistableStateServiceFactory());
+    embeddable.registerEmbeddableFactory(timeSliderPersistableStateServiceFactory());
 
     embeddable.registerEmbeddableFactory(
       controlGroupContainerPersistableStateServiceFactory(embeddable)
