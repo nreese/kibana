@@ -22,5 +22,9 @@ export const RangeSliderStrings = {
       i18n.translate('controls.rangeSlider.popover.noAvailableDataHelpText', {
         defaultMessage: 'There is no data to display. Adjust the time range and filters.',
       }),
+    getSettingsButtonTitle: () =>
+      i18n.translate('controls.rangeSlider.popover.settingsTitle', {
+        defaultMessage: 'Settings',
+      }),
   },
 };

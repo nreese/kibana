@@ -28,6 +28,7 @@ import { RangeSliderStrings } from './range_slider_strings';
 
 export const RangeSliderPopover: FC = () => {
   const [fieldFormatter, setFieldFormatter] = useState(() => (toFormat: string) => toFormat);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const rangeRef = useRef<EuiDualRange | null>(null);
 
   // Controls Services Context
@@ -180,6 +181,19 @@ export const RangeSliderPopover: FC = () => {
               }}
               aria-label={RangeSliderStrings.popover.getClearRangeButtonTitle()}
               data-test-subj="rangeSlider__clearRangeButton"
+            />
+          </EuiToolTip>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiToolTip content={RangeSliderStrings.popover.getSettingsButtonTitle()}>
+            <EuiButtonIcon
+              iconType="gear"
+              color="text"
+              onClick={() => {
+                dispatch(setIsSettingsOpen(!isSettingsOpen));
+              }}
+              aria-label={RangeSliderStrings.popover.getSettingsButtonTitle()}
+              data-test-subj="rangeSlider__settingseButton"
             />
           </EuiToolTip>
         </EuiFlexItem>
