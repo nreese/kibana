@@ -86,7 +86,8 @@ export class DynamicSizeProperty extends DynamicStyleProperty<SizeDynamicOptions
       return this._options.minSize >= 0 ? this._options.minSize : null;
     }
 
-    const isArea = this.getStyleName() === VECTOR_STYLES.ICON_SIZE;
+    //const isArea = this.getStyleName() === VECTOR_STYLES.ICON_SIZE;
+    const isArea = false;
     // isArea === true
     // It's a mistake to linearly map a data value to an area dimension (i.e. cirle radius).
     // Area squares area dimension ("pie * r * r" or "x * x"), visually distorting proportions.
