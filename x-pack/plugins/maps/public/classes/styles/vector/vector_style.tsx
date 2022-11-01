@@ -836,12 +836,12 @@ export class VectorStyle implements IVectorStyle {
       const interpolateExpression = this._iconSizeStyleProperty.getMbSizeExpression();
       console.log(interpolateExpression);
       //interpolateExpression[2] = interpolateExpression[5]; // set value to max value
-      interpolateExpression[2] = ['number', ['get', 'bytes']];
-      interpolateExpression[4] = ["literal", [0, 7]];
-      interpolateExpression[6] = ["literal", [0, 32]];
+      //interpolateExpression[2] = ['number', ['get', 'bytes']];
+      interpolateExpression[4] = ["literal", [0, .5]];
+      interpolateExpression[6] = ["literal", [0, 2.28]];
       console.log('modified', interpolateExpression);
-      mbMap.setPaintProperty(textLayerId, 'text-translate', interpolateExpression);
-      //mbMap.setLayoutProperty(textLayerId, 'text-offset', interpolateExpression);
+      //mbMap.setPaintProperty(textLayerId, 'text-translate', interpolateExpression);
+      mbMap.setLayoutProperty(textLayerId, 'text-offset', interpolateExpression);
     } else {
       mbMap.setPaintProperty(textLayerId, 'text-translate', [0, this._iconSizeStyleProperty.getOptions().size]);
     }
