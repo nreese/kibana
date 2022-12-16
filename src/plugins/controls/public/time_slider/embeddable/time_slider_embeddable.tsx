@@ -50,6 +50,9 @@ export class TimeSliderControlEmbeddable extends Embeddable<
   private getTimezone: ControlsSettingsService['getTimezone'];
   private timefilter: ControlsDataService['timefilter'];
   private prevTimeRange: TimeRange | undefined;
+  private prevTimesliceStartAsPercentageOfTimeRange: number | undefined;
+  private prevTimesliceEndAsPercentageOfTimeRange: number | undefined;
+
   private readonly waitForControlOutputConsumersToLoad$;
 
   private reduxEmbeddableTools: ReduxEmbeddableTools<
@@ -141,18 +144,27 @@ export class TimeSliderControlEmbeddable extends Embeddable<
           timeRangeBounds: nextBounds,
         })
       );
+      this.syncWithTimeRange();
+    } else if (this.prevTimesliceStartAsPercentageOfTimeRange !== input.timesliceStartAsPercentageOfTimeRange
+        || this.prevTimesliceEndAsPercentageOfTimeRange !== input.timesliceEndAsPercentageOfTimeRange) {
+      // Discarding edit mode changes results in replacing edited input with original input
+      // Re-sync with time range when edited input timeslice changes are discarded
+      this.syncWithTimeRange();
     }
-    this.syncWithTimeRange();
   }
 
   private syncWithTimeRange() {
     this.prevTimeRange = this.getInput().timeRange;
+    
     const { actions, dispatch, getState } = this.reduxEmbeddableTools;
     const stepSize = getState().componentState.stepSize;
     const timesliceStartAsPercentageOfTimeRange =
       getState().explicitInput.timesliceStartAsPercentageOfTimeRange;
     const timesliceEndAsPercentageOfTimeRange =
       getState().explicitInput.timesliceEndAsPercentageOfTimeRange;
+    this.prevTimesliceStartAsPercentageOfTimeRange = timesliceStartAsPercentageOfTimeRange;
+    this.prevTimesliceEndAsPercentageOfTimeRange = timesliceEndAsPercentageOfTimeRange;
+
     if (
       timesliceStartAsPercentageOfTimeRange !== undefined &&
       timesliceEndAsPercentageOfTimeRange !== undefined
@@ -199,6 +211,8 @@ export class TimeSliderControlEmbeddable extends Embeddable<
       timesliceEndAsPercentageOfTimeRange =
         (value[TO_INDEX] - timeRangeBounds[FROM_INDEX]) / timeRange;
     }
+    this.prevTimesliceStartAsPercentageOfTimeRange = timesliceStartAsPercentageOfTimeRange;
+    this.prevTimesliceEndAsPercentageOfTimeRange = timesliceEndAsPercentageOfTimeRange;
     dispatch(
       actions.setValueAsPercentageOfTimeRange({
         timesliceStartAsPercentageOfTimeRange,
