@@ -186,7 +186,7 @@ export class MapEmbeddable
     store.dispatch(
       setMapSettings({
         keydownScrollZoom: true,
-        showTimesliderToggleButton: false,
+        showTimesliderToggleButton: this.getInput().timeRange !== undefined,
       })
     );
 

@@ -1,6 +1,6 @@
 .mapTimeslider {
   position: absolute;
-  left: calc(50% - 400px);
+  left: calc(50% - var(--mapControlGroupOffet));
   bottom: $euiSize;
   z-index: 99999;
 

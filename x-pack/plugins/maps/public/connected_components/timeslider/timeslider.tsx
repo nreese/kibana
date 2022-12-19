@@ -9,6 +9,7 @@ import _ from 'lodash';
 import React, { Component } from 'react';
 import { Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
+import { EuiResizeObserver } from '@elastic/eui';
 import { ViewMode } from '@kbn/embeddable-plugin/public';
 import {
   ControlGroupContainer,
@@ -32,6 +33,7 @@ export interface Props {
 export class Timeslider extends Component<Props, {}> {
   private _isMounted: boolean = false;
   private _controlGroup?: ControlGroupContainer | undefined;
+  private _controlGroupWidth: 0;
   private readonly _subscriptions = new Subscription();
 
   componentWillUnmount() {
@@ -65,6 +67,10 @@ export class Timeslider extends Component<Props, {}> {
       timeRange: this.props.timeRange,
     };
   };
+
+  _onResize = ({ width }) => {
+    this._controlGroupWidth = width;
+  }
 
   _onLoadComplete = (controlGroup: ControlGroupContainer) => {
     if (!this._isMounted) {
@@ -101,12 +107,18 @@ export class Timeslider extends Component<Props, {}> {
 
   render() {
     return (
-      <div className="mapTimeslider mapTimeslider--animation">
-        <ControlGroupRenderer
-          onLoadComplete={this._onLoadComplete}
-          getInitialInput={this._getInitialInput}
-        />
-      </div>
+      <EuiResizeObserver onResize={this._onResize}>
+        {(resizeRef) => {
+          return (
+            <div className="mapTimeslider mapTimeslider--animation" ref={resizeRef} style={{ '--mapControlGroupOffet': `${this._controlGroupWidth / 2}px` }}>
+              <ControlGroupRenderer
+                onLoadComplete={this._onLoadComplete}
+                getInitialInput={this._getInitialInput}
+              />
+            </div>
+          );
+      }}
+      </EuiResizeObserver>
     );
   }
 }
