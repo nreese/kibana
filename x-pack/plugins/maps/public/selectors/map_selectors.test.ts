@@ -7,9 +7,11 @@
 
 import { LAYER_STYLE_TYPE, LAYER_TYPE, SOURCE_TYPES } from '../../common/constants';
 
-jest.mock('../classes/layers/heatmap_layer', () => {});
-jest.mock('../classes/layers/ems_vector_tile_layer/ems_vector_tile_layer', () => {});
-jest.mock('../classes/joins/inner_join', () => {});
+jest.mock('../classes/layers/create_layer_instance', () => ({
+  createLayerInstance: () => {
+    throw new Error('each test case provide mock of "createLayerInstance"');
+  }
+}));
 jest.mock('../kibana_services', () => ({
   getTimeFilter: () => ({
     getTime: () => {
@@ -34,6 +36,7 @@ import {
   getTimeFilters,
   getQueryableUniqueIndexPatternIds,
   getSpatialFiltersLayer,
+  getGeoFieldNames,
 } from './map_selectors';
 
 import { LayerDescriptor, VectorLayerDescriptor } from '../../common/descriptor_types';
@@ -215,75 +218,62 @@ describe('areLayersLoaded', () => {
 
 describe('getQueryableUniqueIndexPatternIds', () => {
   function createLayerMock({
-    isVisible = true,
-    indexPatterns = [],
+    isVisible,
+    indexPattern,
   }: {
-    isVisible?: boolean;
-    indexPatterns?: string[];
+    isVisible: boolean;
+    indexPattern: string;
   }) {
     return {
       isVisible: () => {
         return isVisible;
       },
       getQueryableIndexPatternIds: () => {
-        return indexPatterns;
+        return [indexPattern];
       },
     } as unknown as ILayer;
   }
 
-  function createWaitLayerDescriptorMock({
-    indexPatternId,
-    visible = true,
-  }: {
-    visible?: boolean;
-    indexPatternId: string;
-  }) {
-    return {
-      type: LAYER_TYPE.GEOJSON_VECTOR,
-      style: {
-        type: LAYER_STYLE_TYPE.VECTOR,
-      },
-      visible,
-      sourceDescriptor: ESSearchSource.createDescriptor({
-        type: SOURCE_TYPES.ES_SEARCH,
-        indexPatternId,
-        geoField: 'field',
-      }),
-    };
-  }
-
-  test('should only include visible', () => {
+  test('should only include visible layers', () => {
     const layerList: ILayer[] = [
       createLayerMock({}),
-      createLayerMock({ indexPatterns: ['foo'] }),
-      createLayerMock({ indexPatterns: ['bar'] }),
-      createLayerMock({ indexPatterns: ['foobar'], isVisible: false }),
-      createLayerMock({ indexPatterns: ['bar'] }),
+      createLayerMock({ indexPattern: 'foo', isVisible: true }),
+      createLayerMock({ indexPattern: 'bar', isVisible: true }),
+      createLayerMock({ indexPattern: 'foobar', isVisible: false }),
+      createLayerMock({ indexPattern: 'bar', isVisible: true }),
     ];
-    const waitingForMapReadyLayerList: VectorLayerDescriptor[] =
-      [] as unknown as VectorLayerDescriptor[];
+    const waitingForMapReadyLayerList: VectorLayerDescriptor[] = [];
     expect(
       getQueryableUniqueIndexPatternIds.resultFunc(layerList, waitingForMapReadyLayerList)
     ).toEqual(['foo', 'bar']);
   });
 
-  test('should only include visible and waitlist should take precedence', () => {
-    const layerList: ILayer[] = [
-      createLayerMock({}),
-      createLayerMock({ indexPatterns: ['foo'] }),
-      createLayerMock({ indexPatterns: ['bar'] }),
-      createLayerMock({ indexPatterns: ['foobar'], isVisible: false }),
-      createLayerMock({ indexPatterns: ['bar'] }),
-    ];
+  test('should include visible wait list layers', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require('../classes/layers/create_layer_instance').createLayerInstance = () => {
+      return createLayerMock({ indexPattern: 'foo', isVisible: true });
+    };
+    const layerList: ILayer[] = [];
     const waitingForMapReadyLayerList: VectorLayerDescriptor[] = [
-      createWaitLayerDescriptorMock({ indexPatternId: 'foo' }),
-      createWaitLayerDescriptorMock({ indexPatternId: 'barfoo', visible: false }),
-      createWaitLayerDescriptorMock({ indexPatternId: 'fbr' }),
-      createWaitLayerDescriptorMock({ indexPatternId: 'foo' }),
-    ] as unknown as VectorLayerDescriptor[];
+      {} // descriptor is not used to create layer instance, instead see mocked createLayerInstance
+    ];
     expect(
       getQueryableUniqueIndexPatternIds.resultFunc(layerList, waitingForMapReadyLayerList)
-    ).toEqual(['foo', 'fbr']);
+    ).toEqual(['foo']);
+  });
+
+  test('should not include hidden wait list layers', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require('../classes/layers/create_layer_instance').createLayerInstance = () => {
+      return createLayerMock({ indexPattern: 'foo', isVisible: false });
+    };
+    const layerList: ILayer[] = [];
+    const waitingForMapReadyLayerList: VectorLayerDescriptor[] = [
+      {} // descriptor is not used to create layer instance, instead see mocked createLayerInstance
+    ];
+    expect(
+      getQueryableUniqueIndexPatternIds.resultFunc(layerList, waitingForMapReadyLayerList)
+    ).toEqual([]);
   });
 });
 
@@ -345,3 +335,13 @@ describe('getSpatialFiltersLayer', () => {
     expect(geoJsonVectorLayer.isVisible()).toBe(false);
   });
 });
+/*
+describe('getGeoFieldNames', () => {
+  test('should return unique geoFieldNames', () => {
+    const geoJsonVectorLayer = getSpatialFiltersLayer.resultFunc([], undefined, {
+      ...getDefaultMapSettings(),
+      showSpatialFilters: false,
+    });
+    expect(geoJsonVectorLayer.isVisible()).toBe(false);
+  });
+});*/

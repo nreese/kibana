@@ -11,22 +11,17 @@ import _ from 'lodash';
 import type { Query } from '@kbn/data-plugin/common';
 import { Filter } from '@kbn/es-query';
 import type { TimeRange } from '@kbn/es-query';
-import { RasterTileLayer } from '../classes/layers/raster_tile_layer/raster_tile_layer';
-import { EmsVectorTileLayer } from '../classes/layers/ems_vector_tile_layer/ems_vector_tile_layer';
+import { createLayerInstance } from '../classes/layers/create_layer_instance';
 import {
-  BlendedVectorLayer,
   IVectorLayer,
-  MvtVectorLayer,
   GeoJsonVectorLayer,
 } from '../classes/layers/vector_layer';
 import { VectorStyle } from '../classes/styles/vector/vector_style';
 import { isLayerGroup, LayerGroup } from '../classes/layers/layer_group';
-import { HeatmapLayer } from '../classes/layers/heatmap_layer';
 import { getTimeFilter } from '../kibana_services';
 import { getChartsPaletteServiceGetColor } from '../reducers/non_serializable_instances';
 import { copyPersistentState, TRACKED_LAYER_DESCRIPTOR } from '../reducers/copy_persistent_state';
 import { InnerJoin } from '../classes/joins/inner_join';
-import { getSourceByType } from '../classes/sources/source_registry';
 import { GeoJsonFileSource } from '../classes/sources/geojson_file_source';
 import {
   LAYER_TYPE,
@@ -35,108 +30,22 @@ import {
   STYLE_TYPE,
   VECTOR_STYLES,
 } from '../../common/constants';
-// @ts-ignore
 import { extractFeaturesFromFilters } from '../../common/elasticsearch_util';
 import { MapStoreState } from '../reducers/store';
 import {
-  AbstractSourceDescriptor,
   DataRequestDescriptor,
   CustomIcon,
   DrawState,
-  EMSVectorTileLayerDescriptor,
   EditState,
   Goto,
-  HeatmapLayerDescriptor,
   LayerDescriptor,
-  LayerGroupDescriptor,
   MapCenter,
   MapExtent,
   MapSettings,
   TooltipState,
-  VectorLayerDescriptor,
 } from '../../common/descriptor_types';
-import { ISource } from '../classes/sources/source';
-import { IVectorSource } from '../classes/sources/vector_source';
-import { ESGeoGridSource } from '../classes/sources/es_geo_grid_source';
-import { EMSTMSSource } from '../classes/sources/ems_tms_source';
-import { IRasterSource } from '../classes/sources/raster_source';
 import { ILayer } from '../classes/layers/layer';
 import { getIsReadOnly } from './ui_selectors';
-
-function createJoinInstances(vectorLayerDescriptor: VectorLayerDescriptor, source: IVectorSource) {
-  return vectorLayerDescriptor.joins
-    ? vectorLayerDescriptor.joins.map((joinDescriptor) => {
-        return new InnerJoin(joinDescriptor, source);
-      })
-    : [];
-}
-
-export function createLayerInstance(
-  layerDescriptor: LayerDescriptor,
-  customIcons: CustomIcon[],
-  chartsPaletteServiceGetColor?: (value: string) => string | null
-): ILayer {
-  if (layerDescriptor.type === LAYER_TYPE.LAYER_GROUP) {
-    return new LayerGroup({ layerDescriptor: layerDescriptor as LayerGroupDescriptor });
-  }
-
-  const source: ISource = createSourceInstance(layerDescriptor.sourceDescriptor);
-  switch (layerDescriptor.type) {
-    case LAYER_TYPE.RASTER_TILE:
-      return new RasterTileLayer({ layerDescriptor, source: source as IRasterSource });
-    case LAYER_TYPE.EMS_VECTOR_TILE:
-      return new EmsVectorTileLayer({
-        layerDescriptor: layerDescriptor as EMSVectorTileLayerDescriptor,
-        source: source as EMSTMSSource,
-      });
-    case LAYER_TYPE.HEATMAP:
-      return new HeatmapLayer({
-        layerDescriptor: layerDescriptor as HeatmapLayerDescriptor,
-        source: source as ESGeoGridSource,
-      });
-    case LAYER_TYPE.GEOJSON_VECTOR:
-      return new GeoJsonVectorLayer({
-        layerDescriptor: layerDescriptor as VectorLayerDescriptor,
-        source: source as IVectorSource,
-        joins: createJoinInstances(
-          layerDescriptor as VectorLayerDescriptor,
-          source as IVectorSource
-        ),
-        customIcons,
-        chartsPaletteServiceGetColor,
-      });
-    case LAYER_TYPE.BLENDED_VECTOR:
-      return new BlendedVectorLayer({
-        layerDescriptor: layerDescriptor as VectorLayerDescriptor,
-        source: source as IVectorSource,
-        customIcons,
-        chartsPaletteServiceGetColor,
-      });
-    case LAYER_TYPE.MVT_VECTOR:
-      return new MvtVectorLayer({
-        layerDescriptor: layerDescriptor as VectorLayerDescriptor,
-        source: source as IVectorSource,
-        joins: createJoinInstances(
-          layerDescriptor as VectorLayerDescriptor,
-          source as IVectorSource
-        ),
-        customIcons,
-      });
-    default:
-      throw new Error(`Unrecognized layerType ${layerDescriptor.type}`);
-  }
-}
-
-function createSourceInstance(sourceDescriptor: AbstractSourceDescriptor | null): ISource {
-  if (sourceDescriptor === null) {
-    throw new Error('Source-descriptor should be initialized');
-  }
-  const source = getSourceByType(sourceDescriptor.type);
-  if (!source) {
-    throw new Error(`Unrecognized sourceType ${sourceDescriptor.type}`);
-  }
-  return new source.ConstructorFunction(sourceDescriptor);
-}
 
 export const getMapSettings = ({ map }: MapStoreState): MapSettings => map.settings;
 
@@ -449,7 +358,7 @@ export const getGeoFieldNames = createSelector(
   getLayerList,
   getWaitingForMapReadyLayerListRaw,
   (layerList, waitingForMapReadyLayerList) => {
-    const geoFieldNames: string[] = [];
+    const geoFieldNames: GeoFieldNames[] = [];
 
     if (waitingForMapReadyLayerList.length) {
       waitingForMapReadyLayerList.forEach((layerDescriptor) => {

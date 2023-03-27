@@ -381,7 +381,7 @@ export class LayerGroup implements ILayer {
     return [];
   }
 
-  getGeoFieldNames(): string[] {
+  getGeoFieldNames() {
     return [];
   }
 

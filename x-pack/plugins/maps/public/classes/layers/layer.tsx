@@ -33,6 +33,7 @@ import {
   Timeslice,
   StyleMetaDescriptor,
 } from '../../../common/descriptor_types';
+import type { GeoFieldName } from '../../../common';
 import { ImmutableSourceProperty, ISource, SourceEditorArgs } from '../sources/source';
 import { DataRequestContext } from '../../actions';
 import { IStyle } from '../styles/style';
@@ -114,7 +115,7 @@ export interface ILayer {
    */
   getLayerIcon(isTocIcon: boolean): LayerIcon;
   getDescriptor(): LayerDescriptor;
-  getGeoFieldNames(): string[];
+  getGeoFieldNames(): GeoFieldName[];
   getStyleMetaDescriptorFromLocalFeatures(): Promise<StyleMetaDescriptor | null>;
   isBasemap(order: number): boolean;
   getParent(): string | undefined;
@@ -473,7 +474,7 @@ export class AbstractLayer implements ILayer {
     return [];
   }
 
-  getGeoFieldNames(): string[] {
+  getGeoFieldNames(): GeoFieldName[] {
     const source = this.getSource();
     return source.isESSource() ? [(source as IESSource).getGeoFieldName()] : [];
   }

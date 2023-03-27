@@ -77,6 +77,7 @@ export type FilterMeta = {
   group?: string;
   // index and type are optional only because when you create a new filter, there are no defaults
   index?: string;
+  // flag indicating filter supports multiple index patterns
   isMultiIndex?: boolean;
   type?: string;
   key?: string;

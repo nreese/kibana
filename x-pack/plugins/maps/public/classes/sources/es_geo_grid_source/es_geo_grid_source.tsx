@@ -124,7 +124,6 @@ export class ESGeoGridSource extends AbstractESAggSource implements IMvtVectorSo
     return (
       <UpdateSourceEditor
         currentLayerType={sourceEditorArgs.currentLayerType}
-        geoFieldName={this.getGeoFieldName()}
         indexPatternId={this.getIndexPatternId()}
         onChange={onChange}
         metrics={this._descriptor.metrics}

@@ -26,7 +26,6 @@ import { isMvt } from './is_mvt';
 
 interface Props {
   currentLayerType?: string;
-  geoFieldName: string;
   indexPatternId: string;
   onChange: (...args: OnSourceChangeArgs[]) => Promise<void>;
   metrics: AggDescriptor[];

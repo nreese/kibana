@@ -7,3 +7,4 @@
 
 export type { LayerWizard, LayerWizardWithMeta, RenderWizardArguments } from './wizards';
 export { getLayerWizards, registerLayerWizardExternal } from './wizards';
+export { createLayerInstance } from './create_layer_instance';

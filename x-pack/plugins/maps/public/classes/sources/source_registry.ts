@@ -8,6 +8,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
 import { Adapters } from '@kbn/inspector-plugin/common/adapters';
+import { AbstractSourceDescriptor } from '../../../common/descriptor_types';
 import type { ISource } from './source';
 
 export type SourceRegistryEntry = {
@@ -32,6 +33,17 @@ export function registerSource(entry: SourceRegistryEntry) {
   registry.push(entry);
 }
 
-export function getSourceByType(sourceType: string): SourceRegistryEntry | undefined {
+function getSourceByType(sourceType: string): SourceRegistryEntry | undefined {
   return registry.find((source: SourceRegistryEntry) => source.type === sourceType);
+}
+
+export function createSourceInstance(sourceDescriptor: AbstractSourceDescriptor | null): ISource {
+  if (sourceDescriptor === null) {
+    throw new Error('Source-descriptor should be initialized');
+  }
+  const source = getSourceByType(sourceDescriptor.type);
+  if (!source) {
+    throw new Error(`Unrecognized sourceType ${sourceDescriptor.type}`);
+  }
+  return new source.ConstructorFunction(sourceDescriptor);
 }

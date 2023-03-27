@@ -199,7 +199,10 @@ export class ESPewPewSource extends AbstractESAggSource {
   }
 
   getGeoFieldName() {
-    return this._descriptor.destGeoField;
+    return {
+      dataViewId: this.getIndexPatternId(),
+      name: this._descriptor.destGeoField,
+    };
   }
 
   async getBoundsForFilters(

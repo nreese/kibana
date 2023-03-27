@@ -40,6 +40,7 @@ import { IVectorStyle } from '../../styles/vector/vector_style';
 import { IDynamicStyleProperty } from '../../styles/vector/properties/dynamic_style_property';
 import { IField } from '../../fields/field';
 import { FieldFormatter } from '../../../../common/constants';
+import type { GeoFieldName } from '../../../../common';
 import { isValidStringConfig } from '../../util/valid_string_config';
 import { makePublicExecutionContext } from '../../../util';
 
@@ -52,7 +53,7 @@ export interface IESSource extends IVectorSource {
   getId(): string;
   getIndexPattern(): Promise<DataView>;
   getIndexPatternId(): string;
-  getGeoFieldName(): string;
+  getGeoFieldName(): GeoFieldName;
   loadStylePropsMeta({
     layerName,
     style,
@@ -297,7 +298,7 @@ export class AbstractESSource extends AbstractVectorSource implements IESSource 
     searchSource.setField('aggs', {
       fitToBounds: {
         geo_bounds: {
-          field: this.getGeoFieldName(),
+          field: this.getGeoFieldName().name,
         },
       },
     });
@@ -368,11 +369,14 @@ export class AbstractESSource extends AbstractVectorSource implements IESSource 
     return this._descriptor.indexPatternId;
   }
 
-  getGeoFieldName(): string {
+  getGeoFieldName(): GeoFieldName {
     if (!this._descriptor.geoField) {
       throw new Error(`Required field 'geoField' not provided in '_descriptor'`);
     }
-    return this._descriptor.geoField;
+    return {
+      dataViewId: this.getIndexPatternId(),
+      name: this._descriptor.geoField,
+    };
   }
 
   async getIndexPattern(): Promise<DataView> {
@@ -400,12 +404,12 @@ export class AbstractESSource extends AbstractVectorSource implements IESSource 
 
   async _getGeoField(): Promise<DataViewField> {
     const indexPattern = await this.getIndexPattern();
-    const geoField = indexPattern.fields.getByName(this.getGeoFieldName());
+    const geoField = indexPattern.fields.getByName(this.getGeoFieldName().name);
     if (!geoField) {
       throw new Error(
         i18n.translate('xpack.maps.source.esSource.noGeoFieldErrorMessage', {
           defaultMessage: `Data view "{indexPatternLabel}"" no longer contains the geo field "{geoField}"`,
-          values: { indexPatternLabel: indexPattern.getName(), geoField: this.getGeoFieldName() },
+          values: { indexPatternLabel: indexPattern.getName(), geoField: this.getGeoFieldName().name },
         })
       );
     }

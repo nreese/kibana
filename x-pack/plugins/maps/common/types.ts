@@ -35,3 +35,8 @@ export interface WriteSettings {
   body: object;
   [key: string]: any;
 }
+
+export interface GeoFieldName {
+  dataViewId: string;
+  name: string;
+}

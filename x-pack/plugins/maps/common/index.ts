@@ -30,6 +30,8 @@ export {
 
 export type { FieldFormatter } from './constants';
 
+export type { GeoFieldName } from './types';
+
 export type {
   EMSFileSourceDescriptor,
   ESTermSourceDescriptor,

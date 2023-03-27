@@ -809,7 +809,7 @@ export class ESSearchSource extends AbstractESSource implements IMvtVectorSource
     defaultFields: Record<string, Record<string, string>>
   ) {
     const index = await this._getEditableIndex();
-    await addFeatureToIndex(index, geometry, this.getGeoFieldName(), defaultFields);
+    await addFeatureToIndex(index, geometry, this.getGeoFieldName().name, defaultFields);
   }
 
   async deleteFeature(featureId: string) {

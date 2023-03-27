@@ -57,7 +57,7 @@ function getAggType(
 function getClusterSource(documentSource: IESSource, documentStyle: IVectorStyle): ESGeoGridSource {
   const clusterSourceDescriptor = ESGeoGridSource.createDescriptor({
     indexPatternId: documentSource.getIndexPatternId(),
-    geoField: documentSource.getGeoFieldName(),
+    geoField: documentSource.getGeoFieldName().name,
     requestType: RENDER_AS.POINT,
     resolution: GRID_RESOLUTION.COARSE,
   });
