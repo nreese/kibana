@@ -148,14 +148,15 @@ export class RangeSliderEmbeddable
       await this.runRangeSliderQuery();
       await this.buildFilter();
       if (initialValue) {
-        this.setInitializationFinished();
-      }
-    } catch (e) {
-      batch(() => {
-        this.dispatch.setLoading(false);
-        this.dispatch.setErrorMessage(e.message);
-      });
+      this.setInitializationFinished();
     }
+    } catch (e) {
+      this.onLoadingError(e.message);
+    }
+    /*if (initialValue) {
+      this.setInitializationFinished();
+    }*/
+    console.log('finished init');
     this.setupSubscriptions();
   };
 
@@ -182,7 +183,7 @@ export class RangeSliderEmbeddable
           await this.runRangeSliderQuery();
           await this.buildFilter();
         } catch (e) {
-          this.dispatch.setErrorMessage(e.message);
+          this.onLoadingError(e.message);
         }
       })
     );
@@ -209,17 +210,14 @@ export class RangeSliderEmbeddable
     if (!this.dataView || this.dataView.id !== dataViewId) {
       try {
         this.dataView = await this.dataViewsService.get(dataViewId);
-        if (!this.dataView) {
-          throw new Error(
-            i18n.translate('controls.rangeSlider.errors.dataViewNotFound', {
-              defaultMessage: 'Could not locate data view: {dataViewId}',
-              values: { dataViewId },
-            })
-          );
-        }
         this.dispatch.setDataViewId(this.dataView.id);
       } catch (e) {
-        this.dispatch.setErrorMessage(e.message);
+        this.dispatch.setErrorMessage(
+          i18n.translate('controls.rangeSlider.errors.dataViewNotFound', {
+            defaultMessage: 'Could not locate data view: {dataViewId}',
+            values: { dataViewId },
+          })
+        );
       }
     }
 
@@ -232,28 +230,21 @@ export class RangeSliderEmbeddable
 
         this.dispatch.setField(this.field?.toSpec());
       } catch (e) {
-        this.dispatch.setErrorMessage(e.message);
+        this.onLoadingError(e.message);
       }
     }
 
-    return { dataView: this.dataView, field: this.field! };
+    return { dataView: this.dataView, field: this.field };
   };
 
   private runRangeSliderQuery = async () => {
     this.dispatch.setLoading(true);
 
+    console.log('calling getCurrentDataViewAndField');
     const { dataView, field } = await this.getCurrentDataViewAndField();
+    console.log('dataView', dataView);
+    console.log('field', field);
     if (!dataView || !field) return;
-
-    const { fieldName } = this.getInput();
-
-    if (!field) {
-      batch(() => {
-        this.dispatch.setLoading(false);
-        this.dispatch.publishFilters([]);
-      });
-      throw fieldMissingError(fieldName);
-    }
 
     const embeddableInput = this.getInput();
     const { ignoreParentSettings, timeRange: globalTimeRange, timeslice } = embeddableInput;
@@ -425,6 +416,14 @@ export class RangeSliderEmbeddable
     });
   };
 
+  private onLoadingError(errorMessage: string) {
+    batch(() => {
+      this.dispatch.setLoading(false);
+      this.dispatch.publishFilters([]);
+      this.dispatch.setErrorMessage(errorMessage);
+    });
+  }
+
   public clearSelections() {
     this.dispatch.setSelectedRange(['', '']);
   }
@@ -434,7 +433,7 @@ export class RangeSliderEmbeddable
       await this.runRangeSliderQuery();
       await this.buildFilter();
     } catch (e) {
-      this.dispatch.setErrorMessage(e.message);
+      this.onLoadingError(e.message);
     }
   };
 
