@@ -11,8 +11,8 @@ import { BehaviorSubject } from 'rxjs';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event';
-import { useBatchedPublishingSubjects } from '../publishing_batcher';
-import { useStateFromPublishingSubject } from '../publishing_subject';
+import { useBatchedPublishingSubjects } from './publishing_batcher';
+import { useStateFromPublishingSubject } from './publishing_subject';
 
 describe('useBatchedPublishingSubjects', () => {
   let subject1: BehaviorSubject<number>;
