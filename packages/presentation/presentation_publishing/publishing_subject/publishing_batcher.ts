@@ -31,7 +31,7 @@ type PublishingSubjectBatchResult<SubjectsType extends PublishingSubjectCollecti
     : never;
 };
 
-const hasSubjectsObjectChanged = (
+const hasSubjectsKeysChanged = (
   subjectsA: PublishingSubjectCollection,
   subjectsB: PublishingSubjectCollection
 ) => {
@@ -56,24 +56,21 @@ export const useBatchedPublishingSubjects = <SubjectsType extends PublishingSubj
    * memoize and deep diff subjects to avoid rebuilding the subscription when the subjects are the same.
    */
   const previousSubjects = useRef<SubjectsType | null>(null);
-  const subjectsToUse = useMemo(() => {
-    if (!previousSubjects.current && !Object.values(subjects).some((subject) => Boolean(subject))) {
-      // if the previous subjects were null and none of the new subjects are defined, return null to avoid building the subscription.
-      return null;
-    }
-
-    if (!hasSubjectsObjectChanged(previousSubjects.current ?? {}, subjects)) {
-      return previousSubjects.current;
-    }
-    previousSubjects.current = subjects;
-    return subjects;
-  }, [subjects]);
-
+  
   /**
    * Extract only defined subjects from any subjects passed in.
    */
   const { definedKeys, definedSubjects } = useMemo(() => {
-    if (!subjectsToUse) return {};
+    if (!previousSubjects.current && !Object.values(subjects).some((subject) => Boolean(subject))) {
+      return {};
+    }
+
+    const hasChanges = hasSubjectsKeysChanged(previousSubjects.current ?? {}, subjects);
+    const subjectsToUse = hasChanges ? subjects : previousSubjects.current;
+    if (hasChanges) {
+      previousSubjects.current = subjects;
+    }
+
     const definedSubjectsMap: RequiredPublishingSubjectCollection =
       Object.keys(subjectsToUse).reduce((acc, key) => {
         if (Boolean(subjectsToUse[key])) acc[key] = subjectsToUse[key] as AnyPublishingSubject;
@@ -84,7 +81,8 @@ export const useBatchedPublishingSubjects = <SubjectsType extends PublishingSubj
       definedKeys: Object.keys(definedSubjectsMap ?? {}) as Array<keyof SubjectsType>,
       definedSubjects: Object.values(definedSubjectsMap) ?? [],
     };
-  }, [subjectsToUse]);
+    
+  }, [subjects]);
 
   const [latestPublishedValues, setLatestPublishedValues] = useState<
     PublishingSubjectBatchResult<SubjectsType>
