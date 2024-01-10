@@ -110,15 +110,12 @@ export const useBatchedPublishingSubjects = <SubjectsType extends PublishingSubj
         filter((changes) => changes.length > 0)
       )
       .subscribe((latestValues) => {
-        console.log('on next value');
         const nextResult: PublishingSubjectBatchResult<SubjectsType> = {};
         for (let keyIndex = 0; keyIndex < definedKeys.length; keyIndex++) {
           nextResult[definedKeys[keyIndex]] = latestValues[keyIndex] ?? undefined;
         }
         setLatestPublishedValues(nextResult);
       });
-
-    console.log('create new subscription');
 
     return () => subscription.unsubscribe();
   }, [definedKeys, definedSubjects]);

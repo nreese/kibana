@@ -81,8 +81,6 @@ describe('useBatchedPublishingSubjects', () => {
         value6: subject6,
       });
 
-      console.log(`value1: ${value1}, value2: ${value2}, value3: ${value3}, value4: ${value4}, value5: ${value5}, value6: ${value6}`);
-
       renderCount++;
       return (
         <>
