@@ -81,6 +81,8 @@ describe('useBatchedPublishingSubjects', () => {
         value6: subject6,
       });
 
+      console.log(`value1: ${value1}, value2: ${value2}, value3: ${value3}, value4: ${value4}, value5: ${value5}, value6: ${value6}`);
+
       renderCount++;
       return (
         <>
@@ -101,7 +103,7 @@ describe('useBatchedPublishingSubjects', () => {
     await waitFor(() => {
       expect(screen.getByText('value1: 1, value2: 1, value3: 1, value4: 1, value5: 1, value6: 1')).toBeInTheDocument();
     });
-    expect(parseInt(screen.getByTestId('renderCount')?.textContent, 10)).toBeLessThan(7);
+    expect(screen.getByTestId('renderCount')).toHaveTextContent('3');
   });
 
   test('should render for each state update outside of click handler', async () => {

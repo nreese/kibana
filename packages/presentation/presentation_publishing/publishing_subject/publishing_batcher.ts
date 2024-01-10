@@ -31,7 +31,7 @@ type PublishingSubjectBatchResult<SubjectsType extends PublishingSubjectCollecti
     : never;
 };
 
-const hasSubjectsKeysChanged = (
+const hasSubjectsObjectChanged = (
   subjectsA: PublishingSubjectCollection,
   subjectsB: PublishingSubjectCollection
 ) => {
@@ -57,20 +57,24 @@ export const useBatchedPublishingSubjects = <SubjectsType extends PublishingSubj
    */
   const previousSubjects = useRef<SubjectsType | null>(null);
   
+  const subjectsToUse = useMemo(() => {
+    if (!previousSubjects.current && !Object.values(subjects).some((subject) => Boolean(subject))) {
+      // if the previous subjects were null and none of the new subjects are defined, return null to avoid building the subscription.
+      return null;
+    }
+
+    if (!hasSubjectsObjectChanged(previousSubjects.current ?? {}, subjects)) {
+      return previousSubjects.current;
+    }
+    previousSubjects.current = subjects;
+    return subjects;
+  }, [subjects]);
+
   /**
    * Extract only defined subjects from any subjects passed in.
    */
   const { definedKeys, definedSubjects } = useMemo(() => {
-    if (!previousSubjects.current && !Object.values(subjects).some((subject) => Boolean(subject))) {
-      return {};
-    }
-
-    const hasChanges = hasSubjectsKeysChanged(previousSubjects.current ?? {}, subjects);
-    const subjectsToUse = hasChanges ? subjects : previousSubjects.current;
-    if (hasChanges) {
-      previousSubjects.current = subjects;
-    }
-
+    if (!subjectsToUse) return {};
     const definedSubjectsMap: RequiredPublishingSubjectCollection =
       Object.keys(subjectsToUse).reduce((acc, key) => {
         if (Boolean(subjectsToUse[key])) acc[key] = subjectsToUse[key] as AnyPublishingSubject;
@@ -81,8 +85,7 @@ export const useBatchedPublishingSubjects = <SubjectsType extends PublishingSubj
       definedKeys: Object.keys(definedSubjectsMap ?? {}) as Array<keyof SubjectsType>,
       definedSubjects: Object.values(definedSubjectsMap) ?? [],
     };
-    
-  }, [subjects]);
+  }, [subjectsToUse]);
 
   const [latestPublishedValues, setLatestPublishedValues] = useState<
     PublishingSubjectBatchResult<SubjectsType>
@@ -107,12 +110,15 @@ export const useBatchedPublishingSubjects = <SubjectsType extends PublishingSubj
         filter((changes) => changes.length > 0)
       )
       .subscribe((latestValues) => {
+        console.log('on next value');
         const nextResult: PublishingSubjectBatchResult<SubjectsType> = {};
         for (let keyIndex = 0; keyIndex < definedKeys.length; keyIndex++) {
           nextResult[definedKeys[keyIndex]] = latestValues[keyIndex] ?? undefined;
         }
         setLatestPublishedValues(nextResult);
       });
+
+    console.log('create new subscription');
 
     return () => subscription.unsubscribe();
   }, [definedKeys, definedSubjects]);
