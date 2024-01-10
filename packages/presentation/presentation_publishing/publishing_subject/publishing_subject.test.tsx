@@ -41,7 +41,7 @@ describe('useBatchedPublishingSubjects', () => {
 
   test('should render once when all state changes are in click handler (react batch)', async () => {
     let renderCount = 0;
-    function UnbatchedComponent() {
+    function Component() {
       const value1 = useStateFromPublishingSubject<number>(subject1);
       const value2 = useStateFromPublishingSubject<number>(subject2);
       const value3 = useStateFromPublishingSubject<number>(subject3);
@@ -58,7 +58,7 @@ describe('useBatchedPublishingSubjects', () => {
         </>
       );
     }
-    render(<UnbatchedComponent />);
+    render(<Component />);
     await waitFor(() => {
       expect(screen.getByText('value1: 0, value2: 0, value3: 0, value4: 0, value5: 0, value6: 0')).toBeInTheDocument();
     });
@@ -71,7 +71,7 @@ describe('useBatchedPublishingSubjects', () => {
 
   test('should batch state updates when using useBatchedPublishingSubjects', async () => {
     let renderCount = 0;
-    function BatchedComponent() {
+    function Component() {
       const { value1, value2, value3, value4, value5, value6 } = useBatchedPublishingSubjects({
         value1: subject1,
         value2: subject2,
@@ -93,7 +93,7 @@ describe('useBatchedPublishingSubjects', () => {
         </>
       );
     }
-    render(<BatchedComponent />);
+    render(<Component />);
     await waitFor(() => {
       expect(screen.getByText('value1: 0, value2: 0, value3: 0, value4: 0, value5: 0, value6: 0')).toBeInTheDocument();
     });
@@ -106,7 +106,7 @@ describe('useBatchedPublishingSubjects', () => {
 
   test('should render for each state update outside of click handler', async () => {
     let renderCount = 0;
-    function UnbatchedComponent() {
+    function Component() {
       const value1 = useStateFromPublishingSubject<number>(subject1);
       const value2 = useStateFromPublishingSubject<number>(subject2);
       const value3 = useStateFromPublishingSubject<number>(subject3);
@@ -126,7 +126,7 @@ describe('useBatchedPublishingSubjects', () => {
         </>
       );
     }
-    render(<UnbatchedComponent />);
+    render(<Component />);
     await waitFor(() => {
       expect(screen.getByText('value1: 0, value2: 0, value3: 0, value4: 0, value5: 0, value6: 0')).toBeInTheDocument();
     });
