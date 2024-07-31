@@ -14,6 +14,7 @@ import {
   PublishesFilters,
   PublishesPanelTitle,
 } from '@kbn/presentation-publishing';
+import { BehaviorSubject } from 'rxjs';
 import { ControlFactory, DefaultControlApi, DefaultControlState } from '../types';
 
 export type DataControlApi = DefaultControlApi &
@@ -21,6 +22,8 @@ export type DataControlApi = DefaultControlApi &
   HasEditCapabilities &
   PublishesDataViews &
   PublishesFilters & {
+    filtersReady$: BehaviorSubject<boolean>;
+    untilFiltersReady: () => Promise<void>;
     setOutputFilter: (filter: Filter | undefined) => void; // a control should only ever output a **single** filter
   };
 

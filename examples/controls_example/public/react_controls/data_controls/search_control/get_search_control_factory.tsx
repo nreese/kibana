@@ -184,7 +184,7 @@ export const getSearchControlFactory = ({
         });
 
       if (initialState.searchString?.length) {
-        await dataControl.untilFiltersInitialized();
+        await dataControl.api.untilFiltersReady();
       }
 
       return {

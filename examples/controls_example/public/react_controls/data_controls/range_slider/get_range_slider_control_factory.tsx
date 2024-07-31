@@ -201,7 +201,7 @@ export const getRangesliderControlFactory = (
       });
 
       if (initialState.value !== undefined) {
-        await dataControl.untilFiltersInitialized();
+        await dataControl.api.untilFiltersReady();
       }
 
       return {

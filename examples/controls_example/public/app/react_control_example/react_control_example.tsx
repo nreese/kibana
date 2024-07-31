@@ -362,8 +362,8 @@ export const ReactControlExample = ({
             <EuiFlexItem grow={false}>
               <EuiButtonEmpty
                 isDisabled={!controlGroupApi}
-                onClick={() => {
-                  controlGroupApi?.resetUnsavedChanges();
+                onClick={async () => {
+                  if (controlGroupApi) await controlGroupApi.asyncResetUnsavedChanges();
                 }}
               >
                 Reset

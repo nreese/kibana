@@ -7,7 +7,7 @@
  */
 
 import { isEqual } from 'lodash';
-import { BehaviorSubject, combineLatest, first, switchMap } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, first, switchMap, tap } from 'rxjs';
 
 import { CoreStart } from '@kbn/core-lifecycle-browser';
 import { DataView, DATA_VIEW_SAVED_OBJECT_TYPE } from '@kbn/data-views-plugin/common';
@@ -39,7 +39,6 @@ export const initializeDataControl = <EditorState extends object = {}>(
   comparators: StateComparators<DefaultDataControlState>;
   stateManager: ControlStateManager<DefaultDataControlState>;
   serialize: () => SerializedPanelState<DefaultControlState>;
-  untilFiltersInitialized: () => Promise<void>;
 } => {
   const defaultControl = initializeDefaultControlApi(state);
 
@@ -49,6 +48,7 @@ export const initializeDataControl = <EditorState extends object = {}>(
   const fieldName = new BehaviorSubject<string>(state.fieldName);
   const dataViews = new BehaviorSubject<DataView[] | undefined>(undefined);
   const filters$ = new BehaviorSubject<Filter[] | undefined>(undefined);
+  const filtersReady$ = new BehaviorSubject<boolean>(false);
 
   const stateManager: ControlStateManager<DefaultDataControlState> = {
     ...defaultControl.stateManager,
@@ -65,6 +65,10 @@ export const initializeDataControl = <EditorState extends object = {}>(
 
   const dataViewIdSubscription = dataViewId
     .pipe(
+      tap(() => {
+        // need to fetch new data view before filters are ready to be published
+        filtersReady$.next(false);
+      }),
       switchMap(async (currentDataViewId) => {
         let dataView: DataView | undefined;
         try {
@@ -153,6 +157,17 @@ export const initializeDataControl = <EditorState extends object = {}>(
     });
   };
 
+  /** When the filter outputs **for the first time**, set `filtersReady` to `true` */
+  let filtersInitialized = false;
+  combineLatest([defaultControl.api.blockingError, filters$])
+    .pipe(
+      first(([blockingError, filters]) => blockingError !== undefined || (filters?.length ?? 0) > 0)
+    )
+    .subscribe(() => {
+      filtersReady$.next(true);
+      filtersInitialized = true;
+    });
+
   const api: ControlApiInitialization<DataControlApi> = {
     ...defaultControl.api,
     panelTitle,
@@ -160,10 +175,19 @@ export const initializeDataControl = <EditorState extends object = {}>(
     dataViews,
     onEdit,
     filters$,
+    filtersReady$,
     setOutputFilter: (newFilter: Filter | undefined) => {
       filters$.next(newFilter ? [newFilter] : undefined);
+      if (filtersInitialized) filtersReady$.next(true);
     },
     isEditingEnabled: () => true,
+    untilFiltersReady: async () => {
+      return new Promise((resolve) => {
+        filtersReady$.pipe(first((filtersReady) => filtersReady)).subscribe((ready) => {
+          resolve();
+        });
+      });
+    },
   };
 
   return {
@@ -195,20 +219,6 @@ export const initializeDataControl = <EditorState extends object = {}>(
           },
         ],
       };
-    },
-    untilFiltersInitialized: async () => {
-      return new Promise((resolve) => {
-        combineLatest([defaultControl.api.blockingError, filters$])
-          .pipe(
-            first(
-              ([blockingError, filters]) =>
-                blockingError !== undefined || (filters?.length ?? 0) > 0
-            )
-          )
-          .subscribe(() => {
-            resolve();
-          });
-      });
     },
   };
 };

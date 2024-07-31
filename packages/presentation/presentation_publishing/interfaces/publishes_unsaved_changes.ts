@@ -13,7 +13,14 @@ export interface PublishesUnsavedChanges<Runtime extends object = object> {
   resetUnsavedChanges: () => void;
 }
 
-export const apiPublishesUnsavedChanges = (api: unknown): api is PublishesUnsavedChanges => {
+export interface PublishesAsyncUnsavedChanges<Runtime extends object = object>
+  extends Pick<PublishesUnsavedChanges<Runtime>, 'unsavedChanges'> {
+  asyncResetUnsavedChanges: () => Promise<void>;
+}
+
+export const apiPublishesUnsavedChanges = (
+  api: unknown
+): api is PublishesUnsavedChanges | PublishesAsyncUnsavedChanges => {
   return Boolean(
     api &&
       (api as PublishesUnsavedChanges).unsavedChanges &&

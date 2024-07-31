@@ -14,12 +14,13 @@ import {
 } from '@kbn/presentation-containers';
 import {
   apiPublishesUnsavedChanges,
-  PublishesUnsavedChanges,
+  PublishesAsyncUnsavedChanges,
   StateComparators,
 } from '@kbn/presentation-publishing';
 import { combineLatest, map } from 'rxjs';
 import { ControlsInOrder, getControlsInOrder } from './init_controls_manager';
 import { ControlGroupRuntimeState, ControlPanelsState } from './types';
+import { DataControlApi } from '../data_controls/types';
 
 export type ControlGroupComparatorState = Pick<
   ControlGroupRuntimeState,
@@ -35,6 +36,7 @@ export type ControlGroupComparatorState = Pick<
 export function initializeControlGroupUnsavedChanges(
   children$: PresentationContainer['children$'],
   comparators: StateComparators<ControlGroupComparatorState>,
+  applySelections: () => void,
   snapshotControlsRuntimeState: () => ControlPanelsState,
   parentApi: unknown,
   lastSavedRuntimeState: ControlGroupRuntimeState
@@ -68,12 +70,20 @@ export function initializeControlGroupUnsavedChanges(
           return Object.keys(unsavedChanges).length ? unsavedChanges : undefined;
         })
       ),
-      resetUnsavedChanges: () => {
+      asyncResetUnsavedChanges: async () => {
         controlGroupUnsavedChanges.api.resetUnsavedChanges();
+        const filtersReadyPromises: Array<Promise<void>> = [];
         Object.values(children$.value).forEach((controlApi) => {
           if (apiPublishesUnsavedChanges(controlApi)) controlApi.resetUnsavedChanges();
+          if ((controlApi as DataControlApi).untilFiltersReady) {
+            filtersReadyPromises.push((controlApi as DataControlApi).untilFiltersReady());
+          }
         });
+        if (!comparators.autoApplySelections[0].getValue()) {
+          await Promise.all(filtersReadyPromises);
+          applySelections();
+        }
       },
-    } as PublishesUnsavedChanges<ControlGroupRuntimeState>,
+    } as PublishesAsyncUnsavedChanges<ControlGroupRuntimeState>,
   };
 }

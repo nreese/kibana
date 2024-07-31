@@ -19,11 +19,11 @@ import {
 import {
   HasEditCapabilities,
   HasParentApi,
+  PublishesAsyncUnsavedChanges,
   PublishesDataLoading,
   PublishesFilters,
   PublishesTimeslice,
   PublishesUnifiedSearch,
-  PublishesUnsavedChanges,
   PublishingSubject,
 } from '@kbn/presentation-publishing';
 import { PublishesDataViews } from '@kbn/presentation-publishing/interfaces/publishes_data_views';
@@ -55,7 +55,7 @@ export type ControlGroupApi = PresentationContainer &
   HasSerializedChildState<ControlPanelState> &
   HasEditCapabilities &
   PublishesDataLoading &
-  PublishesUnsavedChanges &
+  PublishesAsyncUnsavedChanges &
   PublishesControlGroupDisplaySettings &
   PublishesTimeslice &
   Partial<HasParentApi<PublishesUnifiedSearch> & HasSaveNotification> & {

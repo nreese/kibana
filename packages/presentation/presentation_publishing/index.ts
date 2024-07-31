@@ -110,6 +110,7 @@ export {
 export {
   apiPublishesUnsavedChanges,
   type PublishesUnsavedChanges,
+  type PublishesAsyncUnsavedChanges,
 } from './interfaces/publishes_unsaved_changes';
 export {
   apiPublishesViewMode,
