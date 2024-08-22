@@ -76,7 +76,7 @@ export default function ({ getService, getPageObjects }: PluginFunctionalProvide
       });
     });
 
-    describe('Dashboard', () => {
+    describe.only('Dashboard', () => {
       before(async () => {
         await esArchiver.loadIfNeeded(
           'test/functional/fixtures/es_archiver/dashboard/current/data'

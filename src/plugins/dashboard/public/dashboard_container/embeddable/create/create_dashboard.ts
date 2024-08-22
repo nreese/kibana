@@ -169,6 +169,7 @@ export const initializeDashboard = async ({
   creationOptions?: DashboardCreationOptions;
   controlGroup?: ControlGroupContainer;
 }) => {
+  console.log('initializeDashboard, creationOptions', creationOptions)
   const {
     dashboardBackup,
     embeddable: { getEmbeddableFactory },
@@ -569,6 +570,7 @@ export const initializeDashboard = async ({
 
     const filters$ = new BehaviorSubject<Filter[] | undefined>(getCombinedFilters());
     dashboardContainer.filters$ = filters$;
+    console.log('dashboardContainer.filters$ set');
 
     const inputFilters$ = dashboardContainer.getInput$().pipe(
       startWith(dashboardContainer.getInput()),
@@ -600,6 +602,7 @@ export const initializeDashboard = async ({
       dashboardContainer.getInput().query
     );
     dashboardContainer.query$ = query$;
+    console.log('dashboardContainer.query$ setup')
     dashboardContainer.integrationSubscriptions.add(
       dashboardContainer.getInput$().subscribe((input) => {
         if (!deepEqual(query$.getValue() ?? [], input.query)) {

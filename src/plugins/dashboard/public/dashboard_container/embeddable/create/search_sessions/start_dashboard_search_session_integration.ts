@@ -53,7 +53,9 @@ export function startDashboardSearchSessionIntegration(
     ?.pipe(skip(1))
     .subscribe(() => this.forceRefresh());
 
+  console.log('subscribe to newSession$');
   newSession$(this).subscribe(() => {
+    console.log('newSession$ emit');
     const currentSearchSessionId = this.getState().explicitInput.searchSessionId;
 
     const updatedSearchSessionId: string | undefined = (() => {

@@ -7,7 +7,7 @@
  */
 
 import { Filter, TimeRange, onlyDisabledFiltersChanged } from '@kbn/es-query';
-import { combineLatest, distinctUntilChanged, Observable, skip } from 'rxjs';
+import { combineLatest, distinctUntilChanged, Observable, skip, tap } from 'rxjs';
 import { shouldRefreshFilterCompareOptions } from '@kbn/embeddable-plugin/public';
 import { apiPublishesSettings } from '@kbn/presentation-containers/interfaces/publishes_settings';
 import { apiPublishesUnifiedSearch } from '@kbn/presentation-publishing';
@@ -23,10 +23,11 @@ export function newSession$(api: unknown) {
         // TODO move onlyDisabledFiltersChanged to appliedFilters$ interface
         distinctUntilChanged((previous: Filter[] | undefined, current: Filter[] | undefined) => {
           return onlyDisabledFiltersChanged(previous, current, shouldRefreshFilterCompareOptions);
-        })
+        }),
+        tap(() => console.log('filters$ emit'))
       )
     );
-    observables.push(api.query$);
+    observables.push(api.query$.pipe(tap(() => console.log('query$ emit'))));
     observables.push(
       api.timeRange$.pipe(
         distinctUntilChanged((previous: TimeRange | undefined, current: TimeRange | undefined) => {
@@ -61,5 +62,9 @@ export function newSession$(api: unknown) {
     observables.push((api as DashboardContainer).lastReloadRequestTime$);
   }
 
-  return combineLatest(observables).pipe(skip(1));
+  return combineLatest(observables).pipe(
+    tap(() => console.log('combineLatest(observables) emit - before skip')),
+    skip(1),
+    tap(() => console.log('combineLatest(observables) emit - after skip')),
+    );
 }
