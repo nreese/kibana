@@ -104,6 +104,11 @@ export const getNewDashboardTitle = () =>
     defaultMessage: 'New Dashboard',
   });
 
+  export const getUntitledDashboardTitle = () =>
+  i18n.translate('dashboard.savedDashboard.untitleDashboardTitle', {
+    defaultMessage: 'Untitled Dashboard',
+  });
+
 export const getPanelAddedSuccessString = (savedObjectName?: string) =>
   savedObjectName
     ? i18n.translate('dashboard.addPanel.newEmbeddableAddedSuccessMessageTitle', {

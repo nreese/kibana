@@ -103,6 +103,7 @@ import {
 } from './dashboard_container_factory';
 import { getPanelAddedSuccessString } from '../../dashboard_app/_dashboard_app_strings';
 import { PANELS_CONTROL_GROUP_KEY } from '../../services/dashboard_backup/dashboard_backup_service';
+import { DashboardApi } from '../../dashboard_api/types';
 
 export interface InheritedChildInput {
   filters: Filter[];
@@ -124,15 +125,6 @@ type DashboardReduxEmbeddableTools = ReduxEmbeddableTools<
   DashboardReduxState,
   typeof dashboardContainerReducers
 >;
-
-export const DashboardContainerContext = createContext<DashboardContainer | null>(null);
-export const useDashboardContainer = (): DashboardContainer => {
-  const dashboard = useContext<DashboardContainer | null>(DashboardContainerContext);
-  if (dashboard == null) {
-    throw new Error('useDashboardContainer must be used inside DashboardContainerContext.');
-  }
-  return dashboard!;
-};
 
 export class DashboardContainer
   extends Container<InheritedChildInput, DashboardContainerInput>

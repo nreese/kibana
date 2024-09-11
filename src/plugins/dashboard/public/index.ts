@@ -18,14 +18,8 @@ export {
   PanelPlacementStrategy,
 } from './dashboard_constants';
 export {
-  type DashboardAPI,
-  type AwaitingDashboardAPI,
-  DashboardRenderer,
-  DASHBOARD_CONTAINER_TYPE,
-  type DashboardCreationOptions,
-  type DashboardLocatorParams,
-  type IProvidesLegacyPanelPlacementSettings,
-} from './dashboard_container';
+  LazyDashboardRenderer as DashboardRenderer
+} from './dashboard_api/components/dashboard_renderer_lazy';
 export type { DashboardSetup, DashboardStart, DashboardFeatureFlagConfig } from './plugin';
 
 export { DashboardListingTable } from './dashboard_listing';
