@@ -63,6 +63,7 @@ import {
   registerReactEmbeddableFactory,
 } from './react_embeddable_system';
 import { registerSavedObjectToPanelMethod } from './registry/saved_object_to_panel_methods';
+import { registerContextMenuAction } from './context_menu_registry';
 
 export interface EmbeddableSetupDependencies {
   uiActions: UiActionsSetup;
@@ -78,6 +79,8 @@ export interface EmbeddableStartDependencies {
 }
 
 export interface EmbeddableSetup {
+  registerContextMenuAction: typeof registerContextMenuAction;
+
   /**
    * Register an embeddable API saved object with the Add from library flyout.
    *
@@ -191,6 +194,7 @@ export class EmbeddablePublicPlugin implements Plugin<EmbeddableSetup, Embeddabl
     bootstrap(uiActions);
 
     return {
+      registerContextMenuAction,
       registerReactEmbeddableFactory,
       registerSavedObjectToPanelMethod,
       registerReactEmbeddableSavedObject,
