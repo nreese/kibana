@@ -21,7 +21,6 @@ import {
 } from '@kbn/core/public';
 import { Storage } from '@kbn/kibana-utils-plugin/public';
 import { UsageCollectionStart } from '@kbn/usage-collection-plugin/public';
-import { migrateToLatest, PersistableStateService } from '@kbn/kibana-utils-plugin/common';
 import { SavedObjectsManagementPluginStart } from '@kbn/saved-objects-management-plugin/public';
 import type { ContentManagementPublicStart } from '@kbn/content-management-plugin/public';
 import type { SavedObjectTaggingOssPluginStart } from '@kbn/saved-objects-tagging-oss-plugin/public';
@@ -29,7 +28,6 @@ import {
   EmbeddableFactoryRegistry,
   EnhancementsRegistry,
   EnhancementRegistryDefinition,
-  EnhancementRegistryItem,
 } from './types';
 import { bootstrap } from './bootstrap';
 import {
@@ -41,14 +39,6 @@ import {
 } from './lib';
 import { EmbeddableFactoryDefinition } from './lib/embeddables/embeddable_factory_definition';
 import { EmbeddableStateTransfer } from './lib/state_transfer';
-import { EmbeddableStateWithType, CommonEmbeddableStartContract } from '../common/types';
-import {
-  getExtractFunction,
-  getInjectFunction,
-  getMigrateFunction,
-  getTelemetryFunction,
-} from '../common/lib';
-import { getAllMigrations } from '../common/lib/get_all_migrations';
 import { setKibanaServices } from './kibana_services';
 import { registerReactEmbeddableFactory } from './react_embeddable_system';
 import { registerAddFromLibraryType } from './add_from_library/registry';
@@ -109,7 +99,7 @@ export interface EmbeddableSetup {
   registerEnhancement: (enhancement: EnhancementRegistryDefinition) => void;
 }
 
-export interface EmbeddableStart extends PersistableStateService<EmbeddableStateWithType> {
+export interface EmbeddableStart {
   /**
    * @deprecated use {@link registerReactEmbeddableFactory} instead.
    */
@@ -167,19 +157,6 @@ export class EmbeddablePublicPlugin implements Plugin<EmbeddableSetup, Embeddabl
     );
     this.isRegistryReady = true;
 
-    const commonContract: CommonEmbeddableStartContract = {
-      getEmbeddableFactory: this
-        .getEmbeddableFactory as unknown as CommonEmbeddableStartContract['getEmbeddableFactory'],
-      getEnhancement: this.getEnhancement,
-    };
-
-    const getAllMigrationsFn = () =>
-      getAllMigrations(
-        Array.from(this.embeddableFactories.values()),
-        Array.from(this.enhancements.values()),
-        getMigrateFunction(commonContract)
-      );
-
     const embeddableStart: EmbeddableStart = {
       getEmbeddableFactory: this.getEmbeddableFactory,
       getEmbeddableFactories: this.getEmbeddableFactories,
@@ -192,13 +169,6 @@ export class EmbeddablePublicPlugin implements Plugin<EmbeddableSetup, Embeddabl
               storage
             )
           : this.stateTransferService,
-      telemetry: getTelemetryFunction(commonContract),
-      extract: getExtractFunction(commonContract),
-      inject: getInjectFunction(commonContract),
-      getAllMigrations: getAllMigrationsFn,
-      migrateToLatest: (state) => {
-        return migrateToLatest(getAllMigrationsFn(), state) as EmbeddableStateWithType;
-      },
     };
 
     setKibanaServices(core, embeddableStart, deps);
@@ -226,20 +196,6 @@ export class EmbeddablePublicPlugin implements Plugin<EmbeddableSetup, Embeddabl
         }),
       migrations: enhancement.migrations || {},
     });
-  };
-
-  private getEnhancement = (id: string): EnhancementRegistryItem => {
-    return (
-      this.enhancements.get(id) || {
-        id: 'unknown',
-        telemetry: (state, stats) => stats,
-        inject: identity,
-        extract: (state: SerializableRecord) => {
-          return { state, references: [] };
-        },
-        migrations: {},
-      }
-    );
   };
 
   private getEmbeddableFactories = () => {
