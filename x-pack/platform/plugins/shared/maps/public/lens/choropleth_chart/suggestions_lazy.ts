@@ -29,8 +29,8 @@ export function getSuggestionsLazy(
 ): Array<VisualizationSuggestion<ChoroplethChartState>> {
   if (!promise) {
     promise = new Promise((resolve) => {
-      Promise.all([import('./suggestions'), import('../../util')])
-        .then(async ([{ getSuggestions }, { getEmsFileLayers }]) => {
+      import('./setup_module')
+        .then(async ({ getSuggestions, getEmsFileLayers }) => {
           getSuggestionsActual = getSuggestions;
           try {
             emsFileLayers = await getEmsFileLayers();
