@@ -13,7 +13,7 @@ import { VALUE_CLICK_TRIGGER } from '@kbn/embeddable-plugin/public';
 import { RawValue } from '../../common/constants';
 import type { MapApi } from './types';
 import { getUiActions } from '../kibana_services';
-import { isUrlDrilldown, toValueClickDataFormat } from '../trigger_actions/trigger_utils';
+import { isUrlDrilldown, toValueClickDataFormat } from '../ui_actions/trigger_utils';
 
 export function initializeActionHandlers(getApi: () => MapApi | undefined) {
   function getActionContext() {

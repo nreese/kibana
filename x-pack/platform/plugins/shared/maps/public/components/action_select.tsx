@@ -9,7 +9,7 @@ import React, { Component } from 'react';
 import { EuiFormRow, EuiSuperSelect, EuiIcon } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { ActionExecutionContext, Action } from '@kbn/ui-actions-plugin/public';
-import { isUrlDrilldown } from '../trigger_actions/trigger_utils';
+import { isUrlDrilldown } from '../ui_actions/trigger_utils';
 
 interface Props {
   value?: string;

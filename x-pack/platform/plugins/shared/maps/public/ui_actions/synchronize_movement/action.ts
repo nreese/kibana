@@ -6,14 +6,14 @@
  */
 
 import { i18n } from '@kbn/i18n';
-import { type EmbeddableApiContext, apiHasType } from '@kbn/presentation-publishing';
+import { type EmbeddableApiContext, apiIsOfType } from '@kbn/presentation-publishing';
 import { createAction } from '@kbn/ui-actions-plugin/public';
-import type { SynchronizeMovementActionApi } from './types';
-
-export const SYNCHRONIZE_MOVEMENT_ACTION = 'SYNCHRONIZE_MOVEMENT_ACTION';
-
-export const isApiCompatible = (api: unknown | null): api is SynchronizeMovementActionApi =>
-  Boolean(apiHasType(api));
+import { apiHasVisualizeConfig } from '@kbn/visualizations-plugin/public';
+import { isLensApi } from '@kbn/lens-plugin/public';
+import { MAP_SAVED_OBJECT_TYPE } from '../../../common/constants';
+import { isLegacyMapApi } from '../../legacy_visualizations/is_legacy_map';
+import { mapEmbeddablesSingleton } from '../../react_embeddable/map_embeddables_singleton';
+import { SYNCHRONIZE_MOVEMENT_ACTION } from './constants';
 
 export const synchronizeMovementAction = createAction<EmbeddableApiContext>({
   id: SYNCHRONIZE_MOVEMENT_ACTION,
@@ -34,9 +34,14 @@ export const synchronizeMovementAction = createAction<EmbeddableApiContext>({
     return 'crosshairs';
   },
   isCompatible: async ({ embeddable }: EmbeddableApiContext) => {
-    if (!isApiCompatible(embeddable)) return false;
-    const { isCompatible } = await import('./is_compatible');
-    return isCompatible(embeddable);
+    if (!mapEmbeddablesSingleton.hasMultipleMaps()) {
+      return false;
+    }
+    return (
+      apiIsOfType(embeddable, MAP_SAVED_OBJECT_TYPE) ||
+      (isLensApi(embeddable) && embeddable.getSavedVis()?.visualizationType === 'lnsChoropleth') ||
+      (apiHasVisualizeConfig(embeddable) && isLegacyMapApi(embeddable))
+    );
   },
   execute: async () => {
     const { openModal } = await import('./modal');
