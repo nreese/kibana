@@ -27,11 +27,11 @@ import {
   reportingCsvShareModalProvider,
   reportingExportModalProvider,
 } from '@kbn/reporting-public/share';
-import { ReportingCsvPanelAction } from '@kbn/reporting-csv-share-panel';
 import { InjectedIntl } from '@kbn/i18n-react';
 import type { ReportingSetup, ReportingStart } from '.';
 import { ReportingNotifierStreamHandler as StreamHandler } from './lib/stream_handler';
 import { StartServices } from './types';
+import { CSV_REPORTING_ACTION } from '@kbn/reporting-export-types-csv-common';
 
 export interface ReportingPublicPluginSetupDependencies {
   home: HomePublicPluginSetup;
@@ -199,14 +199,18 @@ export class ReportingPublicPlugin
       visibleIn: [],
     });
 
-    uiActionsSetup.addTriggerAction(
+    uiActionsSetup.addTriggerActionAsync(
       CONTEXT_MENU_TRIGGER,
-      new ReportingCsvPanelAction({
-        core,
-        apiClient,
-        startServices$,
-        csvConfig: this.config.csv,
-      })
+      CSV_REPORTING_ACTION,
+      async () => {
+        const { ReportingCsvPanelAction } = await import ('@kbn/reporting-csv-share-panel');
+        return new ReportingCsvPanelAction({
+          core,
+          apiClient,
+          startServices$,
+          csvConfig: this.config.csv,
+        })
+      }
     );
 
     startServices$.subscribe(([{ application }, { licensing }]) => {
