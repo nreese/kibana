@@ -16,9 +16,9 @@ import { isAnomalySwimlaneSelectionTriggerContext } from './triggers';
 import { SWIMLANE_TYPE, VIEW_BY_JOB_LABEL } from '../application/explorer/explorer_constants';
 import type { SwimLaneDrilldownContext } from '../embeddables';
 import type { MlCoreSetup } from '../plugin';
-import { CONTROLLED_BY_SWIM_LANE_FILTER } from './constants';
+import { APPLY_INFLUENCER_FILTERS_ACTION, CONTROLLED_BY_SWIM_LANE_FILTER } from './constants';
 
-export const APPLY_INFLUENCER_FILTERS_ACTION = 'applyInfluencerFiltersAction';
+
 
 const supportedApps = [DASHBOARD_APP_ID];
 
@@ -26,7 +26,7 @@ export function createApplyInfluencerFiltersAction(
   getStartServices: MlCoreSetup['getStartServices']
 ): UiActionsActionDefinition<SwimLaneDrilldownContext> {
   return {
-    id: 'apply-to-current-view',
+    id: APPLY_INFLUENCER_FILTERS_ACTION,
     type: APPLY_INFLUENCER_FILTERS_ACTION,
     getIconType(): string {
       return 'filter';

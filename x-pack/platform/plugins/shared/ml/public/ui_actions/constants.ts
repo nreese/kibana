@@ -8,3 +8,8 @@
 export const CONTROLLED_BY_SWIM_LANE_FILTER = 'anomaly-swim-lane';
 export const CONTROLLED_BY_ANOMALY_CHARTS_FILTER = 'anomaly-charts';
 export const CONTROLLED_BY_SINGLE_METRIC_VIEWER_FILTER = 'single-metric-viewer';
+
+export const APPLY_INFLUENCER_FILTERS_ACTION = 'applyInfluencerFiltersAction';
+export const APPLY_TIME_RANGE_SELECTION_ACTION = 'applyTimeRangeSelectionAction';
+export const OPEN_IN_ANOMALY_EXPLORER_ACTION = 'openInAnomalyExplorerAction';
+export const OPEN_IN_SINGLE_METRIC_VIEWER_ACTION = 'openInSingleMetricViewerAction';

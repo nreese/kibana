@@ -18,12 +18,11 @@ import { ANOMALY_SINGLE_METRIC_VIEWER_EMBEDDABLE_TYPE } from '../embeddables';
 
 import type { MlCoreSetup } from '../plugin';
 import { getEmbeddableTimeRange } from './get_embeddable_time_range';
+import { OPEN_IN_SINGLE_METRIC_VIEWER_ACTION } from './constants';
 
 export interface OpenInSingleMetricViewerActionContext extends EmbeddableApiContext {
   embeddable: SingleMetricViewerEmbeddableApi;
 }
-
-export const OPEN_IN_SINGLE_METRIC_VIEWER_ACTION = 'openInSingleMetricViewerAction';
 
 export function isSingleMetricViewerEmbeddableContext(
   arg: unknown
@@ -38,7 +37,7 @@ export function createOpenInSingleMetricViewerAction(
   getStartServices: MlCoreSetup['getStartServices']
 ): UiActionsActionDefinition<OpenInSingleMetricViewerActionContext> {
   return {
-    id: 'open-in-single-metric-viewer',
+    id: OPEN_IN_SINGLE_METRIC_VIEWER_ACTION,
     type: OPEN_IN_SINGLE_METRIC_VIEWER_ACTION,
     order: 100,
     getIconType(): string {

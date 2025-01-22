@@ -39,8 +39,6 @@ export interface OpenInAnomalyExplorerAnomalyChartsActionContext extends Embedda
   data?: MlEntityField[];
 }
 
-export const OPEN_IN_ANOMALY_EXPLORER_ACTION = 'openInAnomalyExplorerAction';
-
 export function isAnomalyChartsEmbeddableContext(arg: unknown): arg is {
   embeddable: AnomalyChartsApi;
 } {
@@ -56,7 +54,7 @@ export function createOpenInExplorerAction(
   OpenInAnomalyExplorerSwimLaneActionContext | OpenInAnomalyExplorerAnomalyChartsActionContext
 > {
   return {
-    id: 'open-in-anomaly-explorer',
+    id: OPEN_IN_ANOMALY_EXPLORER_ACTION,
     type: OPEN_IN_ANOMALY_EXPLORER_ACTION,
     order: 40,
     getIconType(): string {

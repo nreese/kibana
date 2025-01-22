@@ -5,4 +5,5 @@
  * 2.0.
  */
 
-export { getAnomalySwimLaneEmbeddableFactory } from './anomaly_swimlane_embeddable_factory';
+export { createOpenInExplorerAction } from './open_in_anomaly_explorer_action';
+export { createOpenInSingleMetricViewerAction } from './open_in_single_metric_viewer_action';
