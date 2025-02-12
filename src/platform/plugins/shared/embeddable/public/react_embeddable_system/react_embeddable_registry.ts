@@ -9,6 +9,7 @@
 
 import { i18n } from '@kbn/i18n';
 import { DefaultEmbeddableApi, ReactEmbeddableFactory } from './types';
+import { warmPresentationPanel } from '@kbn/presentation-panel-plugin/public';
 
 const registry: { [key: string]: () => Promise<ReactEmbeddableFactory<any, any, any>> } = {};
 
@@ -59,3 +60,13 @@ export const getReactEmbeddableFactory = async <
     );
   return registry[key]();
 };
+
+export function warmEmbeddableRegistry() {
+  warmPresentationPanel();
+  console.log(Object.keys(registry));
+  Object.entries(registry).forEach(([id, getFactory]) => {
+    if (['control_group', 'lens', 'visualization', 'maps'].includes(id)) {
+      getFactory();
+    }
+  })
+}

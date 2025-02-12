@@ -29,7 +29,7 @@ import {
 import type { DataPublicPluginSetup, DataPublicPluginStart } from '@kbn/data-plugin/public';
 import type { LensPublicSetup, LensPublicStart } from '@kbn/lens-plugin/public';
 import type { DataViewEditorStart } from '@kbn/data-view-editor-plugin/public';
-import type { EmbeddableSetup, EmbeddableStart } from '@kbn/embeddable-plugin/public';
+import { warmEmbeddableRegistry, type EmbeddableSetup, type EmbeddableStart } from '@kbn/embeddable-plugin/public';
 import { FieldFormatsStart } from '@kbn/field-formats-plugin/public/plugin';
 import type { HomePublicPluginSetup } from '@kbn/home-plugin/public';
 import { i18n } from '@kbn/i18n';
@@ -257,7 +257,13 @@ export class DashboardPlugin
         this.currentHistory = params.history;
         params.element.classList.add(APP_WRAPPER_CLASS);
         await untilPluginStartServicesReady();
-        const { mountApp } = await import('./dashboard_app/dashboard_router');
+        const mountAppPromise = new Promise(resolve => {
+          import('./dashboard_app/dashboard_router').then(({ mountApp }) => {
+            resolve(mountApp);
+          });
+          //warmEmbeddableRegistry();
+        });
+        const mountApp = await mountAppPromise;
         appMounted();
 
         const [coreStart] = await core.getStartServices();

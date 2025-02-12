@@ -10,6 +10,7 @@
 import { PluginInitializerContext } from '@kbn/core/public';
 import { EmbeddablePublicPlugin } from './plugin';
 
+export { warmEmbeddableRegistry } from './react_embeddable_system/react_embeddable_registry';
 export { useAddFromLibraryTypes } from './add_from_library/registry';
 export { openAddFromLibraryFlyout } from './add_from_library/open_add_from_library_flyout';
 export { PanelNotFoundError, PanelIncompatibleError } from './react_embeddable_system';

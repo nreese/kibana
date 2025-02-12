@@ -13,6 +13,10 @@ export function plugin() {
   return new PresentationPanelPlugin();
 }
 
+export function warmPresentationPanel() {
+  import('./panel_component/panel_module');
+}
+
 export { ACTION_CUSTOMIZE_PANEL } from './panel_actions/customize_panel_action/constants';
 export { ACTION_EDIT_PANEL } from './panel_actions/edit_panel_action/constants';
 export { PresentationPanel } from './panel_component';

@@ -123,6 +123,8 @@ function reportPerformanceMetrics({
   const duration =
     loadType === 'dashboardSubsequentLoad' ? timeToData : Math.max(timeToData, totalLoadTime);
 
+  console.log(`dashboard loaded event: timeToData: ${timeToData}, totalLoadTime: ${totalLoadTime}`);
+
   const e = {
     eventName: DASHBOARD_LOADED_EVENT,
     duration,
