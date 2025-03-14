@@ -18,7 +18,7 @@ import { Query, AggregateQuery } from '@kbn/es-query';
 import { CoreStart, DocLinksStart } from '@kbn/core/public';
 import { IStorageWrapper } from '@kbn/kibana-utils-plugin/public';
 import { SavedObjectsManagementPluginStart } from '@kbn/saved-objects-management-plugin/public';
-import { AutocompleteSetup, AutocompleteStart } from './autocomplete';
+import { AutocompleteStart } from './autocomplete';
 import type { IndexPatternSelectProps, QueryStringInputProps, StatefulSearchBarProps } from '.';
 import type { FiltersBuilderProps } from './filters_builder/filters_builder';
 import { StatefulSearchBarDeps } from './search_bar/create_search_bar';
@@ -29,9 +29,7 @@ export interface UnifiedSearchSetupDependencies {
   usageCollection?: UsageCollectionSetup;
 }
 
-export interface UnifiedSearchPluginSetup {
-  autocomplete: AutocompleteSetup;
-}
+export interface UnifiedSearchPluginSetup {}
 
 export interface UnifiedSearchStartDependencies {
   dataViews: DataViewsPublicPluginStart;
@@ -61,11 +59,6 @@ export interface UnifiedSearchPublicPluginStartUi {
  * Unified search plugin public Start contract
  */
 export interface UnifiedSearchPublicPluginStart {
-  /**
-   * autocomplete service
-   * {@link AutocompleteStart}
-   */
-  autocomplete: AutocompleteStart;
   /**
    * prewired UI components
    * {@link UnifiedSearchPublicPluginStartUi}
