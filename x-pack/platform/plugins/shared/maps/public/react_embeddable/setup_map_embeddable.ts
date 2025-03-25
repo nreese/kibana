@@ -16,7 +16,7 @@ export function setupMapEmbeddable(embeddableSetup: EmbeddableSetup) {
     const startServicesPromise = untilPluginStartServicesReady();
     const [, { mapEmbeddableFactory }] = await Promise.all([
       startServicesPromise,
-      import('./embeddable_module'),
+      import('../map_module'),
     ]);
 
     return mapEmbeddableFactory;

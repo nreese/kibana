@@ -201,7 +201,7 @@ export class MapsPlugin
         const [, startServices, { renderApp }] = await Promise.all([
           untilPluginStartServicesReady(),
           core.getStartServices(),
-          import('./render_app'),
+          import('./map_module'),
         ]);
         const [coreStart, { savedObjectsTagging, spaces }] = startServices;
         const UsageTracker =
