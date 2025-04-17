@@ -15,7 +15,7 @@ export interface SerializedTimeRange {
   timeRange?: TimeRange | undefined;
 }
 
-const defaultTimeRangeState: WithAllKeys<SerializedTimeRange> = {
+export const defaultTimeRangeState: WithAllKeys<SerializedTimeRange> = {
   timeRange: undefined,
 };
 

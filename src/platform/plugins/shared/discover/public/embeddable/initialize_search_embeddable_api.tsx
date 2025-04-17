@@ -201,19 +201,27 @@ export const initializeSearchEmbeddableApi = async (
     stateManager,
     anyStateChange$: onAnyStateChange.pipe(map(() => undefined)),
     comparators: {
-      sort: (a, b) => deepEqual(a ?? [], b ?? []),
+      sort: 'deepEquality',
       columns: 'deepEquality',
-      grid: (a, b) => deepEqual(a ?? {}, b ?? {}),
-      sampleSize: (a, b) => (a ?? defaults.sampleSize) === (b ?? defaults.sampleSize),
-      rowsPerPage: (a, b) => (a ?? defaults.rowsPerPage) === (b ?? defaults.rowsPerPage),
-      rowHeight: (a, b) => (a ?? defaults.rowHeight) === (b ?? defaults.rowHeight),
-      headerRowHeight: (a, b) =>
-        (a ?? defaults.headerRowHeight) === (b ?? defaults.headerRowHeight),
+      grid: 'deepEquality',
+      sampleSize: 'referenceEquality',
+      rowsPerPage: 'referenceEquality',
+      rowHeight: 'referenceEquality',
+      headerRowHeight: 'referenceEquality',
       /** The following can't currently be changed from the dashboard */
       serializedSearchSource: 'skip',
       viewMode: 'skip',
       density: 'skip',
     },
+    defaultState: {
+      ...defaults,
+      sort: [],
+      columns: undefined,
+      grid: {},
+      serializedSearchSource: undefined,
+      viewMode: undefined,
+      density: undefined,
+    }
     reinitializeState: (lastSaved?: SearchEmbeddableSerializedState) => {
       sort$.next(lastSaved?.sort);
       columns$.next(lastSaved?.columns);

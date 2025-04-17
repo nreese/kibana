@@ -32,6 +32,7 @@ export { fetch$, useFetchContext, type FetchContext } from './interfaces/fetch/f
 export {
   initializeTimeRangeManager,
   timeRangeComparators,
+  defaultTimeRangeState,
   type SerializedTimeRange,
 } from './interfaces/fetch/time_range_manager';
 export { apiPublishesReload, type PublishesReload } from './interfaces/fetch/publishes_reload';
@@ -149,6 +150,7 @@ export {
   initializeTitleManager,
   stateHasTitles,
   titleComparators,
+  defaultTitlesState,
   type TitlesApi,
   type SerializedTitles,
 } from './interfaces/titles/title_manager';

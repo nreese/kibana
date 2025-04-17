@@ -8,7 +8,7 @@
  */
 
 import deepEqual from 'fast-deep-equal';
-import { StateComparators } from './types';
+import { StateComparators, WithAllKeys } from './types';
 
 const referenceEquality = <T>(a: T, b: T) => a === b;
 const deepEquality = <T>(a: T, b: T) => deepEqual(a, b);
@@ -55,13 +55,14 @@ export const diffComparators = <StateType extends object = object>(
  */
 export const areComparatorsEqual = <StateType extends object = object>(
   comparators: StateComparators<StateType>,
+  defaultState: WithAllKeys<StateType>,
   lastSavedState?: StateType,
   currentState?: StateType
 ): boolean => {
   return Object.keys(comparators).every((key) => {
     const comparator = comparators[key as keyof StateType];
-    const lastSavedValue = lastSavedState?.[key as keyof StateType];
-    const currentValue = currentState?.[key as keyof StateType];
+    const lastSavedValue = lastSavedState?.[key as keyof StateType] ?? defaultState[key as keyof StateType];
+    const currentValue = currentState?.[key as keyof StateType] ?? defaultState[key as keyof StateType];
 
     const areEqual = runComparator(
       comparator,

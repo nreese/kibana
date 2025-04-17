@@ -11,6 +11,7 @@ import {
   apiHasUniqueId,
   EmbeddableApiContext,
   StateComparators,
+  WithAllKeys,
 } from '@kbn/presentation-publishing';
 import {
   AdvancedUiActionsSetup,
@@ -43,6 +44,7 @@ export interface SetupContract {}
 export interface EmbeddableDynamicActionsManager {
   api: HasDynamicActions;
   comparators: StateComparators<DynamicActionsSerializedState>;
+  defaultState: WithAllKeys<DynamicActionsSerializedState>,
   anyStateChange$: Observable<void>;
   getLatestState: () => DynamicActionsSerializedState;
   reinitializeState: (lastState: DynamicActionsSerializedState) => void;
@@ -113,6 +115,9 @@ export class EmbeddableEnhancedPlugin
           return deepEqual(getDynamicActionsState(a), getDynamicActionsState(b));
         },
       } as StateComparators<DynamicActionsSerializedState>,
+      defaultState: {
+        enhancements: undefined
+      } as WithAllKeys<DynamicActionsSerializedState>,
       anyStateChange$: dynamicActionsState$.pipe(map(() => undefined)),
       getLatestState: () => {
         return { enhancements: dynamicActionsState$.getValue() };

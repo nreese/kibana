@@ -19,6 +19,8 @@ import { i18n } from '@kbn/i18n';
 import { KibanaContextProvider } from '@kbn/kibana-react-plugin/public';
 import type { FetchContext } from '@kbn/presentation-publishing';
 import {
+  defaultTimeRangeState,
+  defaultTitlesState,
   initializeTimeRangeManager,
   initializeTitleManager,
   timeRangeComparators,
@@ -159,6 +161,24 @@ export const getSearchEmbeddableFactory = ({
             usesAdHocDataView: 'skip',
             visContext: 'skip',
           };
+        },
+        defaultState: {
+          ...(dynamicActionsManager?.defaultState ?? { enhancements: undefined }),
+          ...defaultTitlesState,
+          ...defaultTimeRangeState,
+          ...searchEmbeddable.defaultState,
+          attributes: undefined,
+          breakdownField: undefined,
+          hideAggregatedPreview: undefined,
+          hideChart: undefined,
+          isTextBasedQuery: undefined,
+          kibanaSavedObjectMeta: undefined,
+          nonPersistedDisplayOptions: undefined,
+          refreshInterval: undefined,
+          savedObjectId: undefined,
+          timeRestore: undefined,
+          usesAdHocDataView: undefined,
+          visContext: undefined,
         },
         onReset: (lastSaved) => {
           dynamicActionsManager?.reinitializeState(lastSaved?.rawState ?? {});

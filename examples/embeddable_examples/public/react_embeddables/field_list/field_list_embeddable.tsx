@@ -24,6 +24,7 @@ import {
   initializeTitleManager,
   titleComparators,
   useBatchedPublishingSubjects,
+  defaultTitlesState,
 } from '@kbn/presentation-publishing';
 import { LazyDataViewPicker, withSuspense } from '@kbn/presentation-util-plugin/public';
 import {
@@ -141,17 +142,22 @@ export const getFieldListFactory = (
         };
       }
 
-      const unsavedChangesApi = initializeUnsavedChanges({
+      const unsavedChangesApi = initializeUnsavedChanges<FieldListSerializedState>({
         uuid,
         parentApi,
         serializeState,
         anyStateChange$: merge(titleManager.anyStateChange$, fieldListStateManager.anyStateChange$),
         getComparators: () => ({
           ...titleComparators,
+          dataViewId: 'referenceEquality',
           selectedFieldNames: (a, b) => {
             return (a?.slice().sort().join(',') ?? '') === (b?.slice().sort().join(',') ?? '');
           },
         }),
+        defaultState: {
+          ...defaultTitlesState,
+          ...defaultFieldListState
+        },
         onReset: async (lastSaved) => {
           const lastState = await deserializeState(dataViews, lastSaved);
           fieldListStateManager.reinitializeState(lastState);

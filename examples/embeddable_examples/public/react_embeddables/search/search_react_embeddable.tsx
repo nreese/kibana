@@ -13,6 +13,7 @@ import { DataView } from '@kbn/data-views-plugin/common';
 import { EmbeddableFactory } from '@kbn/embeddable-plugin/public';
 import { i18n } from '@kbn/i18n';
 import {
+  defaultTimeRangeState,
   fetch$,
   initializeTimeRangeManager,
   timeRangeComparators,
@@ -56,7 +57,7 @@ export const getSearchEmbeddableFactory = (services: Services) => {
         };
       }
 
-      const unsavedChangesApi = initializeUnsavedChanges({
+      const unsavedChangesApi = initializeUnsavedChanges<SearchSerializedState>({
         uuid,
         parentApi,
         serializeState,
@@ -68,6 +69,9 @@ export const getSearchEmbeddableFactory = (services: Services) => {
            * may want to skip comparison of certain state.
            */
           return timeRangeComparators;
+        },
+        defaultState: {
+          ...defaultTimeRangeState
         },
         onReset: (lastSaved) => {
           /**

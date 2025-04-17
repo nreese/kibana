@@ -11,6 +11,7 @@ import {
   PublishesUnsavedChanges,
   SerializedPanelState,
   StateComparators,
+  WithAllKeys,
   areComparatorsEqual,
 } from '@kbn/presentation-publishing';
 import { MaybePromise } from '@kbn/utility-types';
@@ -24,6 +25,7 @@ export const initializeUnsavedChanges = <SerializedStateType extends object = ob
   onReset,
   parentApi,
   getComparators,
+  defaultState,
   serializeState,
   anyStateChange$,
 }: {
@@ -32,6 +34,7 @@ export const initializeUnsavedChanges = <SerializedStateType extends object = ob
   anyStateChange$: Observable<void>;
   serializeState: () => SerializedPanelState<SerializedStateType>;
   getComparators: () => StateComparators<SerializedStateType>;
+  defaultState: WithAllKeys<SerializedStateType>;
   onReset: (lastSavedPanelState?: SerializedPanelState<SerializedStateType>) => MaybePromise<void>;
 }): PublishesUnsavedChanges => {
   if (!apiHasLastSavedChildState<SerializedStateType>(parentApi)) {
@@ -47,7 +50,7 @@ export const initializeUnsavedChanges = <SerializedStateType extends object = ob
     debounceTime(UNSAVED_CHANGES_DEBOUNCE),
     map(([, lastSavedState]) => {
       const currentState = serializeState().rawState;
-      return !areComparatorsEqual(getComparators(), lastSavedState, currentState);
+      return !areComparatorsEqual(getComparators(), defaultState, lastSavedState, currentState);
     })
   );
 

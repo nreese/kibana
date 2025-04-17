@@ -17,6 +17,8 @@ import { KibanaContextProvider } from '@kbn/kibana-react-plugin/public';
 import { Storage } from '@kbn/kibana-utils-plugin/public';
 import { initializeUnsavedChanges } from '@kbn/presentation-containers';
 import {
+  defaultTimeRangeState,
+  defaultTitlesState,
   initializeTimeRangeManager,
   initializeTitleManager,
   timeRangeComparators,
@@ -71,6 +73,10 @@ export const getDataTableFactory = (
           ...titleComparators,
           ...timeRangeComparators,
         };
+      },
+      defaultState: {
+        ...defaultTitlesState,
+        ...defaultTimeRangeState
       },
       onReset: (lastSaved) => {
         const lastSavedState = lastSaved?.rawState;

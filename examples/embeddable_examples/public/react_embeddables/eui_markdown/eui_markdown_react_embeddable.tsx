@@ -15,6 +15,7 @@ import { initializeUnsavedChanges } from '@kbn/presentation-containers';
 import {
   StateComparators,
   WithAllKeys,
+  defaultTitlesState,
   getViewModeSubject,
   initializeStateManager,
   initializeTitleManager,
@@ -63,7 +64,7 @@ export const markdownEmbeddableFactory: EmbeddableFactory<
       };
     }
 
-    const unsavedChangesApi = initializeUnsavedChanges({
+    const unsavedChangesApi = initializeUnsavedChanges<MarkdownEditorSerializedState>({
       uuid,
       parentApi,
       serializeState,
@@ -78,6 +79,10 @@ export const markdownEmbeddableFactory: EmbeddableFactory<
          * may want to skip comparison of certain state.
          */
         return { ...titleComparators, ...markdownComparators };
+      },
+      defaultState: {
+        ...defaultTitlesState,
+        ...defaultMarkdownState
       },
       onReset: (lastSaved) => {
         /**
