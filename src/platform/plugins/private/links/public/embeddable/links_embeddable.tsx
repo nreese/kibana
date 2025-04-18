@@ -12,7 +12,7 @@ import { cloneDeep } from 'lodash';
 import { BehaviorSubject } from 'rxjs';
 import { EuiListGroup, EuiPanel, UseEuiTheme } from '@elastic/eui';
 
-import { PanelIncompatibleError, ReactEmbeddableFactory } from '@kbn/embeddable-plugin/public';
+import { PanelIncompatibleError, EmbeddableFactory } from '@kbn/embeddable-plugin/public';
 import {
   SerializedTitles,
   initializeTitleManager,
@@ -47,52 +47,19 @@ import { resolveLinks } from '../lib/resolve_links';
 import {
   deserializeLinksSavedObject,
   linksSerializeStateIsByReference,
-} from '../lib/deserialize_from_library';
+} from '../lib/deserialize_state';
 import { serializeLinksAttributes } from '../lib/serialize_attributes';
 import { isParentApiCompatible } from '../actions/add_links_panel_action';
 
 export const LinksContext = createContext<LinksApi | null>(null);
 
 export const getLinksEmbeddableFactory = () => {
-  const linksEmbeddableFactory: ReactEmbeddableFactory<
+  const linksEmbeddableFactory: EmbeddableFactory<
     LinksSerializedState,
     LinksRuntimeState,
     LinksApi
   > = {
     type: CONTENT_ID,
-    deserializeState: async (serializedState) => {
-      // Clone the state to avoid an object not extensible error when injecting references
-      const state = cloneDeep(serializedState.rawState);
-      const { title, description, hidePanelTitles } = serializedState.rawState;
-
-      if (linksSerializeStateIsByReference(state)) {
-        const linksSavedObject = await linksClient.get(state.savedObjectId);
-        const runtimeState = await deserializeLinksSavedObject(linksSavedObject.item);
-        return {
-          ...runtimeState,
-          title,
-          description,
-          hidePanelTitles,
-        };
-      }
-
-      const { attributes: attributesWithInjectedIds } = injectReferences({
-        attributes: state.attributes,
-        references: serializedState.references ?? [],
-      });
-
-      const resolvedLinks = await resolveLinks(attributesWithInjectedIds.links ?? []);
-
-      return {
-        title,
-        description,
-        hidePanelTitles,
-        links: resolvedLinks,
-        layout: attributesWithInjectedIds.layout,
-        defaultPanelTitle: attributesWithInjectedIds.title,
-        defaultPanelDescription: attributesWithInjectedIds.description,
-      };
-    },
     buildEmbeddable: async (state, buildApi, uuid, parentApi) => {
       const blockingError$ = new BehaviorSubject<Error | undefined>(state.error);
       if (!isParentApiCompatible(parentApi)) blockingError$.next(new PanelIncompatibleError());

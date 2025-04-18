@@ -8,4 +8,4 @@
  */
 
 export { getLinksEmbeddableFactory } from './links_embeddable';
-export { deserializeLinksSavedObject } from '../lib/deserialize_from_library';
+export { deserializeLinksSavedObject } from '../lib/deserialize_state';

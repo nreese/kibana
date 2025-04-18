@@ -64,7 +64,7 @@ export class LinksPlugin
 
       plugins.embeddable.registerAddFromLibraryType({
         onAdd: async (container, savedObject) => {
-          const { deserializeLinksSavedObject } = await import('./lib/deserialize_from_library');
+          const { deserializeLinksSavedObject } = await import('./lib/deserialize_state');
           const initialState = await deserializeLinksSavedObject(savedObject);
           container.addNewPanel<LinksRuntimeState>({
             panelType: CONTENT_ID,
@@ -107,7 +107,7 @@ export class LinksPlugin
                     const [{ openEditorFlyout }, { deserializeLinksSavedObject }] =
                       await Promise.all([
                         import('./editor/open_editor_flyout'),
-                        import('./lib/deserialize_from_library'),
+                        import('./lib/deserialize_state'),
                       ]);
                     const linksSavedObject = await getLinksClient().get(savedObjectId);
                     const initialState = await deserializeLinksSavedObject(linksSavedObject.item);
