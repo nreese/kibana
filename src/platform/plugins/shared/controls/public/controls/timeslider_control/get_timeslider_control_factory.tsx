@@ -199,22 +199,10 @@ export const getTimesliderControlFactory = (): ControlFactory<
         width: 'large',
       });
 
-      const dashboardDataLoading$ =
+      const parentDataLoading$ =
         apiHasParentApi(controlGroupApi) && apiPublishesDataLoading(controlGroupApi.parentApi)
           ? controlGroupApi.parentApi.dataLoading$
           : new BehaviorSubject<boolean | undefined>(false);
-      const waitForDashboardPanelsToLoad$ = dashboardDataLoading$.pipe(
-        // debounce to give time for panels to start loading if they are going to load from time changes
-        debounceTime(300),
-        first((isLoading: boolean | undefined) => {
-          return !isLoading;
-        }),
-        map(() => {
-          // Observable notifies subscriber when loading is finished
-          // Return void to not expose internal implementation details of observable
-          return;
-        })
-      );
 
       function serializeState() {
         return {
@@ -275,7 +263,7 @@ export const getTimesliderControlFactory = (): ControlFactory<
               viewMode={viewMode}
               disablePlayButton={!autoApplySelections}
               setIsPopoverOpen={(value) => isPopoverOpen$.next(value)}
-              waitForControlOutputConsumersToLoad$={waitForDashboardPanelsToLoad$}
+              parentDataLoading$={parentDataLoading$}
             />
           );
         },

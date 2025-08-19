@@ -8,21 +8,23 @@
  */
 
 import { EuiButtonIcon, EuiFlexItem } from '@elastic/eui';
-import type { ViewMode } from '@kbn/presentation-publishing';
+import type { PublishesDataLoading, ViewMode } from '@kbn/presentation-publishing';
 import type { FC } from 'react';
 import React, { useCallback, useState } from 'react';
-import type { Observable, Subscription } from 'rxjs';
-import { first } from 'rxjs';
+import type { Subscription } from 'rxjs';
+import { debounceTime, first, map } from 'rxjs';
 import { PlayButton } from './play_button';
 import { TimeSliderStrings } from './time_slider_strings';
 
 interface Props {
   onNext: () => void;
   onPrevious: () => void;
-  waitForControlOutputConsumersToLoad$?: Observable<void>;
+  parentDataLoading$: PublishesDataLoading['dataLoading$'];
   viewMode: ViewMode;
   disablePlayButton: boolean;
   setIsPopoverOpen: (isPopoverOpen: boolean) => void;
+  dataLoadingDelay?: number;
+  nextFrameDelay?: number;
 }
 
 export const TimeSliderPrepend: FC<Props> = (props: Props) => {
@@ -34,18 +36,28 @@ export const TimeSliderPrepend: FC<Props> = (props: Props) => {
     // advance to next frame
     props.onNext();
 
-    if (props.waitForControlOutputConsumersToLoad$) {
-      const nextFrameSubscription = props.waitForControlOutputConsumersToLoad$
-        .pipe(first())
-        .subscribe(() => {
-          // use timeout to display frame for small time period before moving to next frame
-          const nextTimeoutId = window.setTimeout(() => {
-            playNextFrame();
-          }, 1750);
-          setTimeoutId(nextTimeoutId);
-        });
-      setSubscription(nextFrameSubscription);
-    }
+    const waitForControlOutputConsumersToLoad$ = props.parentDataLoading$.pipe(
+      // debounce to give time for parent to start loading from time changes
+      debounceTime(props.dataLoadingDelay ?? 300),
+      first((isLoading: boolean | undefined) => {
+        return !isLoading;
+      }),
+      map(() => {
+        // Observable notifies subscriber when loading is finished
+        // Return void to not expose internal implementation details of observable
+        return;
+      })
+    );
+    const nextFrameSubscription = waitForControlOutputConsumersToLoad$
+      .pipe(first())
+      .subscribe(() => {
+        // use timeout to display frame for small time period before moving to next frame
+        const nextTimeoutId = window.setTimeout(() => {
+          playNextFrame();
+        }, props.nextFrameDelay ?? 1750);
+        setTimeoutId(nextTimeoutId);
+      });
+    setSubscription(nextFrameSubscription);
   }, [props]);
 
   const onPlay = useCallback(() => {
@@ -85,7 +97,6 @@ export const TimeSliderPrepend: FC<Props> = (props: Props) => {
         <PlayButton
           onPlay={onPlay}
           onPause={onPause}
-          waitForControlOutputConsumersToLoad$={props.waitForControlOutputConsumersToLoad$}
           viewMode={props.viewMode}
           disablePlayButton={props.disablePlayButton}
           isPaused={isPaused}

@@ -11,24 +11,19 @@ import React from 'react';
 import type { UseEuiTheme } from '@elastic/eui';
 import { EuiButtonIcon, EuiToolTip } from '@elastic/eui';
 import type { ViewMode } from '@kbn/presentation-publishing';
-import type { Observable } from 'rxjs';
 import { css } from '@emotion/react';
 import { TimeSliderStrings } from './time_slider_strings';
 
 interface Props {
   onPlay: () => void;
   onPause: () => void;
-  waitForControlOutputConsumersToLoad$?: Observable<void>;
   viewMode: ViewMode;
   disablePlayButton: boolean;
   isPaused: boolean;
 }
 
 export function PlayButton(props: Props) {
-  if (
-    props.waitForControlOutputConsumersToLoad$ === undefined ||
-    (props.disablePlayButton && props.viewMode === 'view')
-  ) {
+  if (props.disablePlayButton && props.viewMode === 'view') {
     return null;
   }
 
@@ -41,6 +36,7 @@ export function PlayButton(props: Props) {
       display="fill"
       aria-label={TimeSliderStrings.control.getPlayButtonAriaLabel(props.isPaused)}
       css={styles.icon}
+      data-test-subj="timeSlider-playButton"
     />
   );
   return props.disablePlayButton ? (
