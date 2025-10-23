@@ -25,7 +25,6 @@ import type { SharePluginStart } from '@kbn/share-plugin/public';
 import type { DashboardStart } from '@kbn/dashboard-plugin/public';
 import { DashboardHelloWorldDrilldown } from './drilldowns/dashboard_hello_world_drilldown';
 import { DashboardToDiscoverDrilldown } from './drilldowns/dashboard_to_discover_drilldown';
-import { App1ToDashboardDrilldown } from './drilldowns/app1_to_dashboard_drilldown';
 import { App1HelloWorldDrilldown } from './drilldowns/app1_hello_world_drilldown';
 import { DashboardHelloWorldOnlyRangeSelectDrilldown } from './drilldowns/dashboard_hello_world_only_range_select_drilldown';
 import type { SampleApp2ClickContext } from './triggers';
@@ -36,7 +35,6 @@ import {
   sampleApp2ClickContext,
 } from './triggers';
 import { mount } from './mount';
-import { App2ToDashboardDrilldown } from './drilldowns/app2_to_dashboard_drilldown';
 import { registerButtonEmbeddable } from './embeddables/register_button_embeddable';
 
 export interface SetupDependencies {
@@ -74,9 +72,7 @@ export class UiActionsEnhancedExamplesPlugin
     uiActions.registerDrilldown(new DashboardHelloWorldOnlyRangeSelectDrilldown());
     uiActions.registerDrilldown(new DashboardToDiscoverDrilldown({ start }));
     uiActions.registerDrilldown(new App1HelloWorldDrilldown());
-    uiActions.registerDrilldown(new App1ToDashboardDrilldown({ start }));
-    uiActions.registerDrilldown(new App2ToDashboardDrilldown({ start }));
-
+    
     uiActions.registerTrigger(sampleApp1ClickTrigger);
     uiActions.registerTrigger(sampleApp2ClickTrigger);
 

@@ -75,34 +75,3 @@ export class MyPlugin implements Plugin {
 
 `app1_hello_world_drilldown` is a basic example that shows how you can add the most
 basic drilldown to your custom trigger.
-
-### `appx_to_dashboard_drilldown`
-
-`app1_to_dashboard_drilldown` and `app2_to_dashboard_drilldown` show how the Dashboard
-drilldown can be used in other apps, outside of Dashboard.
-
-Basically you define it:
-
-```ts
-type Trigger = typeof MY_TRIGGER_TRIGGER;
-type Context = MyAppClickContext;
-
-export class App1ToDashboardDrilldown extends AbstractDashboardDrilldown<Trigger> {
-  public readonly supportedTriggers = () => [MY_TRIGGER] as Trigger[];
-
-  protected async getURL(config: Config, context: Context): Promise<KibanaURL> {
-    return 'https://...';
-  }
-}
-```
-
-and then you register it in your plugin:
-
-```ts
-export class MyPlugin implements Plugin {
-  public setup(core, { uiActionsEnhanced: uiActions }: SetupDependencies) {
-    const drilldown = new App2ToDashboardDrilldown(/* You can pass in dependencies here. */);
-    uiActions.registerDrilldown(drilldown);
-  }
-}
-```
