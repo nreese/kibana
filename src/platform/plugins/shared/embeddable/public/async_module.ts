@@ -7,6 +7,7 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
+export { renderEmbeddable } from './react_embeddable_system/render_embeddable';
 export { getTransformDrilldownsOut } from '../common/drilldowns/transform_drilldowns_out';
 export { transformDashboardDrilldown } from './bwc/dashboard_drilldown';
 export { initializeDrilldownsManager } from './drilldowns/drilldowns_manager';
