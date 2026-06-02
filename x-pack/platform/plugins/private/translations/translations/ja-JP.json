@@ -3484,7 +3484,6 @@
     "eventAnnotationListing.groupPreview.preview": "プレビュー",
     "eventAnnotationListing.listingViewTitle": "注釈グループ",
     "eventAnnotationListing.tableList.dataView": "データビュー",
-    "eventAnnotationListing.tableList.dataView.missing": "{errorIcon} 存在しません",
     "eventAnnotationListing.tableList.emptyPrompt.body": "Lensエディターでは、複数のビジュアライゼーションで使用する注釈を作成して保存できます。",
     "eventAnnotationListing.tableList.emptyPrompt.cta": "Lensで注釈を作成",
     "eventAnnotationListing.tableList.emptyPrompt.title": "Lensで最初の注釈を作成",

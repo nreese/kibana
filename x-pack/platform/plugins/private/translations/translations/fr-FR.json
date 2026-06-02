@@ -3466,7 +3466,6 @@
     "eventAnnotationListing.groupPreview.preview": "Aperçu",
     "eventAnnotationListing.listingViewTitle": "Groupes d'annotations",
     "eventAnnotationListing.tableList.dataView": "Vue de données",
-    "eventAnnotationListing.tableList.dataView.missing": "{errorIcon} n'existe plus",
     "eventAnnotationListing.tableList.emptyPrompt.body": "Vous pouvez créer et enregistrer des annotations afin de les utiliser dans plusieurs visualisations de l'éditeur Lens.",
     "eventAnnotationListing.tableList.emptyPrompt.cta": "Créer une annotation dans Lens",
     "eventAnnotationListing.tableList.emptyPrompt.title": "Créer votre première annotation dans Lens",

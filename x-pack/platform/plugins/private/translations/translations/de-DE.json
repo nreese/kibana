@@ -3466,7 +3466,6 @@
     "eventAnnotationListing.groupPreview.preview": "Vorschau",
     "eventAnnotationListing.listingViewTitle": "Anmerkungsgruppen",
     "eventAnnotationListing.tableList.dataView": "Datenquelle",
-    "eventAnnotationListing.tableList.dataView.missing": "{errorIcon} existiert nicht mehr",
     "eventAnnotationListing.tableList.emptyPrompt.body": "Sie können Anmerkungen erstellen und speichern, um sie in mehreren Visualisierungen im Lens-Editor zu nutzen.",
     "eventAnnotationListing.tableList.emptyPrompt.cta": "Anmerkung in Lens erstellen",
     "eventAnnotationListing.tableList.emptyPrompt.title": "Erstellen Sie Ihre erste Anmerkung in Lens",

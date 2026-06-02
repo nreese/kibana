@@ -3482,7 +3482,6 @@
     "eventAnnotationListing.groupPreview.preview": "预览",
     "eventAnnotationListing.listingViewTitle": "标注组",
     "eventAnnotationListing.tableList.dataView": "数据视图",
-    "eventAnnotationListing.tableList.dataView.missing": "{errorIcon} 已不存在",
     "eventAnnotationListing.tableList.emptyPrompt.body": "您可以创建并保存标注，供在 Lens 编辑器中跨多个可视化使用。",
     "eventAnnotationListing.tableList.emptyPrompt.cta": "在 Lens 中创建标注",
     "eventAnnotationListing.tableList.emptyPrompt.title": "在 Lens 中创建您的首个标注",
