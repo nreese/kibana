@@ -46611,8 +46611,6 @@
     "xpack.securitySolution.trustedDevices.form.detailsHeader": "Details",
     "xpack.securitySolution.trustedDevices.form.detailsHeaderDescription": "Erlauben Sie einem bestimmten externen Gerät, sich mit Ihren Endpoints zu verbinden, selbst wenn die Gerätesteuerung aktiviert ist.",
     "xpack.securitySolution.trustedDevices.form.errors.descriptionMaxLength": "Die Beschreibung darf 256 Zeichen nicht überschreiten",
-    "xpack.securitySolution.trustedDevices.form.errors.entriesAtLeastOne": "Es muss mindestens eine Bedingung angegeben werden",
-    "xpack.securitySolution.trustedDevices.form.errors.entriesRequired": "Mindestens eine Bedingung ist erforderlich",
     "xpack.securitySolution.trustedDevices.form.errors.entryValueEmpty": "Der Bedingungswert darf nicht leer sein",
     "xpack.securitySolution.trustedDevices.form.errors.invalidField": "Feldeintrag muss einen Wert haben",
     "xpack.securitySolution.trustedDevices.form.errors.invalidHash": "Ungültiger Hash-Wert",

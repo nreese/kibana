@@ -46776,8 +46776,6 @@
     "xpack.securitySolution.trustedDevices.form.detailsHeader": "详情",
     "xpack.securitySolution.trustedDevices.form.detailsHeaderDescription": "允许特定的外部设备连接到您的终端，即使启用了设备控制。",
     "xpack.securitySolution.trustedDevices.form.errors.descriptionMaxLength": "描述不能超过 256 个字符",
-    "xpack.securitySolution.trustedDevices.form.errors.entriesAtLeastOne": "必须至少指定一个条件",
-    "xpack.securitySolution.trustedDevices.form.errors.entriesRequired": "至少需要满足一个条件",
     "xpack.securitySolution.trustedDevices.form.errors.entryValueEmpty": "条件值不能为空",
     "xpack.securitySolution.trustedDevices.form.errors.invalidField": "字段条目必须包含值",
     "xpack.securitySolution.trustedDevices.form.errors.invalidHash": "哈希值无效",

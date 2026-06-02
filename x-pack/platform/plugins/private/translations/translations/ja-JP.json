@@ -46786,8 +46786,6 @@
     "xpack.securitySolution.trustedDevices.form.detailsHeader": "詳細",
     "xpack.securitySolution.trustedDevices.form.detailsHeaderDescription": "デバイスコントロールが有効な場合でも特定の外部デバイスがエンドポイントに接続することを許可します。",
     "xpack.securitySolution.trustedDevices.form.errors.descriptionMaxLength": "説明は256文字以内でなければなりません",
-    "xpack.securitySolution.trustedDevices.form.errors.entriesAtLeastOne": "少なくとも1つの条件を指定する必要があります",
-    "xpack.securitySolution.trustedDevices.form.errors.entriesRequired": "少なくとも1つの条件が必要です",
     "xpack.securitySolution.trustedDevices.form.errors.entryValueEmpty": "条件値を空にすることはできません",
     "xpack.securitySolution.trustedDevices.form.errors.invalidField": "フィールドエントリには値が必要です",
     "xpack.securitySolution.trustedDevices.form.errors.invalidHash": "無効なハッシュ値",

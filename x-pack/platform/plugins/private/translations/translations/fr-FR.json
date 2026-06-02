@@ -46449,8 +46449,6 @@
     "xpack.securitySolution.trustedDevices.form.detailsHeader": "Détails",
     "xpack.securitySolution.trustedDevices.form.detailsHeaderDescription": "Autoriser un périphérique externe spécifique à se connecter à vos points de terminaison, même lorsque le contrôle des périphériques est activé.",
     "xpack.securitySolution.trustedDevices.form.errors.descriptionMaxLength": "La description ne peut pas dépasser 256 caractères",
-    "xpack.securitySolution.trustedDevices.form.errors.entriesAtLeastOne": "Au moins une condition doit être spécifiée",
-    "xpack.securitySolution.trustedDevices.form.errors.entriesRequired": "Au moins une condition est requise.",
     "xpack.securitySolution.trustedDevices.form.errors.entryValueEmpty": "La valeur de la condition ne peut pas être vide.",
     "xpack.securitySolution.trustedDevices.form.errors.invalidField": "L'entrée de champ doit contenir une valeur",
     "xpack.securitySolution.trustedDevices.form.errors.invalidHash": "Valeur de hachage non valide",
