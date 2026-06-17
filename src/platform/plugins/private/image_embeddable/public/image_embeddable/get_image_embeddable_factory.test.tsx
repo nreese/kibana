@@ -7,6 +7,7 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
+import { apiHasDrilldowns } from '@kbn/embeddable-plugin/public/drilldowns/api_has_drilldowns';
 import { IMAGE_EMBEDDABLE_TYPE } from '../../common/constants';
 import type { ImageEmbeddableApi } from '../types';
 import { getImageEmbeddableFactory } from './get_image_embeddable_factory';
@@ -63,6 +64,13 @@ describe('image embeddable', () => {
         done();
       });
       embeddableApi.setTitle('cute puppies');
+    });
+  });
+
+  describe('drilldowns', () => {
+    test('should support drilldowns', () => {
+      expect(apiHasDrilldowns(embeddableApi)).toBe(true);
+      expect(embeddableApi.supportedTriggers().length).toBeGreaterThan(1);
     });
   });
 });
