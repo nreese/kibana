@@ -302,6 +302,8 @@ export const PresentationPanelHoverActions = ({
     disabledActionIds,
   ]);
 
+  console.log('showNotifications', showNotifications);
+
   const quickActionElements = useMemo(() => {
     if (!api || quickActions.length < 1) return [];
 
@@ -372,6 +374,7 @@ export const PresentationPanelHoverActions = ({
       return notificationComponent;
     });
   }, [api, euiTheme.size.xs, notifications, showNotifications]);
+  console.log('hover actions notificationElements', notificationElements);
 
   const contextMenuClasses = classNames({
     // eslint-disable-next-line @typescript-eslint/naming-convention

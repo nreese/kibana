@@ -13,7 +13,8 @@ import type { ViewMode } from '@kbn/presentation-publishing';
 import React, { useCallback, useMemo } from 'react';
 import type { DefaultPresentationPanelApi, PresentationPanelProps } from '../types';
 import { PresentationPanelTitle } from './presentation_panel_title';
-import { usePresentationPanelHeaderActions } from './use_presentation_panel_header_actions';
+import { useNotifications } from './use_notifications';
+import { useBadges } from './use_badges';
 
 export type PresentationPanelHeaderProps<ApiType extends DefaultPresentationPanelApi> = {
   api: ApiType;
@@ -45,12 +46,10 @@ export const PresentationPanelHeader = <
 }: PresentationPanelHeaderProps<ApiType>) => {
   const { euiTheme } = useEuiTheme();
 
-  const { notificationElements, badgeElements } = usePresentationPanelHeaderActions<ApiType>(
-    showNotifications,
-    showBadges,
-    api,
-    getActions
-  );
+  const badges = useBadges(showBadges, api, getActions);
+  const notifications = useNotifications(showNotifications, api, getActions);
+
+  console.log('PresentationPanelHeader notifications', notifications);
 
   const memoizedSetDragHandle = useCallback(
     // memoize the ref callback so that we don't call `setDragHandle` on every render
@@ -88,8 +87,7 @@ export const PresentationPanelHeader = <
     };
   }, [euiTheme.size, euiTheme.colors]);
 
-  const showPanelBar =
-    (!hideTitle && panelTitle) || badgeElements.length > 0 || notificationElements.length > 0;
+  const showPanelBar = (!hideTitle && panelTitle) || badges.length > 0 || notifications.length > 0;
 
   if (!showPanelBar) return null;
 
@@ -114,9 +112,9 @@ export const PresentationPanelHeader = <
           panelDescription={panelDescription}
           titleHighlight={titleHighlight}
         />
-        {showBadges && badgeElements}
+        {showBadges && badges}
       </div>
-      {showNotifications && notificationElements}
+      {showNotifications && notifications}
     </figcaption>
   );
 };
