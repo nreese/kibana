@@ -37,6 +37,9 @@ export interface PresentationPanelInternalProps<
 > {
   Component: PanelCompatibleComponent<ApiType, PropsType>;
   componentProps?: Omit<React.ComponentProps<PanelCompatibleComponent<ApiType, PropsType>>, 'ref'>;
+  componentInternalApi: {
+    setVisibility: (isVisible: boolean) => void;
+  };
 
   showShadow?: boolean;
   showBorder?: boolean;

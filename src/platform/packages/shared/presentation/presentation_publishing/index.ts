@@ -75,6 +75,10 @@ export {
   type PublishesProjectRoutingOverrides,
 } from './interfaces/fetch/publishes_project_routing';
 export {
+  type PublishesFetchOnlyVisible,
+  apiPublishesFetchOnlyVisible,
+} from './interfaces/fetch/fetch_only_visible';
+export {
   apiHasAppContext,
   type EmbeddableAppContext,
   type HasAppContext,

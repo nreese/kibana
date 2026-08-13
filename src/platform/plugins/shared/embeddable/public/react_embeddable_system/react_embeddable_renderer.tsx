@@ -8,11 +8,11 @@
  */
 
 import React, { useImperativeHandle, useMemo, useRef } from 'react';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, combineLatestWith, map } from 'rxjs';
 import { v4 as generateId } from 'uuid';
 
 import type { HasPanelCapabilities, HasSerializedChildState } from '@kbn/presentation-publishing';
-import { apiIsPresentationContainer } from '@kbn/presentation-publishing';
+import { apiIsPresentationContainer, apiPublishesFetchOnlyVisible } from '@kbn/presentation-publishing';
 import type { PresentationPanelProps } from '@kbn/presentation-panel-plugin/public';
 import { PresentationPanel } from '@kbn/presentation-panel-plugin/public';
 
@@ -59,6 +59,14 @@ export const EmbeddableRenderer = <
   const componentPromise = useMemo(
     () => {
       const uuid = maybeId ?? generateId();
+      const isVisible$ = new BehaviorSubject<boolean>(false);
+      const internalApi = {
+        setVisibility: (isVisible: boolean) => {
+          if (isVisible !== isVisible$.getValue()) {
+            isVisible$.next(isVisible);
+          }
+        },
+      };
 
       /**
        * Build the embeddable
@@ -83,6 +91,17 @@ export const EmbeddableRenderer = <
               // Spread default panel capabilities first, allow apiRegistration to override them
               ...panelCapabilitiesDefaults,
               ...apiRegistration,
+              ...(apiPublishesFetchOnlyVisible(parentApi) && {
+                isFetchPaused$: parentApi.fetchOnlyVisible$.pipe(
+                  combineLatestWith(isVisible$),
+                  map(([parentFetchOnlyVisible, isVisible]) => {
+                    return parentFetchOnlyVisible
+                      ? !isVisible
+                      : // If the fetch setting is 'all', we do not pause the fetch
+                        false;
+                  })
+                ),
+              }),
               uuid,
               phase$: phaseTracker.current.getPhase$(),
               parentApi,
@@ -120,7 +139,7 @@ export const EmbeddableRenderer = <
           onApiAvailable?.(api);
           return React.forwardRef<typeof api>((_, ref) => {
             // expose the api into the imperative handle
-            useImperativeHandle(ref, () => api, []);
+            useImperativeHandle(ref, () => { api, internalApi }, []);
 
             return <Component />;
           });
@@ -137,9 +156,9 @@ export const EmbeddableRenderer = <
             errorApi.parentApi = parentApi;
           }
           onApiAvailable?.(errorApi);
-          return React.forwardRef<Api>((_, ref) => {
+          return React.forwardRef<{ api: Api, }>((_, ref) => {
             // expose the dummy error api into the imperative handle
-            useImperativeHandle(ref, () => errorApi, []);
+            useImperativeHandle(ref, () => { api: errorApi, internalApi }, []);
             return null;
           });
         }
