@@ -16,10 +16,11 @@ import { ESQL_TABLE_TYPE } from '@kbn/data-plugin/common';
 import type { Datatable } from '@kbn/expressions-plugin/common';
 import { fieldFormatsMock } from '@kbn/field-formats-plugin/common/mocks';
 import type { FieldFormatsStart } from '@kbn/field-formats-plugin/public';
+import { FILTER_CELL_ACTION_TYPE } from '@kbn/cell-actions/constants';
 import { getLegendActions } from './get_legend_actions';
 import { createMockVisData, createMockPieParams } from '../mocks';
 import { getFilterEventData } from './filter_helpers';
-import type { FilterEvent } from '../types';
+import type { CellValueAction, FilterEvent } from '../types';
 
 const visData = createMockVisData();
 const visParams = createMockPieParams();
@@ -295,6 +296,107 @@ describe('getLegendActions', () => {
       );
       await renderAndOpen(Component);
       expect(screen.queryByTestId('legendFilterFooterMessage')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('compatible cell actions', () => {
+    const filterCellAction: CellValueAction = {
+      id: 'filter-action',
+      type: FILTER_CELL_ACTION_TYPE,
+      iconType: 'plusInCircle',
+      displayName: 'Filter for value',
+      execute: jest.fn(),
+    };
+
+    const nonFilterCellAction: CellValueAction = {
+      id: 'drilldown-action',
+      type: 'drilldown',
+      iconType: 'popout',
+      displayName: 'Open in app',
+      execute: jest.fn(),
+    };
+
+    /** ES|QL text-field datatable with a blank-value row so the legend key '' is non-filterable. */
+    const esqlBlankTextVisData: Datatable = {
+      ...visData,
+      meta: { type: ESQL_TABLE_TYPE },
+      rows: [{ 'col-0-2': '', 'col-1-1': 5, 'col-2-3': 0, 'col-3-1': 5 }],
+      columns: visData.columns.map((col) =>
+        col.id === 'col-0-2'
+          ? { ...col, meta: { ...col.meta, esType: 'text' } }
+          : col
+      ),
+    };
+
+    const blankSeriesProps: LegendActionProps = {
+      color: '#fff',
+      label: '',
+      series: [{ key: '', specId: 'pie' }] as unknown as SeriesIdentifier[],
+    };
+
+    it('disables a filter-type compatible cell action when the column is not filterable', async () => {
+      const Component = getLegendActions(
+        undefined,
+        makeGetFilterEventData(esqlBlankTextVisData),
+        jest.fn(),
+        [[filterCellAction]],
+        visParams,
+        esqlBlankTextVisData,
+        fieldFormatsMock as unknown as FieldFormatsStart
+      );
+      await renderAndOpen(Component, blankSeriesProps);
+      await waitFor(() => {
+        expect(screen.getByRole('menuitem', { name: 'Filter for value' })).toBeDisabled();
+      });
+    });
+
+    it('does not call execute on a disabled filter-type compatible cell action', async () => {
+      const execute = jest.fn();
+      const Component = getLegendActions(
+        undefined,
+        makeGetFilterEventData(esqlBlankTextVisData),
+        jest.fn(),
+        [[{ ...filterCellAction, execute }]],
+        visParams,
+        esqlBlankTextVisData,
+        fieldFormatsMock as unknown as FieldFormatsStart
+      );
+      const { user } = await renderAndOpen(Component, blankSeriesProps);
+      const item = await screen.findByRole('menuitem', { name: 'Filter for value' });
+      await user.click(item);
+      expect(execute).not.toHaveBeenCalled();
+    });
+
+    it('leaves a non-filter compatible cell action enabled even when the column is not filterable', async () => {
+      const Component = getLegendActions(
+        undefined,
+        makeGetFilterEventData(esqlBlankTextVisData),
+        jest.fn(),
+        [[nonFilterCellAction]],
+        visParams,
+        esqlBlankTextVisData,
+        fieldFormatsMock as unknown as FieldFormatsStart
+      );
+      await renderAndOpen(Component, blankSeriesProps);
+      await waitFor(() => {
+        expect(screen.getByRole('menuitem', { name: 'Open in app' })).toBeEnabled();
+      });
+    });
+
+    it('enables a filter-type compatible cell action when the column is filterable', async () => {
+      const Component = getLegendActions(
+        jest.fn().mockResolvedValue(true),
+        makeGetFilterEventData(esqlVisData),
+        jest.fn(),
+        [[filterCellAction]],
+        visParams,
+        esqlVisData,
+        fieldFormatsMock as unknown as FieldFormatsStart
+      );
+      await renderAndOpen(Component);
+      await waitFor(() => {
+        expect(screen.getByRole('menuitem', { name: 'Filter for value' })).toBeEnabled();
+      });
     });
   });
 });

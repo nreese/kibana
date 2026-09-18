@@ -16,6 +16,7 @@ import {
 } from '@kbn/chart-expressions-common';
 import type { CellValueContext } from '@kbn/embeddable-plugin/public';
 import { ESQL_TABLE_TYPE } from '@kbn/data-plugin/common';
+import { FILTER_CELL_ACTION_TYPE } from '@kbn/cell-actions/constants';
 import type { LayerCellValueActions, FilterEvent } from '../types';
 import type { CommonXYDataLayerConfig } from '../../common';
 import type { LegendCellValueActions } from './legend_action_popover';
@@ -102,10 +103,14 @@ export const getLegendAction = (
     };
 
     const legendCellValueActions: LegendCellValueActions =
-      layerCellValueActions[layerIndex]?.map((action) => ({
-        ...action,
-        execute: () => action.execute(cellValueActionData),
-      })) ?? [];
+      layerCellValueActions[layerIndex]?.map((action) => {
+        const disabled = action.type === FILTER_CELL_ACTION_TYPE && !isFilterable;
+        return {
+          ...action,
+          disabled,
+          execute: disabled ? () => {} : () => action.execute(cellValueActionData),
+        };
+      }) ?? [];
 
     const label =
       getSeriesName(

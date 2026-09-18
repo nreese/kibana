@@ -22,6 +22,8 @@ import type { FieldFormat } from '@kbn/field-formats-plugin/common';
 import type { InvertedRawValueMap, LayerFieldFormats } from '../helpers';
 import type { RawValue } from '@kbn/data-plugin/common';
 import { ESQL_TABLE_TYPE } from '@kbn/data-plugin/common';
+import { FILTER_CELL_ACTION_TYPE } from '@kbn/cell-actions/constants';
+import type { CellValueAction } from '../types';
 
 const legendCellValueActions: LegendCellValueActions = [
   { id: 'action_1', displayName: 'Action 1', iconType: 'testIcon1', execute: () => {} },
@@ -435,5 +437,94 @@ describe('getLegendAction', () => {
     const Component = buildComponent({ ...sampleLayer, table: tableWithIndexField });
     renderWithKibanaRenderContext(<Component {...makeSeriesProps("Women's Accessories")} />);
     expect(screen.getByRole('button', { name: /legend actions/i })).toBeInTheDocument();
+  });
+
+  describe('compatible cell actions with filter type', () => {
+    const filterCellAction: CellValueAction = {
+      id: 'filter-action',
+      type: FILTER_CELL_ACTION_TYPE,
+      iconType: 'plusInCircle',
+      displayName: 'Filter for value',
+      execute: jest.fn(),
+    };
+
+    const nonFilterCellAction: CellValueAction = {
+      id: 'drilldown-action',
+      type: 'drilldown',
+      iconType: 'popout',
+      displayName: 'Open in app',
+      execute: jest.fn(),
+    };
+
+    /** ES|QL table where splitAccessorId is a text field containing a blank value. */
+    const esqlBlankTextTable: Datatable = {
+      ...table,
+      meta: { type: ESQL_TABLE_TYPE },
+      rows: [{ xAccessorId: 1585758120000, splitAccessorId: '', yAccessorId: 1 }],
+      columns: table.columns.map((col) =>
+        col.id === 'splitAccessorId'
+          ? { ...col, meta: { ...col.meta, esType: 'text' } }
+          : col
+      ),
+    };
+
+    const buildWithActions = (
+      testTable: Datatable,
+      actions: CellValueAction[]
+    ): React.ComponentType<LegendActionProps> =>
+      getLegendAction(
+        [{ ...sampleLayer, table: testTable }],
+        jest.fn(),
+        [actions],
+        {
+          first: {
+            splitSeriesAccessors: {
+              splitAccessorId: {
+                format: { id: 'string' },
+                formatter: { convertToText: (x: unknown) => x } as FieldFormat,
+              },
+            },
+          } as unknown as LayerFieldFormats,
+        },
+        { first: { table: testTable, invertedRawValueMap, formattedColumns: {} } },
+        {}
+      );
+
+    it('disables a filter-type cell action when the column is not filterable', async () => {
+      const Component = buildWithActions(esqlBlankTextTable, [filterCellAction]);
+      await renderAndOpen(Component, makeSeriesProps(''));
+      await waitFor(() => {
+        expect(screen.getByRole('menuitem', { name: 'Filter for value' })).toBeDisabled();
+      });
+    });
+
+    it('does not call execute on a disabled filter-type cell action', async () => {
+      const execute = jest.fn();
+      const Component = buildWithActions(esqlBlankTextTable, [{ ...filterCellAction, execute }]);
+      const { user } = await renderAndOpen(Component, makeSeriesProps(''));
+      const item = await screen.findByRole('menuitem', { name: 'Filter for value' });
+      await user.click(item);
+      expect(execute).not.toHaveBeenCalled();
+    });
+
+    it('leaves a non-filter cell action enabled when the column is not filterable', async () => {
+      const Component = buildWithActions(esqlBlankTextTable, [nonFilterCellAction]);
+      await renderAndOpen(Component, makeSeriesProps(''));
+      await waitFor(() => {
+        expect(screen.getByRole('menuitem', { name: 'Open in app' })).toBeEnabled();
+      });
+    });
+
+    it('enables a filter-type cell action when the column is filterable', async () => {
+      const filterable: Datatable = {
+        ...table,
+        meta: { type: ESQL_TABLE_TYPE },
+      };
+      const Component = buildWithActions(filterable, [filterCellAction]);
+      await renderAndOpen(Component, makeSeriesProps("Women's Accessories"));
+      await waitFor(() => {
+        expect(screen.getByRole('menuitem', { name: 'Filter for value' })).toBeEnabled();
+      });
+    });
   });
 });

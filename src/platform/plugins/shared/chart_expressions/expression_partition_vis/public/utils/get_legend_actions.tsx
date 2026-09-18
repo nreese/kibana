@@ -175,14 +175,18 @@ export const getLegendActions = (
     }
 
     compatibleCellActions.forEach((action) => {
+      const disabled = action.type === FILTER_CELL_ACTION_TYPE && !isComputedColumnFilterable;
       panelItems.push({
         name: action.displayName,
         'data-test-subj': `legend-${title}-${action.id}`,
         icon: <EuiIcon type={action.iconType} size="m" aria-hidden={true} />,
-        onClick: () => {
-          action.execute([{ columnMeta: column.meta, value: pieSeries.key }]);
-          setPopoverOpen(false);
-        },
+        disabled,
+        onClick: disabled
+          ? () => {}
+          : () => {
+              action.execute([{ columnMeta: column.meta, value: pieSeries.key }]);
+              setPopoverOpen(false);
+            },
       });
     });
 

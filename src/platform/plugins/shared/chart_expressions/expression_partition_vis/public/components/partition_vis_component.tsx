@@ -31,6 +31,7 @@ import {
   ChartTooltipFooterMessage,
   getColumnByAccessor,
   getFilterDrilldownWarningMessage,
+  isFilterableColumnSet,
   getOverridesFor,
   DEFAULT_LEGEND_SIZE,
   LegendSizeToPixels,
@@ -200,6 +201,16 @@ const PartitionVisComponent = (props: PartitionVisComponentProps) => {
       splitChartDimension?: DatatableColumn,
       splitChartFormatter?: FieldFormat
     ): void => {
+      if (vData.meta?.type === ESQL_TABLE_TYPE) {
+        const clickedColumns = clickedLayers.map((_, i) =>
+          vData.columns.find((col) => col.id === buckets[i]?.id)
+        );
+        const clickedValues = clickedLayers.map((layer) => layer.groupByRollup);
+        if (!isFilterableColumnSet(clickedColumns, clickedValues)) {
+          return;
+        }
+      }
+
       const data = getFilterClickData(
         clickedLayers,
         buckets,
