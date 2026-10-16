@@ -9,7 +9,8 @@
     "public/**/*.json",
     "server/**/*",
     "../../../../../typings/**/*",
-    "./jest_setup.ts"
+    "./jest_setup.ts",
+    "test/**/*"
   ],
   "kbn_references": [
     "@kbn/core",
@@ -45,7 +46,8 @@
     "@kbn/esql",
     "@kbn/presentation-publishing-schemas",
     "@kbn/controls-renderer",
-    "@kbn/ui-callout"
+    "@kbn/ui-callout",
+    "@kbn/scout"
   ],
   "exclude": ["target/**/*"]
 }
